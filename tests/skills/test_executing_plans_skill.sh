@@ -36,6 +36,11 @@ assert_contains "**REQUIRED SUB-SKILL:** Use loom:finishing-a-development-branch
 assert_contains "**loom:using-git-worktrees**" "$SKILL_FILE"
 assert_contains "**loom:writing-plans**" "$SKILL_FILE"
 assert_contains "**loom:finishing-a-development-branch**" "$SKILL_FILE"
+assert_contains "Archive the executed plan after successful completion" "$SKILL_FILE"
+assert_contains "docs/exec-plans/active/<filename>.md" "$SKILL_FILE"
+assert_contains "docs/exec-plans/completed/<filename>.md" "$SKILL_FILE"
+assert_contains "mkdir -p docs/exec-plans/completed" "$SKILL_FILE"
+assert_contains "mv docs/exec-plans/active/<filename>.md docs/exec-plans/completed/<filename>.md" "$SKILL_FILE"
 
 if [[ ! -f "$NOTES_FILE" ]]; then
   echo "FAIL: missing $NOTES_FILE" >&2

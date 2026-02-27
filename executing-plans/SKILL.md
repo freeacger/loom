@@ -49,6 +49,15 @@ After all tasks complete and verified:
 - **REQUIRED SUB-SKILL:** Use loom:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice
 
+**Archive the executed plan after successful completion:**
+
+```bash
+mkdir -p docs/exec-plans/completed
+mv docs/exec-plans/active/<filename>.md docs/exec-plans/completed/<filename>.md
+```
+
+Then report which plan file was moved so the reviewer can verify archival state.
+
 ## When to Stop and Ask for Help
 
 **STOP executing immediately when:**
