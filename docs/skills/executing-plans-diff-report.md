@@ -5,8 +5,8 @@ Source local copy: /tmp/executing-plans-source.md
 ## Unified Diff (git diff style)
 ```diff
 --- /tmp/executing-plans-source.md	2026-02-27 13:40:01
-+++ executing-plans/SKILL.md	2026-02-27 13:39:03
-@@ -46,7 +46,7 @@
++++ executing-plans/SKILL.md	2026-02-27 13:40:39
+@@ -46,9 +46,18 @@
  
  After all tasks complete and verified:
  - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
@@ -14,8 +14,19 @@ Source local copy: /tmp/executing-plans-source.md
 +- **REQUIRED SUB-SKILL:** Use loom:finishing-a-development-branch
  - Follow that skill to verify tests, present options, execute choice
  
++**Archive the executed plan after successful completion:**
++
++```bash
++mkdir -p docs/exec-plans/completed
++mv docs/exec-plans/active/<filename>.md docs/exec-plans/completed/<filename>.md
++```
++
++Then report which plan file was moved so the reviewer can verify archival state.
++
  ## When to Stop and Ask for Help
-@@ -79,6 +79,6 @@
+ 
+ **STOP executing immediately when:**
+@@ -79,6 +88,6 @@
  ## Integration
  
  **Required workflow skills:**
