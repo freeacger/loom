@@ -2,6 +2,7 @@
 set -euo pipefail
 
 SKILL_FILE="executing-plans/SKILL.md"
+NOTES_FILE="docs/skills/executing-plans-porting.md"
 
 assert_contains() {
   local pattern="$1"
@@ -35,5 +36,15 @@ assert_contains "**REQUIRED SUB-SKILL:** Use loom:finishing-a-development-branch
 assert_contains "**loom:using-git-worktrees**" "$SKILL_FILE"
 assert_contains "**loom:writing-plans**" "$SKILL_FILE"
 assert_contains "**loom:finishing-a-development-branch**" "$SKILL_FILE"
+
+if [[ ! -f "$NOTES_FILE" ]]; then
+  echo "FAIL: missing $NOTES_FILE" >&2
+  exit 1
+fi
+
+assert_contains "Source:" "$NOTES_FILE"
+assert_contains "https://github.com/obra/superpowers/blob/main/skills/executing-plans/SKILL.md" "$NOTES_FILE"
+assert_contains "Local Changes:" "$NOTES_FILE"
+assert_contains "Replaced superpowers namespace with loom namespace" "$NOTES_FILE"
 
 echo "PASS: full executing-plans workflow contract checks passed"
