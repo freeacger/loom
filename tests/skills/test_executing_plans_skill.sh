@@ -18,7 +18,18 @@ if [[ ! -f "$SKILL_FILE" ]]; then
 fi
 
 assert_contains "name: executing-plans" "$SKILL_FILE"
-assert_contains "description: Use when you have a written implementation plan to execute in a separate session with review checkpoints" "$SKILL_FILE"
-assert_contains "I'm using the executing-plans skill to implement this plan." "$SKILL_FILE"
+assert_contains "# Executing Plans" "$SKILL_FILE"
+assert_contains "## The Process" "$SKILL_FILE"
+assert_contains "### Step 1: Load and Review Plan" "$SKILL_FILE"
+assert_contains "### Step 2: Execute Batch" "$SKILL_FILE"
+assert_contains "### Step 3: Report" "$SKILL_FILE"
+assert_contains "### Step 4: Continue" "$SKILL_FILE"
+assert_contains "### Step 5: Complete Development" "$SKILL_FILE"
+assert_contains "## When to Stop and Ask for Help" "$SKILL_FILE"
+assert_contains "## When to Revisit Earlier Steps" "$SKILL_FILE"
+assert_contains "## Remember" "$SKILL_FILE"
+assert_contains "## Integration" "$SKILL_FILE"
+assert_contains "Ready for feedback." "$SKILL_FILE"
+assert_contains "Never start implementation on main/master branch without explicit user consent" "$SKILL_FILE"
 
-echo "PASS: base executing-plans skill contract checks passed"
+echo "PASS: full executing-plans workflow contract checks passed"
