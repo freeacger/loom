@@ -29,5 +29,7 @@ go.work.sum
 
 # Editor/IDE
 .vscode/
+.codex/
+.claude/
 docs/exec-plans/
 docs/drafts
