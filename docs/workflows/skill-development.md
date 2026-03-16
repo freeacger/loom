@@ -2,6 +2,16 @@
 
 Operational guide for editing, evaluating, publishing, and updating skills in this repository.
 
+## Setup
+
+Install the git pre-push hook (one-time per clone):
+
+```bash
+mise run install-hooks
+```
+
+This symlinks `scripts/hooks/pre-push` → `.git/hooks/pre-push`. The hook runs `mise run check` before every push and aborts if any install path has diverged from the repo.
+
 ---
 
 ## Directory Layout
@@ -15,43 +25,39 @@ loom/skills/<name>/SKILL.md   ← canonical source, always edit here
                                                        ~/.agents/skills/<name>/
 ```
 
-Install paths are always populated from skills.sh via `npx skills add`.
+Install paths are always populated from skills.sh via `mise run pull`.
 Never write to install paths directly.
 
 ---
 
-## Standard Workflow: Edit → Publish → Pull
+## Standard Workflow: Edit → Release
 
 ### 1. Edit
 
 Edit `skills/<name>/SKILL.md` in this repository only.
 
-Check divergence before editing if unsure:
-```bash
-diff skills/<name>/SKILL.md ~/.claude/skills/<name>/SKILL.md
-```
-
-### 2. Publish
-
-Commit and push to GitHub. skills.sh re-scans the repo automatically.
+### 2. Release
 
 ```bash
-git add skills/<name>
-git commit -m "..."
-git push
+mise run release <name> "<commit message>"
 ```
 
-Verify the publish (allow a few minutes):
-```
-https://skills.sh/freeacger/loom/<name>
-```
+This runs in sequence:
+1. `git add skills/<name>` → `git commit` → `git push`
+2. `npx skills add freeacger/loom/<name>` (updates both install paths)
 
-### 3. Pull
+If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 
-Once skills.sh is updated, pull to both install paths:
+> **Note:** skills.sh has a cache delay of a few minutes. If `pull` returns an old version, wait and re-run `mise run pull <name>`.
+
+---
+
+## Individual Tasks
 
 ```bash
-npx skills add freeacger/loom/<name>
+mise run check                          # diff repo vs all install paths
+mise run publish <name> "<message>"     # git add + commit + push only
+mise run pull <name>                    # npx skills add freeacger/loom/<name>
 ```
 
 ---
@@ -64,7 +70,11 @@ Always point the subagent at the **repo path**, not the install path:
 Skill path: /Users/youjunxin/workspace/tools/loom/skills/<name>
 ```
 
-After the eval loop is complete, publish and pull (steps 2–3 above).
+After the eval loop is complete, run:
+
+```bash
+mise run release <name> "<commit message>"
+```
 
 ---
 
@@ -72,7 +82,7 @@ After the eval loop is complete, publish and pull (steps 2–3 above).
 
 1. Create `skills/<new-name>/SKILL.md`.
 2. Run skill-creator evals from the repo path.
-3. Publish and pull (steps 2–3 above).
+3. `mise run release <new-name> "feat(<new-name>): initial version"`
 
 ---
 
@@ -84,28 +94,13 @@ After the eval loop is complete, publish and pull (steps 2–3 above).
    rm -r ~/.claude/skills/<name>
    rm -r ~/.agents/skills/<name>
    ```
-3. Commit and push.
-
----
-
-## Checking for Divergence
-
-To detect any install path that has drifted from the repo (e.g. direct edits made by mistake):
-
-```bash
-for skill in skills/*/; do
-  name=$(basename "$skill")
-  diff -q "$skill/SKILL.md" ~/.claude/skills/$name/SKILL.md 2>/dev/null \
-    && echo "✓ $name" || echo "✗ $name (diverged)"
-done
-```
+3. `git add -A && git commit -m "... " && git push`
 
 ---
 
 ## Pre-Commit Checklist
 
 - [ ] Edit was made in `skills/<name>/SKILL.md`, not in an install path
-- [ ] `git diff` reflects only the intended change
+- [ ] `mise run check` passes (or divergence is intentional and will be resolved by release)
 - [ ] `skills/<name>/CHANGELOG.md` updated if the change is user-visible
 - [ ] After push: verify `https://skills.sh/freeacger/loom/<name>` shows the updated version
-- [ ] `npx skills add freeacger/loom/<name>` run to update install paths
