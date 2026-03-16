@@ -31,5 +31,14 @@ go.work.sum
 .vscode/
 .codex/
 .claude/
+.idea/
 docs/exec-plans/
 docs/drafts
+
+# skills CLI generated (agent-specific installs and lock file)
+.agent/
+.agents/
+.junie/
+.trae/
+.windsurf/
+skills-lock.json
