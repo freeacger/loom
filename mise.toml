@@ -62,18 +62,17 @@ echo "✓ $name published"
 """
 
 [tasks.pull]
-description = "Pull a skill from skills.sh — usage: mise run pull <name>"
+description = "Pull all loom skills from skills.sh globally — usage: mise run pull"
 run = """
 #!/usr/bin/env bash
 set -e
-name="${1:?Usage: mise run pull <name>}"
-echo "⚠ skills.sh may have a cache delay — if you get an old version, wait 2 minutes and retry"
-npx skills add freeacger/loom/$name
-echo "✓ $name pulled"
+echo "⚠ skills.sh may have a cache delay — if you just pushed, wait 2 minutes and retry"
+cd ~ && npx skills add freeacger/loom -y -g
+echo "✓ all loom skills pulled"
 """
 
 [tasks.release]
-description = "Publish then pull a skill — usage: mise run release <name> '<message>'"
+description = "Publish a skill then pull all loom skills — usage: mise run release <name> '<message>'"
 run = """
 #!/usr/bin/env bash
 set -e

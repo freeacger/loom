@@ -44,7 +44,7 @@ mise run release <name> "<commit message>"
 
 This runs in sequence:
 1. `git add skills/<name>` → `git commit` → `git push`
-2. `npx skills add freeacger/loom/<name>` (updates both install paths)
+2. `cd ~ && npx skills add freeacger/loom -y -g` (updates all skills globally)
 
 If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 
@@ -57,7 +57,7 @@ If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 ```bash
 mise run check                          # diff repo vs all install paths
 mise run publish <name> "<message>"     # git add + commit + push only
-mise run pull <name>                    # npx skills add freeacger/loom/<name>
+mise run pull                           # npx skills add freeacger/loom -g (all skills)
 ```
 
 ---
