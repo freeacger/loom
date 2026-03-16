@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+#MISE description="Commit and push a skill to GitHub"
+#USAGE arg "<name>" help="Skill name"
+#USAGE arg "<message>" help="Commit message"
+set -euo pipefail
+
+name="${1:?Usage: mise run publish <name> '<commit message>'}"
+msg="${2:?Usage: mise run publish <name> '<commit message>'}"
+
+[ -d "skills/$name" ] || { echo "✗ skills/$name not found"; exit 1; }
+
+git add "skills/$name"
+if git diff --cached --quiet; then
+  echo "⚠ nothing to commit for '$name', skipping publish"
+  exit 0
+fi
+
+git commit -m "$msg"
+git push
+echo "✓ $name published"

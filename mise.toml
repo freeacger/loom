@@ -1,103 +1,10 @@
-[tasks.check]
-description = "Check for divergence between repo skills and install paths"
-run = """
-#!/usr/bin/env bash
-fail=0
-for skill_dir in skills/*/; do
-  name=$(basename "$skill_dir")
-  src="$skill_dir/SKILL.md"
-  claude_path="$HOME/.claude/skills/$name/SKILL.md"
-  agents_path="$HOME/.agents/skills/$name/SKILL.md"
-  skill_fail=0
-
-  if [ ! -f "$claude_path" ]; then
-    echo "  ⚠ $name: not installed at ~/.claude/skills/"
-  elif ! diff -q "$src" "$claude_path" > /dev/null 2>&1; then
-    echo "  ✗ $name: diverged at ~/.claude/skills/"
-    skill_fail=1
-  fi
-
-  if [ ! -f "$agents_path" ]; then
-    echo "  ⚠ $name: not installed at ~/.agents/skills/"
-  elif ! diff -q "$src" "$agents_path" > /dev/null 2>&1; then
-    echo "  ✗ $name: diverged at ~/.agents/skills/"
-    skill_fail=1
-  fi
-
-  if [ $skill_fail -eq 0 ] && [ -f "$claude_path" ] && [ -f "$agents_path" ]; then
-    echo "  ✓ $name"
-  fi
-
-  fail=$((fail + skill_fail))
-done
-
-if [ $fail -gt 0 ]; then
-  echo ""
-  echo "✗ $fail skill(s) have diverged install paths. Push aborted."
-  echo "  Run 'mise run pull <name>' to fix, or investigate divergence."
-  exit 1
-fi
-echo "✓ all skills in sync"
-"""
-
-[tasks.publish]
-description = "Commit and push a skill — usage: mise run publish <name> '<message>'"
-run = """
-#!/usr/bin/env bash
-set -e
-name="${1:?Usage: mise run publish <name> '<commit message>'}"
-msg="${2:?Usage: mise run publish <name> '<commit message>'}"
-
-[ -d "skills/$name" ] || { echo "✗ skills/$name not found"; exit 1; }
-
-git add "skills/$name"
-if git diff --cached --quiet; then
-  echo "⚠ nothing to commit for '$name', skipping publish"
-  exit 0
-fi
-
-git commit -m "$msg"
-git push
-echo "✓ $name published"
-"""
-
-[tasks.pull]
-description = "Pull all loom skills from skills.sh globally — usage: mise run pull"
-run = """
-#!/usr/bin/env bash
-set -e
-echo "⚠ skills.sh may have a cache delay — if you just pushed, wait 2 minutes and retry"
-cd ~ && npx skills add freeacger/loom -y -g
-echo "✓ all loom skills pulled"
-"""
-
 [tasks.release]
 description = "Publish a skill then pull all loom skills — usage: mise run release <name> '<message>'"
 run = """
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 name="${1:?Usage: mise run release <name> '<commit message>'}"
 msg="${2:?Usage: mise run release <name> '<commit message>'}"
-
 mise run publish "$name" "$msg"
-mise run pull "$name"
-"""
-
-[tasks.install-hooks]
-description = "Install git pre-push hook (symlink to scripts/hooks/pre-push)"
-run = """
-#!/usr/bin/env bash
-set -e
-hook=".git/hooks/pre-push"
-src="../../scripts/hooks/pre-push"
-
-if [ -f "$hook" ] && [ ! -L "$hook" ]; then
-  echo "⚠ $hook already exists and is not a symlink."
-  echo "  Inspect it and merge manually, then run:"
-  echo "    ln -sf $src $hook"
-  exit 1
-fi
-
-ln -sf "$src" "$hook"
-echo "✓ pre-push hook installed → $hook"
+mise run pull
 """

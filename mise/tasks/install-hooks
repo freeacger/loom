@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+#MISE description="Install git pre-push hook (symlink to scripts/hooks/pre-push)"
+set -euo pipefail
+
+hook=".git/hooks/pre-push"
+src="../../scripts/hooks/pre-push"
+
+if [ -f "$hook" ] && [ ! -L "$hook" ]; then
+  echo "⚠ $hook already exists and is not a symlink."
+  echo "  Inspect it and merge manually, then run:"
+  echo "    ln -sf $src $hook"
+  exit 1
+fi
+
+ln -sf "$src" "$hook"
+echo "✓ pre-push hook installed → $hook"

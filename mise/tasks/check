@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#MISE description="Check for divergence between repo skills and install paths"
+set -uo pipefail
+
+fail=0
+for skill_dir in skills/*/; do
+  name=$(basename "$skill_dir")
+  src="$skill_dir/SKILL.md"
+  claude_path="$HOME/.claude/skills/$name/SKILL.md"
+  agents_path="$HOME/.agents/skills/$name/SKILL.md"
+  skill_fail=0
+
+  if [ ! -f "$claude_path" ]; then
+    echo "  ⚠ $name: not installed at ~/.claude/skills/"
+  elif ! diff -q "$src" "$claude_path" > /dev/null 2>&1; then
+    echo "  ✗ $name: diverged at ~/.claude/skills/"
+    skill_fail=1
+  fi
+
+  if [ ! -f "$agents_path" ]; then
+    echo "  ⚠ $name: not installed at ~/.agents/skills/"
+  elif ! diff -q "$src" "$agents_path" > /dev/null 2>&1; then
+    echo "  ✗ $name: diverged at ~/.agents/skills/"
+    skill_fail=1
+  fi
+
+  if [ $skill_fail -eq 0 ] && [ -f "$claude_path" ] && [ -f "$agents_path" ]; then
+    echo "  ✓ $name"
+  fi
+
+  fail=$((fail + skill_fail))
+done
+
+if [ $fail -gt 0 ]; then
+  echo ""
+  echo "✗ $fail skill(s) have diverged install paths. Push aborted."
+  exit 1
+fi
+echo "✓ all skills in sync"
