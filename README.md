@@ -79,20 +79,15 @@ If you want the broader system, upstream documentation, or the original project 
 
 ## How To Use
 
-There is no installer in this repository today.
+Install all skills globally via [skills.sh](https://skills.sh):
 
-The usual approach is:
+```bash
+npx skills add freeacger/loom -y -g
+```
 
-1. Pick the skill folders you want from `skills/`
-2. Copy them into your local skill directory
-3. Adjust wording, examples, or paths for your own environment
+This installs into `~/.claude/skills/` and `~/.agents/skills/` automatically.
 
-Typical locations depend on your toolchain, for example:
-
-- Codex-style setups: `~/.agents/skills/` or `$CODEX_HOME/skills/`
-- Claude Code setups: `~/.claude/skills/`
-
-Use the locations and loading rules required by your own agent harness.
+Alternatively, pick individual skill folders from `skills/` and copy them into your local skill directory, adjusting wording or paths for your own environment.
 
 ## Why Keep A Separate Repo
 

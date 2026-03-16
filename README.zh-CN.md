@@ -79,20 +79,15 @@ loom/
 
 ## 如何使用
 
-当前仓库没有提供安装器。
+通过 [skills.sh](https://skills.sh) 全局安装所有 skill：
 
-比较常见的使用方式是：
+```bash
+npx skills add freeacger/loom -y -g
+```
 
-1. 从 `skills/` 中挑选你需要的 skill 目录
-2. 复制到你本地的 skill 目录
-3. 根据自己的环境调整措辞、示例和路径
+这会自动安装到 `~/.claude/skills/` 和 `~/.agents/skills/`。
 
-常见目录位置会因工具而异，例如：
-
-- Codex 风格环境：`~/.agents/skills/` 或 `$CODEX_HOME/skills/`
-- Claude Code 环境：`~/.claude/skills/`
-
-请以你自己的 agent 工具链要求为准。
+也可以从 `skills/` 中挑选单个目录手动复制到本地 skill 目录，根据自己的环境调整措辞或路径。
 
 ## 为什么单独维护这个仓库
 

@@ -48,7 +48,7 @@ This runs in sequence:
 
 If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 
-> **Note:** skills.sh has a cache delay of a few minutes. If `pull` returns an old version, wait and re-run `mise run pull <name>`.
+> **Note:** skills.sh may have a cache delay — if you just pushed, wait 2 minutes and re-run `mise run pull`.
 
 ---
 
