@@ -37,7 +37,7 @@ You MUST create a task for each of these items and complete them in order:
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose exactly 4 approaches** — with trade-offs and your recommendation
 4. **Present design** — in sections scaled to their complexity, get user approval after each section
-5. **Write design doc** — save to `docs/drafts/YYYY-MM-DD-<topic>-design.md` and commit
+5. **Write design doc** — save to `docs/design-decisions/YYYY-MM-DD-<topic>-design.md` with frontmatter, run `gen_index.sh`, and commit
 6. **Transition to implementation** — invoke writing-plans skill to create implementation plan
 
 ## Process Flow
@@ -130,9 +130,31 @@ When batching, render each question as a separate numbered card. Critical decisi
 ## After the Design
 
 **Documentation:**
-- Write the validated design to `docs/drafts/YYYY-MM-DD-<topic>-design.md`
+- The target path is `docs/design-decisions/YYYY-MM-DD-<topic>-design.md`
+- **Before writing, check if the file already exists.** Another agent may have written a design for the same topic. If the file exists, append a variant suffix: `-v2`, `-v3`, etc. (e.g. `2026-03-24-feature-x-design-v2.md`). Never overwrite an existing design document.
+- Write the validated design to the resolved path
+- The file MUST begin with this frontmatter block (fill all fields before writing):
+  ```yaml
+  ---
+  title: <full title of the design>
+  status: Active
+  area: <top-level/sub-area, kebab-case>
+  description: <one sentence: what problem this design solves>
+  supersedes: ""
+  superseded_by: ""
+  authors: <run `git config user.name`>
+  model: <current model id, e.g. claude-sonnet-4-6>
+  ---
+  ```
+- `area` format: `<top-level>/<sub-area>` in kebab-case (e.g. `auth/session`, `billing/refund`, `infra/ci`). Sub-area is optional. Derive top-level from the project's directory structure, module names, or domain language. If `docs/design-decisions/` already contains design docs, reuse an existing area value when the topic fits — consistency matters more than precision.
+- Allowed `status` values: `Active`, `Implemented`, `Superseded`, `Archived`. New designs always start as `Active`.
 - Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
+- After writing the file, regenerate the index:
+  ```bash
+  bash scripts/gen-design-index.sh --root "$(pwd)"
+  ```
+  If `scripts/gen-design-index.sh` does not exist in the project, skip this step and inform the user: "Index not regenerated — copy `scripts/gen-design-index.sh` from the brainstorming skill source to enable it."
+- Stage both the new design doc and the updated `docs/design-decisions/index.md` in the same commit
 
 **Implementation:**
 - Invoke the writing-plans skill to create a detailed implementation plan
