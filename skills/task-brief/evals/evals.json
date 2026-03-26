@@ -1,0 +1,81 @@
+{
+  "skill_name": "task-brief",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I need to rename the function `getUserData` to `fetchUserProfile` everywhere in the codebase. It's used in about 15 files.",
+      "expected_output": "A concise task brief that sets Execution Mode to 'direct', correctly identifies this as a straightforward transformation task, lists minimal constraints (scope: all files using getUserData), and keeps the brief short (3-5 fields). Should NOT pad with unnecessary clarifying questions or over-engineer a simple rename.",
+      "assertions": [
+        {
+          "name": "execution_mode_is_direct",
+          "description": "The brief sets Execution Mode to 'direct' since this is a clear, unambiguous rename task",
+          "type": "qualitative"
+        },
+        {
+          "name": "brief_is_concise",
+          "description": "The brief does not ask unnecessary clarifying questions and does not pad with fields that add no information",
+          "type": "qualitative"
+        },
+        {
+          "name": "goal_is_actionable",
+          "description": "User Goal is stated as a verb-led actionable sentence, not a restatement of the original request",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "我们的 API 响应时间最近变慢了，P99 从 200ms 涨到了 800ms，大概是上周部署之后开始的。能帮我找出原因吗？",
+      "expected_output": "A task brief that correctly classifies this as 'investigation' type, sets Execution Mode to 'clarify-first' (because key info is missing: which endpoints, what changed in the deployment, is there monitoring data?), identifies ONE most critical clarifying question, and fills in reasonable assumptions for the rest. The brief should identify that the executor needs to correlate deployment changes with performance data.",
+      "assertions": [
+        {
+          "name": "task_type_is_investigation",
+          "description": "Task Type is correctly identified as 'investigation' (not generation or transformation)",
+          "type": "qualitative"
+        },
+        {
+          "name": "execution_mode_is_clarify_first",
+          "description": "Execution Mode is 'clarify-first' since key context is missing for root cause analysis",
+          "type": "qualitative"
+        },
+        {
+          "name": "one_focused_question",
+          "description": "The brief asks exactly ONE focused clarifying question, not a list of 3+ questions",
+          "type": "qualitative"
+        },
+        {
+          "name": "deployment_context_captured",
+          "description": "The brief references the recent deployment as a key constraint/assumption to investigate",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I want to build a SaaS tool for small law firms to manage client intake: a web form for new clients, auto-send a welcome email, save their info to a database, and let lawyers review and approve clients from a dashboard. Should be easy to use, mobile-friendly, and need to keep the data secure since it includes PII.",
+      "expected_output": "A task brief that sets Execution Mode to 'decompose', correctly identifies this as an orchestration task with at least 3 independent sub-tasks (intake form, email automation, dashboard/approval flow), surfaces the PII/security constraint prominently, and produces sub-task mini-briefs with clear deliverables. Should NOT try to compress everything into a single execution path.",
+      "assertions": [
+        {
+          "name": "execution_mode_is_decompose",
+          "description": "Execution Mode is 'decompose' since this is a multi-component system with independent workstreams",
+          "type": "qualitative"
+        },
+        {
+          "name": "subtasks_are_independent",
+          "description": "At least 3 sub-tasks are identified, each with its own goal and deliverable",
+          "type": "qualitative"
+        },
+        {
+          "name": "pii_constraint_surfaced",
+          "description": "PII/data security constraint is listed under Constraints with a note about what it prohibits (e.g., no plaintext storage, no unauthenticated access)",
+          "type": "qualitative"
+        },
+        {
+          "name": "deliverables_are_concrete",
+          "description": "Each sub-task deliverable is a concrete artifact, not a vague outcome",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}
