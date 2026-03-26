@@ -268,7 +268,7 @@ Build a web dashboard that displays live sales data from a Postgres database, re
 ### Example 4 — Tier 2 (Ambiguous Intent)
 
 **User input:**
-> "我们的 API 文档太烂了，能帮我搞一下吗？"
+> "Our API docs are a mess — can you help fix them?"
 
 **Task Brief:**
 
@@ -306,7 +306,7 @@ These require different executors, different files touched, and different succes
 ```
 
 **Clarifying question:**
-> 文档的核心问题是**内容**（接口描述缺失、示例不准确、错误码没写）还是**呈现方式**（工具老旧、结构乱、难找）？前者从审查现有文档开始，后者从选型和迁移开始。
+> Is the core problem the **content** (missing endpoint descriptions, inaccurate examples, undocumented error codes) or the **presentation** (outdated tooling, poor structure, hard to navigate)? The answer determines whether we start by auditing existing docs or by evaluating tooling options.
 
 ---
 
