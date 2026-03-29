@@ -98,6 +98,12 @@ When the user explicitly narrows the rule source:
 - do not inherit unrelated repo standards just because they exist nearby
 - do not infer a repo report directory from the current workspace unless the user asked for saving
 
+When the document is explicitly marked as draft, WIP, or incomplete (e.g., contains "WIP", "draft", "TBD", "work in progress" in the title, frontmatter, or first section):
+- Note the draft status in the Executive Summary
+- Downgrade all `[GAP]` findings by one priority level (`P1` → `P2`, `P2` → `P3`)
+- Prefix downgraded gap findings with `[DRAFT]` to signal the author likely knows these are missing
+- Keep all `[RISK]` and `[ASSUME]` findings at their original priority — a wrong decision is still wrong in a draft
+
 If the user does not override the scope and the repo contains project-standard files, inherit them instead of ignoring them.
 Typical examples:
 - `AGENTS.md`
@@ -158,18 +164,19 @@ Only add conditional modules when the design actually triggers them.
 Use the repo checklist when one exists.
 Otherwise use these default module triggers.
 
-Trigger modules only when the design clearly involves one of these areas:
-- Semi-structured payloads
-- Performance and indexing
-- State machine or orchestration
-- Concurrency and locking
-- Async jobs and failure isolation
-- Human review
-- Audit and compliance
-- Scan and alert design
+Trigger a module only when the design clearly matches its signals.
+Do not force every module into every audit. If a module does not apply, omit it.
 
-Do not force every module into every audit.
-If a module does not apply, omit it.
+| Module | Trigger signals |
+|--------|----------------|
+| Semi-structured payloads | JSON fields, dynamic columns, flexible schema, payload validation, extensible attributes, `interface{}` or `any` typed storage |
+| Performance and indexing | query patterns, index design, pagination, bulk reads/writes, hot-path latency, large table scans |
+| State machine or orchestration | status transitions, state enum, workflow steps, job scheduling, retry logic, FSM diagrams |
+| Concurrency and locking | mutex, row-level lock, optimistic lock, concurrent writers, race condition mitigation, distributed lock |
+| Async jobs and failure isolation | background jobs, queues, workers, dead-letter queues, retry with backoff, at-least-once delivery |
+| Human review | manual approval steps, escalation paths, review SLA, operator action required |
+| Audit and compliance | audit log, PII handling, data retention, GDPR/CCPA, regulatory requirements, immutable records |
+| Scan and alert design | scheduled scans, anomaly detection, alert thresholds, on-call routing, runbook references |
 
 ## Default Finding Contract
 
@@ -180,18 +187,23 @@ Otherwise use the defaults below.
 
 Rules:
 - Use thread-unique IDs
-- Default ID format: `CR01 [P1]`
+- Default ID format: `CR01 [P1] [GAP]` — priority tag followed by type tag
 - Order findings from highest priority to lowest priority
 - Treat `P0` and `P1` as merge-blocking by default
 - Do not give conclusion-only findings
-- If there are findings, use a flat bullet list and keep the chosen `XX [P#]` prefix on every item
-- If there are no findings, write `No findings identified.` and then list residual risks or assumptions separately
+- If there are findings, use a flat bullet list and keep the full prefix on every item
+- If there are no findings, use the Verified Checklist format described below
 
 Default priorities:
-- `P0`: unsafe to merge or deploy
-- `P1`: major design gap or likely regression risk
-- `P2`: meaningful correctness or operability risk
-- `P3`: minor but real improvement
+- `P0`: merging or deploying will **necessarily** cause at least one of: data corruption, service unavailability, security vulnerability, or no rollback path
+- `P1`: damage is possible but requires specific conditions to trigger, OR a design gap that prevents engineers from safely proceeding with implementation
+- `P2`: meaningful correctness or operability risk that is unlikely to cause immediate harm but degrades reliability or maintainability
+- `P3`: minor but real improvement with no production risk
+
+Finding type tags — always include one per finding:
+- `[GAP]`: a required decision is absent from the document
+- `[RISK]`: a decision exists but is incorrect, contradictory, or dangerously incomplete
+- `[ASSUME]`: the design implies a decision that was never made explicit; flag the hidden assumption
 
 Explain each finding in this order:
 1. What the issue is
@@ -201,7 +213,46 @@ Explain each finding in this order:
 
 Use expected behavior versus current behavior when that comparison makes the risk clearer.
 
-If there are no findings, say so explicitly and list any residual risks or unanswered assumptions.
+Do NOT write conclusion-only findings. Examples:
+
+BAD:
+- `CR01 [P1] [GAP]: Migration strategy is unclear and may cause data loss.`
+- `CR02 [P2] [RISK]: Observability is insufficient.`
+
+GOOD:
+- `CR01 [P1] [GAP]: The design does not specify how the job handles partial failures. If the job inserts 500 rows and fails at row 300, there is no rollback or resume mechanism described. Re-running the job would create duplicate rows unless the caller enforces idempotency externally.`
+- `CR02 [P2] [RISK]: The rollback plan in step 4 says "revert the migration" but the migration is destructive (column drop). A revert would require restoring from backup, which is not mentioned. Operators following this plan would have no path forward during an incident.`
+
+## No-Findings Protocol
+
+When there are no findings, do not write only `No findings identified.`
+
+Instead, produce an explicit verified checklist that confirms what was checked and what was not triggered:
+
+```
+No findings identified.
+
+Verified:
+- ✓ <dimension>: <one sentence confirming what was checked and what was found sound>
+- ✓ <dimension>: ...
+
+Skipped (not triggered):
+- <Module name>: <one-line reason why it was not triggered>
+```
+
+Example:
+```
+No findings identified.
+
+Verified:
+- ✓ Migration strategy: gradual rollout with feature flag and dual-write described; rollback path explicit
+- ✓ Idempotency: job uses upsert on unique constraint; safe to re-run
+- ✓ Observability: structured log on every state transition; alert threshold defined
+
+Skipped (not triggered):
+- State machine module: no status transitions in scope
+- Concurrency and locking module: single-writer path only
+```
 
 ## Suggested Additions Standard
 
@@ -275,6 +326,21 @@ Bad comparison dimensions:
 
 If the design is clearly blocked by one finding, the recommended option should prefer safety and reversibility over speed.
 
+## Output Calibration
+
+Scale remediation verbosity to document complexity.
+
+For short or simple documents (under 300 words, or fewer than 3 triggered modules, or all findings are P3):
+- Collapse the three-option table into a single recommended approach plus one-line trade-off note
+- Do not suppress findings — only reduce remediation prose
+- Example: `Recommended: use a feature flag for rollout. Trade-off: adds one release cycle of flag management overhead.`
+
+For complex documents (5 or more triggered modules, or any P0 finding, or more than 6 findings total):
+- Apply the full three-option table format for every P0–P2 finding
+- Do not abbreviate option analysis
+
+Default to the full format when complexity is unclear.
+
 ## Output Format
 
 Always use this structure in the chat response:
@@ -302,7 +368,7 @@ Section rules:
 Use section names in the chosen output language while preserving the same logical structure.
 
 Within each applicable finding, use this sub-structure:
-- finding statement
+- finding statement (include type tag: `[GAP]`, `[RISK]`, or `[ASSUME]`)
 - `Options`
 - `Recommended Option`
 - `Why Not Others`
@@ -389,11 +455,16 @@ Otherwise, continue the audit and list the uncertainty under `Open Questions`.
 
 Before finishing, check these points:
 - The response has all six required sections
-- `Triggered Modules` is explicit, even when empty
-- Findings follow the repo-required format, or `CRXX [P#]` when no repo format exists
-- Every `P0` to `P2` finding contains exactly three repair options, one recommendation, and brief rejection reasons
-- The three repair options are presented in a compact markdown table
+- `Triggered Modules` is explicit, even when empty; each triggered module names the signals that fired it
+- Findings follow the repo-required format, or `CRXX [P#] [TYPE]` when no repo format exists
+- Every finding includes a type tag: `[GAP]`, `[RISK]`, or `[ASSUME]`
+- No finding is conclusion-only — each one states what, how, a concrete example, and why it matters
+- Every `P0` to `P2` finding contains repair options, one recommendation, and brief rejection reasons
+  - Full three-option table for complex documents
+  - Single recommended approach + one-line trade-off for short/simple documents
 - `Suggested Additions` reflect the recommended option rather than repeating all options
+- If there are no findings, the response uses the Verified Checklist format (not just `No findings identified.`)
+- If the document was marked draft/WIP, `[GAP]` findings are downgraded one level and prefixed `[DRAFT]`
 - The chat response and saved report use the same inferred output language
 - Suggested additions are copy-ready
 - Explicit user overrides beat ambient repo conventions
