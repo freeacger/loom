@@ -42,15 +42,16 @@ Goal: Load design state and assemble context for parallel checks.
 
 ### Phase B: Parallel Readiness Checks
 
-Goal: Run four independent checks in parallel using specialized subagents.
+Goal: Run five independent checks in parallel using specialized subagents.
 
-5. Launch four parallel Sonnet subagents, each using one of the checker agent templates:
+5. Launch five parallel Sonnet subagents, each using one of the checker agent templates:
    - **branch-checker**: reads `skills/design-readiness-check/agents/branch-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
    - **assumption-checker**: reads `skills/design-readiness-check/agents/assumption-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
    - **failure-checker**: reads `skills/design-readiness-check/agents/failure-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
    - **risk-checker**: reads `skills/design-readiness-check/agents/risk-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
+   - **dependency-checker**: reads `skills/design-readiness-check/agents/dependency-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
 
-6. Collect results from all four subagents.
+6. Collect results from all five subagents.
 
 **Fallback**: If any subagent fails or times out, the main agent performs that check inline using the same rubric from the agent template.
 
@@ -63,11 +64,12 @@ Goal: Combine check results into a clear readiness judgment.
    - assumption-checker → "Decisions resolved" (if assumptions are unresolved)
    - failure-checker → "Failure paths documented" and "Validation strategy defined"
    - risk-checker → "Blocking risks mitigated"
+   - dependency-checker → "External dependencies validated"
 
 8. Build the ✓/✗ checklist diagram following Diagram Conventions.
 
 9. Determine verdict:
-   - **READY**: all four checks return `pass`
+   - **READY**: all five checks return `pass`
    - **NOT READY**: any check returns `fail`
 
 10. If NOT READY, determine the handoff target based on which check failed:
@@ -75,6 +77,7 @@ Goal: Combine check results into a clear readiness judgment.
     - assumption-checker fails → hand off to `design-refinement` (assumptions need expansion)
     - failure-checker fails → hand off to `design-refinement` (failure paths need adding)
     - risk-checker fails → hand off to `decision-evaluation` (unresolved risk decision) or `design-refinement` (risk documentation weak)
+    - dependency-checker fails → hand off to `design-refinement` (external dependencies need validation or description completion) or `decision-evaluation` (alternative approaches needed)
 
 11. Update `design_state` with:
     - `status.ready_for_planning`: true or false
@@ -92,6 +95,7 @@ A design is ready for planning only when:
 - major decision nodes are resolved or explicitly deferred with acceptable rationale
 - failure paths and validation strategy are not missing
 - blocking risks are either mitigated or clearly acknowledged
+- external dependencies are validated or explicitly accepted
 
 ## Expected Outputs
 
@@ -100,6 +104,7 @@ Produce or update a `design_state` that includes:
 - `open_branches`
 - `risks`
 - `validation`
+- `external_dependencies`
 - `status.ready_for_planning`
 - `status.blocking_issues`
 
@@ -114,14 +119,15 @@ Present the readiness verdict as a status checklist inside a code block (no lang
 
 ```
 Readiness Check
-├── Design tree present          ✓
-├── Key branches refined         ✓
-├── Decisions resolved           ✗ (storage choice pending)
-├── Failure paths documented     ✓
-├── Validation strategy defined  ✓
-└── Blocking risks mitigated     ✗ (migration cutover risk)
+├── Design tree present             ✓
+├── Key branches refined            ✓
+├── Decisions resolved              ✗ (storage choice pending)
+├── Failure paths documented        ✓
+├── Validation strategy defined     ✓
+├── Blocking risks mitigated        ✗ (migration cutover risk)
+└── External dependencies validated ✗ (payment SDK unverified)
 
-Verdict: NOT READY — 2 blocking issues
+Verdict: NOT READY — 3 blocking issues
 ```
 
 **Rules:**

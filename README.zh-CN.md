@@ -36,7 +36,6 @@
 
 | Skill | 用途 |
 |---|---|
-| `brainstorming` | 已停用的历史技能，仅在迁移期间保留目录作参考 |
 | `decision-evaluation` | 对有边界的设计决策做方案比较并给出推荐 |
 | `design-decision-audit` | 审查设计文档或计划文档中的缺失决策与上线缺口 |
 | `design-orchestrator` | 在多个设计技能之间编排和路由设计阶段工作 |

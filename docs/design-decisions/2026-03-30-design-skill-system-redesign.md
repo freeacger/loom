@@ -26,7 +26,7 @@ model: gpt-5
   - `design-refinement`
   - `decision-evaluation`
   - `design-readiness-check`
-- `brainstorming` 目录暂时保留，但标记为已停用（inactive）。
+- `brainstorming` 已从工作树移除，不再保留兼容入口。
 
 # 目标与非目标 (Goals and Non-Goals)
 
@@ -40,7 +40,6 @@ model: gpt-5
 ## 非目标 (Non-Goals)
 
 - 本次改造不处理实现类技能的整体重构。
-- 本次改造不删除 `skills/brainstorming/` 目录。
 - 本次改造不覆盖外部设计文档审计能力；该职责仍由 `design-decision-audit` 承担。
 
 # 总体架构 (System Topology)
@@ -97,7 +96,7 @@ flowchart TD
 
 ## 设计就绪检查 (design-readiness-check)
 
-负责在进入 `writing-plans` 之前检查当前设计是否足够完整。它关注空分支、弱叶子节点、隐含假设、未解决风险、失败处理与验证策略是否缺失，并输出明确的 `ready_for_planning` 结论。
+负责在进入 `writing-plans` 之前检查当前设计是否足够完整。它关注空分支、弱叶子节点、隐含假设、未解决风险、失败处理与验证策略是否缺失，并输出明确的 `ready_for_planning` 结论。并行运行 5 个独立检查器：branch-checker、assumption-checker、failure-checker、risk-checker、dependency-checker。其中 dependency-checker 专门验证标记为 `[RESEARCH]` 的外部依赖节点是否已通过深度调研。
 
 # 协同契约 (Coordination Contract)
 
@@ -108,6 +107,7 @@ flowchart TD
 - `design_tree`
 - `open_branches`
 - `decision_nodes`
+- `external_dependencies`
 - `decisions`
 - `risks`
 - `validation`
@@ -115,13 +115,43 @@ flowchart TD
 
 字段分工如下：
 
-- `design-structure` 主要初始化 `problem`、`scope`、`design_tree`、`open_branches`、`decision_nodes`
-- `design-refinement` 主要补充 `design_tree`、`open_branches`、`risks`、`validation`
+- `design-structure` 主要初始化 `problem`、`scope`、`design_tree`、`open_branches`、`decision_nodes`、`external_dependencies`
+- `design-refinement` 主要补充 `design_tree`、`open_branches`、`risks`、`validation`、`external_dependencies`
 - `decision-evaluation` 主要更新 `decision_nodes`、`decisions`、`risks`
 - `design-readiness-check` 主要判断 `status.ready_for_planning` 与 `status.blocking_issues`
 - `design-orchestrator` 主要读取全体状态并调整 `status.phase`
 
 这份契约的目的不是引入严格 schema（模式）约束，而是避免多个技能之间的 handoff 丢失关键状态。
+
+### 外部依赖追踪 (External Dependency Tracking)
+
+`external_dependencies` 字段用于追踪设计树中依赖外部工具、API、库或服务的节点。每个条目包含：
+
+- `node`: 设计树中对应的节点编号与名称
+- `dependency`: 外部依赖的具体名称
+- `validation_needed`: 需要验证的项目列表（如 API 兼容性、版本约束、定价）
+- `status`: 验证状态，枚举值为 `unverified` | `verified` | `blocked`
+
+### 状态标记体系 (Status Markers)
+
+设计树节点使用以下状态标记：
+
+| 标记 | 含义 |
+|------|------|
+| `[OPEN]` | 未解决，需要细化或决策 |
+| `[DECISION]` | 决策节点，有多个候选方案 |
+| `[DRAFT]` | 暂定，可能变更 |
+| `[RESEARCH]` | 依赖外部工具/API/库/服务，已通过初步可行性确认，尚需深度验证 |
+| `✓` | 完成 / 已验证 |
+| `✗` | 已拒绝 / 超出范围 |
+
+### 分层调研机制 (Layered Research)
+
+当设计技能识别到外部依赖时，采用分层调研：
+
+1. **轻量确认**（design-structure 标记时）— 执行一次 web search 或文档查找，确认工具存在且基本可用。明确不可行→`✗`；确认可行但有开放问题→`[RESEARCH]` + 初步发现；已充分确认→`✓`。
+2. **深度调研**（design-refinement 到该分支时）— 验证 API 兼容性、版本约束、集成模式、错误处理、rate limit 等。验证通过→`✓`；否决→`✗`；有替代方案→`[DECISION]`；无法完成→保留 `[RESEARCH]` + 记录已了解信息。
+3. **门禁拦截**（design-readiness-check）— dependency-checker 检查所有 `[RESEARCH]` 节点是否已解决，未解决的依赖阻止进入 `writing-plans`。
 
 # 为什么选择 4+1 (Why 4+1 Instead of Plain 4)
 
@@ -157,13 +187,12 @@ flowchart TD
 
 # brainstorming 处置方案 (Brainstorming Disposition)
 
-`brainstorming` 将被标记为已停用（inactive），不再作为有效技能入口。目录暂时保留，原因如下：
+`brainstorming` 已从工作树移除，不再作为有效技能入口，也不再保留兼容目录。新的规范入口由 `task-brief` 和 `design-orchestrator` 组成。
 
-- 迁移期间保留历史上下文，便于对照旧逻辑。
-- 避免在同一轮改造中同时做大规模删除。
-- 便于后续决定是否彻底清理相关评测（eval）和遗留文件。
+这样处理的目的有两个：
 
-为避免继续触发，`skills/brainstorming/SKILL.md` 需要显式声明它已被新体系替代，并指向 `design-orchestrator` 作为新入口。
+- 避免“双入口”长期并存，持续稀释新体系的边界。
+- 让仓库内的技能目录与文档表述保持一致，不再出现“名义停用、实际仍在”的迁移状态。
 
 # 迁移范围 (Migration Scope)
 
@@ -175,7 +204,6 @@ flowchart TD
 - `skills/task-brief/SKILL.md`
 - `skills/writing-plans/SKILL.md`
 - `skills/using-git-worktrees/SKILL.md`
-- `skills/brainstorming/SKILL.md`
 - 新增的 5 个技能目录与 `SKILL.md`
 
 若后续发现其他显式引用 `brainstorming` 的文件，应一并迁移。
@@ -184,9 +212,9 @@ flowchart TD
 
 ## 风险 (Risks)
 
-- 新旧技能共存一段时间，容易造成认知偏差。
 - 新技能名称虽然统一，但触发描述仍需靠评测（eval）继续校准。
 - 如果不把 `design_state` 作为共享契约写进技能正文，多个技能之间仍可能出现状态漂移。
+- 移除 `brainstorming` 后，任何未迁移的旧文档、旧评测或个人习惯都可能引用失效。
 
 ## 缓解 (Mitigations)
 
@@ -200,7 +228,7 @@ flowchart TD
 
 1. 新建 5 个设计技能并完成基础正文。
 2. 更新文档与技能引用，切换到新体系。
-3. 将 `brainstorming` 标记为已停用。
+3. 移除 `brainstorming` 目录并更新所有显式引用。
 4. 运行一致性检查，确认仓库内不再把 `brainstorming` 当作有效入口。
 5. 后续再处理评测（eval）迁移与目录清理。
 
@@ -210,4 +238,3 @@ flowchart TD
 
 - 是否为 5 个新技能补独立评测（eval）目录。
 - 是否将 `design_state` 进一步正式化为固定输出模板。
-- 是否在后续版本中彻底删除 `skills/brainstorming/`。

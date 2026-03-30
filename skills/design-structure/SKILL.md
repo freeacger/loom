@@ -205,6 +205,7 @@ Your responsibilities are:
 5. Identify explicit decision nodes that should later go to `decision-evaluation`.
 6. Record assumptions instead of silently relying on them.
 7. Write all output to the design file incrementally.
+8. Flag nodes that depend on unverified external tools, APIs, libraries, or services. Perform a lightweight feasibility check (web search or doc lookup) at the time of flagging. If the dependency is clearly infeasible, mark `✗` immediately; if confirmed feasible with open questions, mark `[RESEARCH]` with initial findings; if fully confirmed, mark `✓`.
 
 ## Expected Outputs
 
@@ -217,6 +218,7 @@ The design file at `docs/design-tree/<name>.md` must contain:
 - 设计树(design_tree) — tree diagram
 - 开放分支(open_branches) — list
 - 决策节点(decision_nodes) — list
+- 外部依赖(external_dependencies) — list, each entry contains: node, dependency, validation_needed, status (unverified | verified | blocked)
 
 ### Conversation Output (concise)
 
@@ -241,8 +243,10 @@ design_tree
 │   └── 2.2 异常路径
 ├── 3. 接口与数据(interfaces)
 │   └── 3.1 API 合约 [DRAFT]
-└── 4. 决策点(decisions)
-    └── 4.1 存储选择 [DECISION]
+├── 4. 外部集成(integrations)
+│   └── 4.1 支付 SDK [RESEARCH]
+└── 5. 决策点(decisions)
+    └── 5.1 存储选择 [DECISION]
 ```
 
 **Character rules:**
@@ -259,6 +263,7 @@ design_tree
 | `[OPEN]` | Unresolved, needs refinement or decision |
 | `[DECISION]` | Decision node with multiple real options |
 | `[DRAFT]` | Tentative, may change |
+| `[RESEARCH]` | Depends on an external tool, API, library, or service that has passed initial feasibility check but needs deeper validation |
 | `✓` | Complete / verified |
 | `✗` | Rejected / out of scope |
 

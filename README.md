@@ -36,7 +36,6 @@ The repository currently maintains these skills:
 
 | Skill | Purpose |
 |---|---|
-| `brainstorming` | Legacy inactive skill kept only for historical reference during migration |
 | `decision-evaluation` | Compare bounded design options and recommend one with trade-offs |
 | `design-decision-audit` | Review design or plan documents for missing decisions and rollout gaps |
 | `design-orchestrator` | Route design-stage work across the specialized design skills |

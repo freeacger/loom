@@ -35,6 +35,7 @@ Assume the design workflow passes around a shared `design_state` with these logi
 - `design_tree`
 - `open_branches`
 - `decision_nodes`
+- `external_dependencies`
 - `decisions`
 - `risks`
 - `validation`

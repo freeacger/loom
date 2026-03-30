@@ -60,8 +60,10 @@ design_tree
 │   └── 2.2 Error path
 ├── 3. Interfaces and data
 │   └── 3.1 API contract [DRAFT]
-└── 4. Decision points
-    └── 4.1 Storage choice [DECISION]
+├── 4. External integrations
+│   └── 4.1 Payment provider SDK [RESEARCH]
+└── 5. Decision points
+    └── 5.1 Storage choice [DECISION]
 ```
 
 **Rules:**
@@ -77,6 +79,7 @@ design_tree
 | `[OPEN]` | Unresolved, needs refinement or decision |
 | `[DECISION]` | Decision node with multiple real options |
 | `[DRAFT]` | Tentative, may change |
+| `[RESEARCH]` | Depends on an external tool, API, library, or service that has passed initial feasibility check but needs deeper validation |
 | `✓` | Complete / verified |
 | `✗` | Rejected / out of scope |
 

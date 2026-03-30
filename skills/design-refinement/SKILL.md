@@ -48,6 +48,7 @@ Your responsibilities are:
 4. Surface hidden assumptions and edge cases.
 5. Add failure-path and validation detail where missing.
 6. Explicitly mark newly discovered decision nodes instead of pretending they are settled.
+7. Resolve `[RESEARCH]` nodes by performing deep validation of external dependencies (API compatibility, version constraints, integration patterns, error handling, rate limits). Replace `[RESEARCH]` with `✓` when validated, `✗` when rejected, or `[DECISION]` if alternatives need evaluation. If validation cannot be completed in the current context, document what was learned and retain `[RESEARCH]`.
 
 ## Expected Outputs
 
@@ -58,6 +59,7 @@ Produce or update a `design_state` that includes:
 - `confirmed_assumptions`
 - `risks`
 - `validation`
+- updated `external_dependencies` if any [RESEARCH] nodes were resolved
 - new `decision_nodes` if discovered
 
 ## Diagram Conventions
