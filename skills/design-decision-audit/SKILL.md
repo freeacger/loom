@@ -406,20 +406,69 @@ Do not claim the report path unless the file has actually been written.
 
 ## Workflow
 
+### Phase A: Context Preparation
+
+Goal: Build a complete context package and perform default checklist audit.
+
 1. Read the design document.
 2. Determine the audit output language from the user instruction.
 3. Read repo-standard files when present and relevant.
 4. Read user-provided context files that affect scope or intent.
 5. Determine whether the user explicitly limited the audit to standalone mode or named files only.
 6. Resolve the review contract, finding format, checklist, and report-path conventions using the priority order in this skill.
-7. Determine which checklist modules are triggered.
-8. Audit the document against inherited standards when they exist, otherwise use the default standards in this skill.
-9. Write prioritized findings.
-10. For each `P0` to `P2` finding, generate three distinct repair options and choose the best one.
-11. Write concrete suggested additions.
-12. If the task requires saving but no report path can be inferred, ask the user where to save it before finishing.
-13. Save the audit report when required by the task or repo convention.
-14. Return the structured audit response with the report path in the chosen language.
+7. Determine which conditional modules are triggered.
+8. **Default checklist audit**: Audit the design against the 5 default dimensions (correctness and project standards, performance bottlenecks, KISS and DRY, observability, idempotency and data consistency). Record these as preliminary findings.
+9. **Assemble context package**: Combine the design document content, repo standards, review contract, draft status, and triggered module list into a structured context package for Phase B.
+
+### Phase B: Parallel Module Audit
+
+Goal: Audit each triggered conditional module in parallel using specialized subagents.
+
+**When no modules are triggered**: Skip Phase B entirely. Use only Phase A preliminary findings.
+
+**When one or more modules are triggered**:
+
+10. For each triggered conditional module, launch a parallel Sonnet subagent:
+    - Read the agent template at `skills/design-decision-audit/agents/module-auditor.md`
+    - Fill in the template parameters:
+      - `{{MODULE_NAME}}`: the module name (e.g., "State Machine and Orchestration")
+      - `{{TRIGGER_SIGNALS}}`: the trigger signals that matched this module
+      - `{{DESIGN_DOC}}`: the design document content
+      - `{{REPO_STANDARDS}}`: repo standards content (or "None" if standalone)
+      - `{{REVIEW_CONTRACT_SECTION}}`: review contract if one exists (or empty)
+    - Use the filled template as the subagent prompt
+    - Each subagent runs independently with no shared state
+
+11. Collect findings from all subagents as they complete.
+
+**Fallback**: If a subagent fails or times out, the main agent audits that module inline using the same dimension scope.
+
+### Phase C: Synthesis
+
+Goal: Merge, deduplicate, prioritize, and format all findings into the final audit output.
+
+12. **Merge findings**: Combine Phase A preliminary findings (default checklist) and Phase B findings (module audits) into a single list.
+
+13. **Deduplicate** using this decision tree:
+    - Two findings describe the same issue at the same location → merge into one, keep the finding with richer detail. If from different sources, append `[CROSS-VALIDATED]` to the finding tag.
+    - Two findings share a root cause but describe different manifestations → keep both, add cross-references (e.g., "see also CR01").
+    - Unsure whether two findings overlap → keep both, do not merge.
+
+14. **Assign final IDs**: Number findings as CR01, CR02, ... in priority order (P0 first, then P1, etc.).
+
+15. **Token guard**: If the merged findings text exceeds roughly 4000 tokens, keep all P0 and P1 findings in full. For P2 and P3, keep only the summary line and defer detail to the report file.
+
+16. **Generate repair options**: For each P0 to P2 finding, generate three distinct repair options and recommend the best one. Apply Output Calibration rules (full table for complex documents, collapsed format for simple ones).
+
+17. **Write suggested additions**: Based on the recommended options, produce copy-ready additions grouped by section or topic.
+
+18. **Draft handling**: If the document was marked draft/WIP, downgrade `[GAP]` findings by one priority level and prefix with `[DRAFT]`.
+
+19. **Format output**: Assemble the final response using the required six-section structure (Executive Summary, Triggered Modules, Findings, Suggested Additions, Open Questions, Report Path).
+
+20. **Save report**: If the task requires saving, write the report file. If no save path can be inferred, ask the user.
+
+21. Return the structured audit response with the report path in the chosen language.
 
 ## Boundaries
 
