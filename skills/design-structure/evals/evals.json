@@ -4,16 +4,31 @@
     {
       "id": 1,
       "prompt": "我想做一个 API 网关服务，供公司内部各个微服务使用。大概需要路由转发、认证鉴权、限流、日志。",
-      "expected_output": "A complete initial design_state with all required fields: problem (clearly stated), scope (with explicit non-goals), design_tree (at least 6 branches covering problem definition, scope, core objects, core flows, interfaces/data, decision points), open_branches (listing branches needing refinement), decision_nodes (at least one architectural choice like auth model or rate-limit strategy), and assumptions. The tree should be a structured skeleton, not implementation detail.",
+      "expected_output": "A two-phase interaction: Phase 1 asks the user to confirm problem, scope, and assumptions (using structured Q&A formats); Phase 2 generates a design tree. A design file at docs/design-tree/<name>.md is created with all required sections. The file contains bilingual labels (e.g., 问题(problem), 范围(scope)). The design tree has at least 6 branches covering problem definition, scope, core objects, core flows, interfaces/data, decision points. Conversation output is concise: tree diagram + decision nodes + open branches + next step.",
       "assertions": [
         {
-          "name": "all_required_fields_present",
-          "description": "Output includes all six required fields: problem, scope, design_tree, open_branches, decision_nodes, assumptions",
+          "name": "interactive_confirmation",
+          "description": "Skill initiates interactive confirmation for problem, scope, and assumptions before generating the design tree — asking structured questions rather than outputting everything at once",
+          "type": "qualitative"
+        },
+        {
+          "name": "design_file_created",
+          "description": "A design file is created at docs/design-tree/<name>.md containing all required sections",
+          "type": "qualitative"
+        },
+        {
+          "name": "bilingual_labels",
+          "description": "Section headings use bilingual format: 问题(problem), 范围(scope), 设计树(design_tree), 开放分支(open_branches), 决策节点(decision_nodes), 假设(assumptions)",
+          "type": "qualitative"
+        },
+        {
+          "name": "all_required_fields_in_file",
+          "description": "Design file includes all six required fields: 问题(problem), 范围(scope), 假设(assumptions), 设计树(design_tree), 开放分支(open_branches), 决策节点(decision_nodes)",
           "type": "qualitative"
         },
         {
           "name": "scope_has_non_goals",
-          "description": "Scope section explicitly lists non-goals or boundaries, not just what is included",
+          "description": "Scope section in the file explicitly lists non-goals or boundaries (不包含), not just what is included",
           "type": "qualitative"
         },
         {
@@ -35,37 +50,47 @@
           "name": "tree_diagram_status_markers",
           "description": "Tree diagram uses at least one status marker (e.g., [OPEN], [DECISION], [DRAFT]) to indicate branch state",
           "type": "qualitative"
+        },
+        {
+          "name": "conversation_output_concise",
+          "description": "Conversation output does not repeat the full content of problem/scope/assumptions that were already confirmed and written to the file",
+          "type": "qualitative"
         }
       ]
     },
     {
       "id": 2,
       "prompt": "帮我设计一个支持多租户的文件存储服务，用户可以上传、下载、分享文件，支持权限控制。需要能扛住大文件（单文件最大 5GB）。",
-      "expected_output": "design_state where scope contains explicit non-goals (e.g., no file editing, no virus scanning, no CDN). design_tree should include a non-functional requirements branch covering the 5GB file size constraint with at least notes on chunked upload and streaming. open_branches should not be empty. assumptions should record at least the scale or storage backend assumptions the skill is making.",
+      "expected_output": "Two-phase interaction producing a design file. Scope in the file contains explicit non-goals (e.g., no file editing, no virus scanning, no CDN). design_tree includes a non-functional requirements branch covering the 5GB constraint with notes on chunked upload and streaming. open_branches is not empty. assumptions records at least the scale or storage backend assumptions.",
       "assertions": [
         {
           "name": "non_goals_explicit",
-          "description": "Scope includes explicit non-goals section, listing at least 2 things the system will NOT do",
+          "description": "Scope in the file includes explicit non-goals section (不包含), listing at least 2 things the system will NOT do",
           "type": "qualitative"
         },
         {
           "name": "nfr_branch_present",
-          "description": "design_tree includes a non-functional requirements branch that addresses the 5GB constraint",
+          "description": "design_tree includes a non-functional requirements (非功能需求) branch that addresses the 5GB constraint",
           "type": "qualitative"
         },
         {
           "name": "assumptions_recorded",
-          "description": "assumptions field has at least 2 entries — the skill is not silently relying on unspoken premises",
+          "description": "假设(assumptions) section has at least 2 entries — the skill is not silently relying on unspoken premises",
           "type": "qualitative"
         },
         {
           "name": "open_branches_not_empty",
-          "description": "open_branches is not empty — skill acknowledges what still needs refinement rather than claiming design is done",
+          "description": "开放分支(open_branches) is not empty — skill acknowledges what still needs refinement rather than claiming design is done",
           "type": "qualitative"
         },
         {
           "name": "tree_diagram_for_large_design",
           "description": "Since this design has 3+ branches, output includes a character tree diagram inside a code block showing the hierarchy",
+          "type": "qualitative"
+        },
+        {
+          "name": "bilingual_labels_consistent",
+          "description": "All section headings in the file and conversation consistently use bilingual format (中文(english))",
           "type": "qualitative"
         }
       ]
@@ -73,21 +98,26 @@
     {
       "id": 3,
       "prompt": "我们需要一个消息推送系统，支持 App 推送、短信、邮件三种渠道，消息有优先级，高优先级要保证送达。",
-      "expected_output": "design_state where decision_nodes includes at least one explicit architectural choice surfaced from the requirements — likely around delivery guarantee strategy, channel fallback policy, or queue/broker selection. The design tree should not silently resolve these choices; it should name them as decisions to be made later. The tree should cover core flows including the high-priority delivery path.",
+      "expected_output": "Two-phase interaction producing a design file. decision_nodes includes at least one explicit architectural choice — likely around delivery guarantee strategy, channel fallback policy, or queue/broker selection. The design tree does not silently resolve these choices; it names them as decisions. The tree covers core flows including the high-priority delivery path. Decision nodes presented with structured format (table with star ratings recommended).",
       "assertions": [
         {
           "name": "delivery_guarantee_as_decision",
-          "description": "decision_nodes includes at least one node related to delivery guarantee or retry strategy — this is a real architectural choice, not something to silently assume",
+          "description": "决策节点(decision_nodes) includes at least one node related to delivery guarantee or retry strategy — this is a real architectural choice, not something to silently assume",
           "type": "qualitative"
         },
         {
           "name": "core_flows_covered",
-          "description": "design_tree includes a core flows branch that covers at minimum: message intake → routing → channel dispatch → delivery confirmation",
+          "description": "design_tree includes a core flows (核心流程) branch that covers at minimum: message intake → routing → channel dispatch → delivery confirmation",
           "type": "qualitative"
         },
         {
           "name": "no_premature_option_selection",
           "description": "Skill does not compare or select queue/broker implementations (Kafka vs SQS etc.) — that belongs to decision-evaluation, not structure",
+          "type": "qualitative"
+        },
+        {
+          "name": "decision_format_structured",
+          "description": "When presenting decision nodes to the user, skill uses a structured format (table with options, or at minimum numbered choices) rather than unstructured prose",
           "type": "qualitative"
         }
       ]
