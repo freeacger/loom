@@ -69,9 +69,11 @@ loom/
 │       ├── agents/          # Parallel agent templates (optional)
 │       └── evals/           # Evaluation test cases (optional)
 ├── docs/
-│   ├── conventions/         # Style and format conventions
+│   ├── standards/           # Standards and style guides
 │   ├── design-decisions/    # Design decision records
+│   ├── design-tree/         # Design-stage analysis artifacts
 │   ├── exec-plans/          # Execution plans (active/completed)
+│   ├── reports/             # Time-bound reports and audits
 │   └── workflows/           # Workflow documentation
 ├── scripts/                 # Utility scripts (hooks, generators)
 ├── mise/                    # Mise task definitions

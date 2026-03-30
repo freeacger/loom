@@ -15,7 +15,7 @@
 
 ### 不包含
 - `skills/*/evals/` — eval 中的中文提示词允许保留
-- `docs/TODO.md` — 不在范围
+- `docs/workflows/system-design-review-prompt-methodology.md` — 不在范围
 - `docs/design-decisions/2026-03-30-...md` — 不在范围
 - `docs/workflows/skill-development.md` — 不在范围
 

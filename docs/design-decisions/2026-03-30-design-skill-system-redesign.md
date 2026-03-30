@@ -200,7 +200,7 @@ flowchart TD
 
 - `README.md`
 - `README.zh-CN.md`
-- `docs/skills/workflow.md`
+- `docs/workflows/skill-invocation-workflow.md`
 - `skills/task-brief/SKILL.md`
 - `skills/writing-plans/SKILL.md`
 - `skills/using-git-worktrees/SKILL.md`

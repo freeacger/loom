@@ -13,7 +13,7 @@
 | 报告声称 | 实际情况 | 严重程度 |
 |----------|----------|----------|
 | loom 有 19 个技能 | 实际 20 个（agent-browser 未计入？） | 低（数字不影响结论） |
-| 图表规范在多个 SKILL.md 中内联重复 ~250 行 | `docs/conventions/terminal-diagram-style.md` 已存在，但 5 个 design 技能仍有各自专用的图表明细（不完全是重复） | **中**（报告将"各技能有专用图表规则"等同于"重复"，这是过度简化） |
+| 图表规范在多个 SKILL.md 中内联重复 ~250 行 | `docs/standards/terminal-diagram-style-guide.md` 已存在，但 5 个 design 技能仍有各自专用的图表明细（不完全是重复） | **中**（报告将"各技能有专用图表规则"等同于"重复"，这是过度简化） |
 | loom 缺少"完整性优先"原则 | design-readiness-check 本质就是完整性门禁，只是没有贴"Boil the Lake"的哲学标签 | 低（标签 vs 实质） |
 
 ---

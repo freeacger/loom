@@ -186,7 +186,7 @@ Review Status
 ### 中期改进 (Medium-term)
 
 4. **引入轻量共享上下文块** — 类似 gstack 的 preamble，但更简单：为 design 系列技能定义一个共享的"设计原则"块（完整性优先、三层知识模型），通过文件引用注入
-5. **图表规范去重** — 将内联的 ~250 行 diagram 规则替换为 `@docs/conventions/terminal-diagram-style.md` 引用
+5. **图表规范去重** — 将内联的 ~250 行 diagram 规则替换为 `@docs/standards/terminal-diagram-style-guide.md` 引用
 
 ### 长期考虑 (Long-term)
 

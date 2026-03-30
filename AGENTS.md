@@ -6,5 +6,12 @@
 - **Never run `npx skills add` directly in this repo** — the CLI replaces `skills/` directories with symlinks. Always use `mise run pull`.
 - **Commit before publishing**: Never publish uncommitted changes.
 
+## Docs Conventions
+
+- `docs/README.md` is the source of truth for docs directory layout and naming.
+- Workflow, guide, standard, and methodology documents use stable `kebab-case.md` names without dates.
+- Time-bound artifacts such as reports, design decisions, and execution plans use `YYYY-MM-DD-<topic>.md`.
+- Do not create vague names such as `TODO.md` or `workflow.md` under `docs/`.
+
 ## Skill Development Workflow
 @docs/workflows/skill-development.md

@@ -69,9 +69,11 @@ loom/
 │       ├── agents/          # 并行 agent 模板（可选）
 │       └── evals/           # 评估测试用例（可选）
 ├── docs/
-│   ├── conventions/         # 风格与格式约定
+│   ├── standards/           # 标准与风格指南
 │   ├── design-decisions/    # 设计决策记录
+│   ├── design-tree/         # 设计阶段分析产物
 │   ├── exec-plans/          # 执行计划（活跃/已完成）
+│   ├── reports/             # 时效性报告与审计产物
 │   └── workflows/           # 工作流文档
 ├── scripts/                 # 工具脚本（hooks、生成器）
 ├── mise/                    # Mise 任务定义
