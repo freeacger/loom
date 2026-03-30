@@ -13,7 +13,7 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Announce at start:** "I'm using the writing-plans skill to create the implementation plan."
 
-**Context:** This should be run in a dedicated worktree (created by brainstorming skill).
+**Context:** This should be run after design-stage work has passed `design-readiness-check`, ideally in a dedicated worktree prepared via `using-git-worktrees`.
 
 **Save plans to:** `docs/exec-plans/active/YYYY-MM-DD-<feature-name>.md`
 

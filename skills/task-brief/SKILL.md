@@ -9,7 +9,7 @@ description: "Use this skill to turn a raw user request into a structured, model
 
 Turn a raw natural-language request into a structured task brief that any execution model can act on without reading the original message.
 
-**This skill is a task specification normalizer.** Its job is to surface the real goal, fill in missing constraints, and decide how to proceed. It does not explore design alternatives (that's `brainstorming`), write implementation steps (that's `writing-plans`), or execute the task itself.
+**This skill is a task specification normalizer.** Its job is to surface the real goal, fill in missing constraints, and decide how to proceed. It does not do design-stage routing or design decomposition (that belongs to `design-orchestrator` and the specialized design skills), write implementation steps (that's `writing-plans`), or execute the task itself.
 
 The value is straightforward: a well-formed brief reduces misunderstanding, prevents wasted work on the wrong sub-problem, and makes the task portable — another model, agent, or human can pick it up cold.
 

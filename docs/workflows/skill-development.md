@@ -70,6 +70,8 @@ Always point the subagent at the **repo path**, not the install path:
 Skill path: /Users/youjunxin/workspace/tools/loom/skills/<name>
 ```
 
+Eval 工作目录（`*-workspace/`）必须放在 `tests/` 下，不要留在 `skills/` 内——pre-push hook 会将 `skills/` 下非标准目录识别为未安装技能并报警。
+
 After the eval loop is complete, run:
 
 ```bash
