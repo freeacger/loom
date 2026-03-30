@@ -1,0 +1,115 @@
+{
+  "skill_name": "design-orchestrator",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我想做一个给远程团队用的异步每日站会工具。大概思路是每天给成员发提醒，让他们填写昨天做了什么、今天计划做什么、有没有障碍，然后汇总展示给整个团队。",
+      "expected_output": "The orchestrator should recognize that no design tree exists yet, and route to design-structure. It should NOT attempt to list options, compare architectures, or produce implementation plans. The output must clearly name design-structure as the next skill and briefly explain why (no design tree / scope undefined).",
+      "assertions": [
+        {
+          "name": "routes_to_design_structure",
+          "description": "Output explicitly routes to design-structure as the next skill, not to any other skill",
+          "type": "qualitative"
+        },
+        {
+          "name": "no_premature_work",
+          "description": "Orchestrator does not do design-structure's work itself — it does not build the design tree, list components, or enumerate options",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_rationale_given",
+          "description": "Output briefly explains why design-structure is the right next step (e.g., no design tree, scope undefined)",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "当前设计状态如下：\n\nproblem: 构建一个实时协作白板，支持多人同时绘图\nscope: 包含画布渲染、用户光标同步、对象持久化；不包含视频通话\ndesign_tree:\n  - 画布渲染层（具体方案待定）\n  - 实时同步层（具体方案待定）\n  - 持久化层（具体方案待定）\n  - 用户认证（具体方案待定）\nopen_branches: [画布渲染层, 实时同步层, 持久化层, 用户认证]\ndecision_nodes: []\nassumptions: [用户数 < 50 人同时在线]\n\n请继续。",
+      "expected_output": "The orchestrator should see that a design tree exists but all branches are shallow (marked as '待定' / unresolved), and route to design-refinement. It should NOT route to design-structure (tree already exists) or design-readiness-check (too early). Output must name design-refinement and explain the branches need deepening.",
+      "assertions": [
+        {
+          "name": "routes_to_design_refinement",
+          "description": "Output explicitly routes to design-refinement, not design-structure or design-readiness-check",
+          "type": "qualitative"
+        },
+        {
+          "name": "identifies_shallow_branches",
+          "description": "Orchestrator identifies that existing branches are too shallow or unresolved as the reason for routing",
+          "type": "qualitative"
+        },
+        {
+          "name": "no_branch_expansion",
+          "description": "Orchestrator does not expand the branches itself — it leaves that work to design-refinement",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "当前设计状态如下：\n\nproblem: 为移动 App 实现离线优先的数据同步\nscope: 本地缓存 + 服务端同步，支持冲突处理\ndesign_tree:\n  - 本地存储层：使用 SQLite，schema 已定义，CRUD 操作接口已明确\n  - 网络层：HTTP 客户端封装，重试逻辑，错误处理已设计\n  - 同步引擎：负责将本地变更推送至服务端，拉取远端变更合并本地\n    - 变更追踪：已明确用 event log 方式\n    - 冲突解决策略：待决定（last-write-wins vs CRDT vs 手动合并）\ndecision_nodes:\n  - conflict_resolution: 选择冲突解决策略，三种方案各有取舍\nopen_branches: [冲突解决策略]\n\n请继续。",
+      "expected_output": "The orchestrator should detect the explicit decision_node 'conflict_resolution' with multiple alternatives, and route to decision-evaluation. It should NOT route to design-refinement (the blocking issue is a decision, not vague branches). Output must name decision-evaluation and reference the specific decision node.",
+      "assertions": [
+        {
+          "name": "routes_to_decision_evaluation",
+          "description": "Output explicitly routes to decision-evaluation, not design-refinement or readiness-check",
+          "type": "qualitative"
+        },
+        {
+          "name": "references_decision_node",
+          "description": "Orchestrator identifies the specific decision node (conflict_resolution / 冲突解决策略) as the routing reason",
+          "type": "qualitative"
+        },
+        {
+          "name": "no_option_comparison",
+          "description": "Orchestrator does not evaluate the options itself — routing only, no last-write-wins vs CRDT analysis",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "当前设计状态如下：\n\nproblem: 构建企业内部知识库检索系统\nscope: 文档导入、向量化、语义检索、访问权限控制；不含文档编辑\ndesign_tree:\n  - 文档导入管道：支持 PDF/Word/Markdown，解析、分块、清洗逻辑已设计，失败路径已记录\n  - 向量化服务：使用 OpenAI Embeddings，批量处理，限流和重试策略已定\n  - 检索接口：语义搜索 + 关键词过滤混合，相关性排序算法已明确，API 契约已定义\n  - 权限控制：基于文档 metadata 的 ACL，与现有 SSO 集成路径已设计\ndecision_nodes: []\nopen_branches: []\ndecisions:\n  - 向量数据库选型: 选择 Qdrant，理由：支持 payload filter、有托管方案、团队熟悉\nrisks:\n  - OpenAI API 可用性依赖：已通过 fallback 到本地模型缓解\nvalidation:\n  - 每个模块有集成测试，E2E 测试覆盖主检索路径\nstatus:\n  phase: design\n\n请评估当前设计是否可以进入规划阶段。",
+      "expected_output": "The orchestrator should assess the design as mostly complete (all branches refined, no open decision nodes, risks documented) and route to design-readiness-check. It should NOT route to refinement or decision-evaluation. Output must name design-readiness-check and explain the design appears ready for a final quality gate.",
+      "assertions": [
+        {
+          "name": "routes_to_readiness_check",
+          "description": "Output explicitly routes to design-readiness-check as the next step",
+          "type": "qualitative"
+        },
+        {
+          "name": "does_not_skip_to_planning",
+          "description": "Orchestrator does NOT route directly to writing-plans — it defers the final readiness judgment to design-readiness-check",
+          "type": "qualitative"
+        },
+        {
+          "name": "completeness_acknowledged",
+          "description": "Orchestrator recognizes that the design looks mostly complete as the reason for routing to readiness-check",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "我有个想法想做成一个订阅制 SaaS，主要是帮中小企业自动生成财务报告。跳过设计，直接帮我写实现计划吧。",
+      "expected_output": "The orchestrator should refuse to skip design and route to design-structure instead. It must explain that writing-plans requires a completed design, and that design-structure is the correct first step. The user's explicit request to skip design does NOT override the orchestrator's responsibility to prevent premature planning transition.",
+      "assertions": [
+        {
+          "name": "blocks_premature_planning",
+          "description": "Orchestrator does not hand off to writing-plans; it explicitly declines to skip design",
+          "type": "qualitative"
+        },
+        {
+          "name": "routes_to_structure_instead",
+          "description": "Orchestrator routes to design-structure as the appropriate first step given no design exists",
+          "type": "qualitative"
+        },
+        {
+          "name": "explains_why",
+          "description": "Orchestrator explains why skipping design would be premature (e.g., no scope defined, implementation plan needs a design to build from)",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}
