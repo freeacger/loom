@@ -1,0 +1,81 @@
+{
+  "skill_name": "decision-evaluation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "当前设计包含以下决策节点：\n\ndecision_node: auth_model\n描述: 为 B2B SaaS 平台选择用户认证方案。平台需要支持企业客户用自己的 IdP（如 Okta、Azure AD）登录，也需要支持小团队直接用邮箱密码注册。系统是 Web + Mobile，有 API 供第三方集成。\n\n请评估此决策节点并给出推荐。",
+      "expected_output": "Output presents 3-4 real auth model options (e.g., SAML-based SSO, OIDC/OAuth2 federation, custom JWT with IdP adapters, Auth0/external IdP as a service). Each option has concrete trade-off comparison. One option is clearly recommended with reasoning. Rejected options have explicit reasons. A decision record is created in the decisions field.",
+      "assertions": [
+        {
+          "name": "three_to_four_options",
+          "description": "Output presents 3 to 4 distinct real options, not 1-2 vague alternatives or a list of 5+ that waters down the comparison",
+          "type": "qualitative"
+        },
+        {
+          "name": "single_recommendation",
+          "description": "Exactly one option is recommended — not 'it depends' or 'either A or B would work', but a clear directional choice with reasoning",
+          "type": "qualitative"
+        },
+        {
+          "name": "rejected_options_explained",
+          "description": "Each rejected option has a specific reason it is not preferred in this context — not generic dismissals",
+          "type": "qualitative"
+        },
+        {
+          "name": "decision_record_created",
+          "description": "Output includes or updates a decisions field with a record for auth_model containing the chosen option and rationale",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "当前设计包含以下决策节点：\n\ndecision_node: realtime_sync_strategy\n描述: 为多人协作文档编辑器选择实时同步策略。多个用户可能同时编辑同一文档的不同位置。需要保证最终一致性，冲突处理对用户要透明。延迟要求：用户感知到同伴光标移动应在 200ms 以内。服务端使用 Node.js，客户端为 Web。\n\n请评估并推荐。",
+      "expected_output": "Comparison covers real options like OT (Operational Transformation), CRDT (Conflict-free Replicated Data Types), last-write-wins, and possibly server-authoritative diff/patch. Trade-off dimensions used must be relevant: implementation complexity, conflict handling transparency to users, latency characteristics, maintainability. Recommendation is specific (e.g., recommends CRDT with specific rationale), not a hedge.",
+      "assertions": [
+        {
+          "name": "options_are_real_and_distinct",
+          "description": "Options presented are real, named strategies (OT, CRDT, LWW, etc.) — not invented categories or paraphrases of the same approach",
+          "type": "qualitative"
+        },
+        {
+          "name": "tradeoffs_cover_relevant_dimensions",
+          "description": "Comparison covers at least 3 of the relevant dimensions: implementation complexity, conflict handling, latency, maintainability — dimensions are relevant to this specific decision, not a generic template applied blindly",
+          "type": "qualitative"
+        },
+        {
+          "name": "recommendation_is_specific",
+          "description": "Recommendation names one approach and gives concrete reasoning tied to the stated constraints (200ms latency, Node.js, transparent conflict handling)",
+          "type": "qualitative"
+        },
+        {
+          "name": "downstream_impact_noted",
+          "description": "Output notes at least one downstream design impact from the chosen approach (e.g., if CRDT is chosen: state structure in design tree needs CRDT-compatible document model)",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "当前设计包含以下决策节点：\n\ndecision_node: task_queue_backend\n描述: 为后台任务处理系统选择消息队列/任务队列方案。任务包括：发送邮件、生成报告、数据同步。峰值约 500 任务/分钟，要求任务不能丢失，失败要重试，需要能查看任务状态。团队熟悉 Python/Django，基础设施跑在 AWS 上。\n\n请评估并推荐。",
+      "expected_output": "Presents options appropriate to the constraints (Celery+Redis, Celery+SQS, AWS SQS+Lambda, Django-Q, or similar). Comparison must use operationally relevant dimensions: operational complexity, durability/at-least-once delivery, visibility/monitoring, team familiarity, cost. Rejected options have clear reasons tied to the stated constraints. Decision record is created.",
+      "assertions": [
+        {
+          "name": "options_fit_constraints",
+          "description": "Options presented are appropriate to the tech stack (Python/Django, AWS) and scale (500 tasks/min) — no options that require a major stack change without justification",
+          "type": "qualitative"
+        },
+        {
+          "name": "durability_addressed",
+          "description": "Comparison explicitly addresses durability (task not lost) and retry behavior for each option — this is a stated requirement, not optional",
+          "type": "qualitative"
+        },
+        {
+          "name": "decision_record_in_output",
+          "description": "decisions field contains a record for task_queue_backend with: chosen option, primary rationale, and brief note on why alternatives were not selected",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}
