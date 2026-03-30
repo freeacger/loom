@@ -2,59 +2,62 @@
 
 **Language:** English | [简体中文](README.zh-CN.md)
 
-`loom` is a small repository of workflow skills for Codex, Claude-style agents, and similar local agent setups.
+`loom` is a workflow skill repository for Codex, Claude-style agents, and similar local agent setups. It provides structured, composable skills that guide agents through design, planning, implementation, and review — from idea to production-ready code.
 
-Most skills in this repository are taken from or adapted from [obra/superpowers](https://github.com/obra/superpowers), then adjusted to fit personal workflow preferences. This repo does not try to present itself as a new framework or a complete platform. It is primarily a maintained personal skill set with a few local changes.
+Early versions drew heavily from [obra/superpowers](https://github.com/obra/superpowers), but the project has since evolved its own design pipeline, parallel agent workflows, and skill development tooling.
 
-## What This Repository Is
+## Scope
 
-- A curated set of reusable workflow skills
-- A place to keep locally adjusted versions of upstream skills
-- A reference repo for personal agent setup
+The repository covers the full engineering lifecycle:
 
-## What This Repository Is Not
-
-- Not a full agent product
-- Not a plugin or installer
-- Not a replacement for the upstream `superpowers` project
-
-## Current Scope
-
-The repository currently focuses on process and engineering workflow skills, especially:
-
-- planning before implementation
-- test-driven development
-- systematic debugging
-- code review workflows
-- worktree-based isolation
-- completion verification
-- skill authoring
+- **Design** — structured workflow from vague idea to implementation-ready design
+- **Planning** — turning requirements into concrete, batched implementation plans
+- **Implementation** — test-driven development, parallel agent dispatch, plan execution
+- **Review** — code review (giving and receiving), design document audits
+- **Quality** — systematic debugging, completion verification, clear writing
 
 ## Skills
 
-The repository currently maintains these skills:
+19 skills organized by phase:
+
+### Design
 
 | Skill | Purpose |
 |---|---|
-| `decision-evaluation` | Compare bounded design options and recommend one with trade-offs |
-| `design-decision-audit` | Review design or plan documents for missing decisions and rollout gaps |
 | `design-orchestrator` | Route design-stage work across the specialized design skills |
-| `design-readiness-check` | Decide whether a design is complete enough for implementation planning |
-| `design-refinement` | Deepen an existing design tree until key branches are implementation-ready |
 | `design-structure` | Turn a vague idea into an initial design tree and design skeleton |
-| `dispatching-parallel-agents` | Split independent tasks across parallel agents |
-| `executing-plans` | Execute a written implementation plan in batches with checkpoints |
-| `finishing-a-development-branch` | Close out a finished branch with merge, PR, keep, or discard flows |
-| `receiving-code-review` | Evaluate review feedback before applying changes |
-| `requesting-code-review` | Request structured code review before moving on or merging |
-| `subagent-driven-development` | Execute plan tasks with dedicated subagents and staged review |
-| `systematic-debugging` | Find root cause before attempting fixes |
+| `design-refinement` | Deepen an existing design tree until key branches are implementation-ready |
+| `decision-evaluation` | Compare bounded design options and recommend one with trade-offs |
+| `design-readiness-check` | Decide whether a design is complete enough for implementation planning |
+| `design-decision-audit` | Review design or plan documents for missing decisions and rollout gaps |
+
+### Planning
+
+| Skill | Purpose |
+|---|---|
 | `task-brief` | Normalize a raw request into a structured task brief before execution |
+| `writing-plans` | Turn requirements into concrete implementation plans |
+
+### Implementation
+
+| Skill | Purpose |
+|---|---|
 | `test-driven-development` | Enforce red-green-refactor for features and bug fixes |
+| `executing-plans` | Execute a written implementation plan in batches with checkpoints |
+| `subagent-driven-development` | Execute plan tasks with dedicated subagents and staged review |
+| `dispatching-parallel-agents` | Split independent tasks across parallel agents |
 | `using-git-worktrees` | Start work in an isolated git worktree |
+| `systematic-debugging` | Find root cause before attempting fixes |
+
+### Review & Quality
+
+| Skill | Purpose |
+|---|---|
+| `requesting-code-review` | Request structured code review before moving on or merging |
+| `receiving-code-review` | Evaluate review feedback before applying changes |
+| `finishing-a-development-branch` | Close out a finished branch with merge, PR, keep, or discard flows |
 | `verification-before-completion` | Verify claims with fresh evidence before saying work is done |
 | `writing-clearly-and-concisely` | Improve documentation and other human-facing writing |
-| `writing-plans` | Turn requirements into concrete implementation plans |
 
 ## Repository Layout
 
@@ -63,24 +66,22 @@ loom/
 ├── skills/                  # Skill definitions
 │   └── <skill-name>/
 │       ├── SKILL.md         # Main skill document
-│       └── ...              # Optional supporting files
-├── docs/                    # Repo notes and execution plans
+│       ├── agents/          # Parallel agent templates (optional)
+│       └── evals/           # Evaluation test cases (optional)
+├── docs/
+│   ├── conventions/         # Style and format conventions
+│   ├── design-decisions/    # Design decision records
+│   ├── exec-plans/          # Execution plans (active/completed)
+│   └── workflows/           # Workflow documentation
+├── scripts/                 # Utility scripts (hooks, generators)
+├── mise/                    # Mise task definitions
+├── tests/                   # Eval workspaces
+├── AGENTS.md                # Agent rules
+├── mise.toml                # Task runner configuration
 └── LICENSE
 ```
 
-## Relationship to `obra/superpowers`
-
-This repository is heavily influenced by `obra/superpowers`.
-
-In practice, that means:
-
-- some skills are copied directly or with minor edits
-- some skills are adapted to fit local tool behavior and personal preferences
-- naming, wording, and workflow details may differ from upstream
-
-If you want the broader system, upstream documentation, or the original project direction, use [obra/superpowers](https://github.com/obra/superpowers) as the primary reference.
-
-## How To Use
+## Quick Start
 
 Install all skills globally via [skills.sh](https://skills.sh):
 
@@ -90,19 +91,12 @@ npx skills add freeacger/loom -y -g
 
 This installs into `~/.claude/skills/` and `~/.agents/skills/` automatically.
 
-Alternatively, pick individual skill folders from `skills/` and copy them into your local skill directory, adjusting wording or paths for your own environment.
+Alternatively, pick individual skill folders from `skills/` and copy them into your local skill directory.
 
-## Why Keep A Separate Repo
+## Acknowledgments
 
-Keeping these skills in a separate repo makes it easier to:
-
-- track personal adjustments over time
-- compare local changes against upstream
-- reuse the same skills across machines
-- document which workflows are actually in use
+Some skills originated from or were inspired by [obra/superpowers](https://github.com/obra/superpowers). Those foundations are appreciated, though the skills here have been significantly reworked and extended.
 
 ## License
 
-This repository is licensed under the [MIT License](LICENSE).
-
-Upstream skill content may have its own provenance. When reusing or redistributing skill text, check both this repository and the upstream source project.
+[MIT License](LICENSE).
