@@ -1,6 +1,6 @@
 ---
 name: decision-evaluation
-description: Evaluate options for a specific design decision node and recommend one with explicit trade-offs. Use when the design already exposes a concrete choice such as architecture style, state management approach, auth model, storage pattern, sync strategy, or multi-agent coordination model. Trigger when the user needs structured comparison and recommendation for a bounded design decision. Do not use for broad design discovery, full-system decomposition, or final readiness review.
+description: Evaluate options for a specific design decision node and recommend one with explicit trade-offs. Use when the design already exposes a concrete choice such as architecture style, state management approach, auth model, storage pattern, sync strategy, multi-agent coordination model, language or runtime, UI framework, data-layer library, or tooling selection. Trigger when the user needs structured comparison and recommendation for a bounded design decision. Do not use for broad design discovery, full-system decomposition, or final readiness review.
 ---
 
 # Decision Evaluation
@@ -27,6 +27,10 @@ Typical examples include:
 - sync model
 - state management approach
 - retry or execution model
+- language or runtime selection
+- UI framework selection
+- data-layer library (ORM, query builder, validation) selection
+- tooling selection (bundler, linter, test runner, CI platform)
 
 Do not use this skill when:
 
@@ -35,11 +39,26 @@ Do not use this skill when:
 - the main need is deeper refinement rather than bounded comparison
 - the task is a final readiness gate
 
+## Constraint Gathering
+
+When the decision involves technology selection (language, framework, library, or tooling), perform this step before the formal comparison.
+
+Ask the user to confirm:
+
+1. Hard constraints: existing tech stack, license requirements, budget limits, deployment environment restrictions.
+2. Preferences or already-excluded options.
+3. Priority of evaluation dimensions (e.g., performance > ecosystem > learning curve).
+4. Must-have requirements (TypeScript support, SSR capability, plugin system, etc.).
+
+Filter the candidate list based on confirmed constraints. Only feasible options proceed to formal comparison.
+
+Output: confirmed constraints + filtered candidate list.
+
 ## Core Responsibilities
 
 Your responsibilities are:
 
-1. Frame the exact decision question.
+1. Frame the exact decision question. For technology selections, frame the question based on constraints confirmed in the Constraint Gathering step.
 2. Present 3 to 4 real options when real options exist.
 3. Compare trade-offs clearly and concretely.
 4. Recommend one option or a justified combination when appropriate.
