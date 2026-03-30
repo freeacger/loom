@@ -60,6 +60,77 @@ Produce or update a `design_state` that includes:
 - `validation`
 - new `decision_nodes` if discovered
 
+## Diagram Conventions
+
+Use character diagrams inside code blocks (no language tag) to visualize component interactions, failure paths, and state transitions.
+
+### Sequence Diagrams
+
+Use when a leaf node describes "how it interacts with adjacent parts" and involves 3+ components.
+
+```
+Client          API Server      Auth Service     DB
+  │                │                │             │
+  │── request ────→│                │             │
+  │                │── verify ────→│             │
+  │                │←── ok ────────│             │
+  │                │── insert ─────────────────→│
+  │←── response ───│                │             │
+```
+
+**Rules:**
+
+- Three-column maximum; split into two diagrams if more participants
+- Lifelines use `│`; messages use `──→` (right) or `←──` (left)
+- Labels sit on the arrow line: `── label ──→`
+- Participant names ≤20 chars, left-aligned at top
+- Omit ACK returns unless they carry meaningful data
+
+### Data Flow Diagrams
+
+Use when showing data pipelines or transformation chains.
+
+```
+Source
+    │
+    ▼
+Transform ──── enrich ────→ Enrichment
+    │                            │
+    ▼                            ▼
+Sink A                     Cache Store
+```
+
+- Components as plain text (no brackets)
+- Vertical: `│` and `▼`; horizontal: `──→`; return: `◄────`
+
+### State Machine Diagrams
+
+Use when a component has 3+ states with transitions.
+
+```
+┌──────────┐     approve     ┌───────────┐
+│ Pending  │───────────────→│ Approved  │
+└──────────┘                 └───────────┘
+     │                            │
+     │ timeout               │ start
+     ▼                            ▼
+┌──────────┐             ┌──────────┐     ok     ┌───────────┐
+│ Expired  │             │ Running  │───────────→│ Succeeded │
+└──────────┘             └──────────┘             └───────────┘
+```
+
+- State boxes use `┌ ┐ └ ┘ ─ │`
+- Transitions: `──→` with label above/below
+- Terminal states can include `✓` or `✗`
+
+### When to Add Diagrams
+
+- Sequence: 3+ components exchanging messages
+- Data flow: pipeline with 3+ stages or branching paths
+- State machine: a component has 3+ states with transitions
+- Do NOT add a diagram for 2-node linear flows — use a numbered list instead
+- Max width: 78 characters
+
 ## Entry and Exit Criteria
 
 Enter when:

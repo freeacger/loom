@@ -36,8 +36,13 @@ The repository currently maintains these skills:
 
 | Skill | Purpose |
 |---|---|
-| `brainstorming` | Clarify intent, constraints, and design before implementation |
+| `brainstorming` | Legacy inactive skill kept only for historical reference during migration |
+| `decision-evaluation` | Compare bounded design options and recommend one with trade-offs |
 | `design-decision-audit` | Review design or plan documents for missing decisions and rollout gaps |
+| `design-orchestrator` | Route design-stage work across the specialized design skills |
+| `design-readiness-check` | Decide whether a design is complete enough for implementation planning |
+| `design-refinement` | Deepen an existing design tree until key branches are implementation-ready |
+| `design-structure` | Turn a vague idea into an initial design tree and design skeleton |
 | `dispatching-parallel-agents` | Split independent tasks across parallel agents |
 | `executing-plans` | Execute a written implementation plan in batches with checkpoints |
 | `finishing-a-development-branch` | Close out a finished branch with merge, PR, keep, or discard flows |
@@ -45,13 +50,12 @@ The repository currently maintains these skills:
 | `requesting-code-review` | Request structured code review before moving on or merging |
 | `subagent-driven-development` | Execute plan tasks with dedicated subagents and staged review |
 | `systematic-debugging` | Find root cause before attempting fixes |
+| `task-brief` | Normalize a raw request into a structured task brief before execution |
 | `test-driven-development` | Enforce red-green-refactor for features and bug fixes |
 | `using-git-worktrees` | Start work in an isolated git worktree |
-| `using-superpowers` | Check and load relevant skills at the start of a task |
 | `verification-before-completion` | Verify claims with fresh evidence before saying work is done |
 | `writing-clearly-and-concisely` | Improve documentation and other human-facing writing |
 | `writing-plans` | Turn requirements into concrete implementation plans |
-| `writing-skills` | Create, refine, and validate skills themselves |
 
 ## Repository Layout
 

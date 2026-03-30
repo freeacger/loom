@@ -25,6 +25,16 @@
           "name": "design_tree_has_branches",
           "description": "design_tree contains at least 5 named branches with brief descriptions; not just a flat list of features",
           "type": "qualitative"
+        },
+        {
+          "name": "tree_diagram_present",
+          "description": "Output includes a character tree diagram inside a code block (no language tag) using ├── └── │ characters showing the design tree hierarchy",
+          "type": "qualitative"
+        },
+        {
+          "name": "tree_diagram_status_markers",
+          "description": "Tree diagram uses at least one status marker (e.g., [OPEN], [DECISION], [DRAFT]) to indicate branch state",
+          "type": "qualitative"
         }
       ]
     },
@@ -51,6 +61,11 @@
         {
           "name": "open_branches_not_empty",
           "description": "open_branches is not empty — skill acknowledges what still needs refinement rather than claiming design is done",
+          "type": "qualitative"
+        },
+        {
+          "name": "tree_diagram_for_large_design",
+          "description": "Since this design has 3+ branches, output includes a character tree diagram inside a code block showing the hierarchy",
           "type": "qualitative"
         }
       ]

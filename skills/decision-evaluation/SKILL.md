@@ -69,6 +69,68 @@ Produce or update a `design_state` that includes:
 - `risks`
 - optional downstream impact notes for the design tree
 
+## Diagram Conventions
+
+Use character diagrams inside code blocks (no language tag) to visualize trade-offs and architecture topology.
+
+### Star Ratings
+
+Use when comparing 3+ options across 2+ quantitative dimensions.
+
+```
+Overall Rating:
+
+Auth0:      ★★★★☆  4/5
+Keycloak:   ★★★☆☆  3/5
+Self-build: ★☆☆☆☆  1/5
+
+Dimension Breakdown:
+
+Security:       Auth0 ★★★★★  Keycloak ★★★★☆  Self ★★☆☆☆
+Speed-to-MVP:   Auth0 ★★★★★  Keycloak ★★★☆☆  Self ★☆☆☆☆
+Cost-at-scale:  Auth0 ★★★☆☆  Keycloak ★★★★☆  Self ★★★★★
+```
+
+**Rules:**
+
+- `★` (filled, U+2605) + `☆` (empty, U+2606), 5-star scale (max = ★★★★★)
+- Format: `label ★★★★☆  4/5`
+- Always show all 5 stars (e.g. `★★☆☆☆`, never `★★`)
+- Overall rating section first, then Dimension Breakdown
+- Breakdown section: one dimension per row, all options on the same row
+- Always state the scale explicitly
+
+### Architecture Topology
+
+Use when the decision changes component layout or system topology.
+
+```
+┌──────────────────┐
+│  Load Balancer   │
+└────────┬─────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+ [API x2] [API x2]
+    │         │
+    └────┬────┘
+         ▼
+  ┌────────────┐
+  │  Postgres  │
+  └────────────┘
+```
+
+- Boxes use `┌ ┐ └ ┘ ─ │` for infrastructure components
+- `[brackets]` for application components
+- Vertical flow primary; `──→` for horizontal connections
+
+### When to Add Diagrams
+
+- Star ratings: 3+ options × 2+ quantitative dimensions
+- Topology: the decision changes the physical or logical component layout
+- Do NOT add diagrams for simple yes/no or qualitative comparisons — use markdown tables
+- Max width: 78 characters
+
 ## Entry and Exit Criteria
 
 Enter when:

@@ -76,6 +76,37 @@ Route to `design-readiness-check` when:
 - the design appears mostly complete
 - the remaining question is whether it is safe to move into implementation planning
 
+## Diagram Conventions
+
+After routing, show the current workflow position as a character DAG inside a code block (no language tag):
+
+```
+[task-brief]
+     │
+     ▼
+[design-orchestrator]  ← you are here
+     │
+     ▼
+[design-structure]
+```
+
+Or when showing branching:
+
+```
+          [orchestrator]
+          │    │    │
+     ┌────┘    │    └────┐
+     ▼         ▼         ▼
+[structure] [refine] [evaluate]
+```
+
+**Rules:**
+
+- Components in `[brackets]`, vertical flow with `│` and `▼`
+- Fan-out: `┌────┘` / `└────┐`; fan-in: `└────┬────┘`
+- Max width: 78 characters
+- Only include when routing changes or the user asks for a status overview
+
 ## Entry and Exit Criteria
 
 Enter when:

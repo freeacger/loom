@@ -25,6 +25,11 @@
           "name": "interaction_with_adjacent_parts",
           "description": "Branch describes how 通知调度器 interacts with at least one adjacent component (e.g.,渠道适配层 or the caller)",
           "type": "qualitative"
+        },
+        {
+          "name": "diagram_used_for_interactions",
+          "description": "Since 通知调度器 interacts with adjacent components (3+ components), output includes a character diagram (sequence or data flow) inside a code block without language tag",
+          "type": "qualitative"
         }
       ]
     },
@@ -46,6 +51,11 @@
         {
           "name": "branches_more_concrete",
           "description": "At least one refined branch has sub-nodes with concrete behavior descriptions, not just renamed versions of the top-level label",
+          "type": "qualitative"
+        },
+        {
+          "name": "diagram_for_distributed_system",
+          "description": "Since this is a distributed system with multiple components (Worker, task queue, dispatcher), output includes at least one character diagram (sequence, data flow, or state machine) in a code block",
           "type": "qualitative"
         }
       ]

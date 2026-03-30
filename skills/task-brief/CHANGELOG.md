@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0 — Diagram Conventions
+
+- Adds character DAG diagram rules for decompose mode (3+ sub-tasks with dependencies)
+- DAG uses `[brackets]` for components, `──→` for arrows, max width 78 chars
+
 ## v0.2.0 — Goal Validation
 
 - Adds "Inaccurate goal" as a third Tier 2 sub-case alongside "Missing parameter" and "Ambiguous intent"

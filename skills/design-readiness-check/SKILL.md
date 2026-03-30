@@ -64,6 +64,28 @@ Always return an explicit result:
 - ready for planning
 - not ready for planning
 
+## Diagram Conventions
+
+Present the readiness verdict as a status checklist inside a code block (no language tag):
+
+```
+Readiness Check
+├── Design tree present          ✓
+├── Key branches refined         ✓
+├── Decisions resolved           ✗ (storage choice pending)
+├── Failure paths documented     ✓
+├── Validation strategy defined  ✓
+└── Blocking risks mitigated     ✗ (migration cutover risk)
+
+Verdict: NOT READY — 2 blocking issues
+```
+
+**Rules:**
+
+- Use `✓` (pass) and `✗` (fail) markers with inline reason for failures
+- Max width: 78 characters
+- Always include this checklist in the readiness verdict
+
 ## Entry and Exit Criteria
 
 Enter when:

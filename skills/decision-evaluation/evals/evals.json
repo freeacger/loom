@@ -22,6 +22,11 @@
           "type": "qualitative"
         },
         {
+          "name": "star_rating_present",
+          "description": "Since there are 3+ options compared on multiple dimensions, output includes a star rating using ★ and ☆ characters (5-star scale) with a stated scale",
+          "type": "qualitative"
+        },
+        {
           "name": "decision_record_created",
           "description": "Output includes or updates a decisions field with a record for auth_model containing the chosen option and rationale",
           "type": "qualitative"
@@ -51,6 +56,11 @@
         {
           "name": "downstream_impact_noted",
           "description": "Output notes at least one downstream design impact from the chosen approach (e.g., if CRDT is chosen: state structure in design tree needs CRDT-compatible document model)",
+          "type": "qualitative"
+        },
+        {
+          "name": "star_rating_with_stars",
+          "description": "Output includes a quantitative comparison using ★ (filled) and ☆ (empty) star characters in a code block with 5-star scale",
           "type": "qualitative"
         }
       ]

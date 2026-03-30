@@ -1,13 +1,14 @@
 # Skill Invocation Workflow
 
-Archived from `using-superpowers` skill. Describes the decision flow for invoking skills in response to user messages.
+Describes the decision flow for invoking skills in response to user messages.
 
 ```dot
 digraph skill_flow {
     "User message received" [shape=doublecircle];
     "About to EnterPlanMode?" [shape=doublecircle];
-    "Already brainstormed?" [shape=diamond];
-    "Invoke brainstorming skill" [shape=box];
+    "Need design-stage work?" [shape=diamond];
+    "Invoke task-brief" [shape=box];
+    "Invoke design-orchestrator" [shape=box];
     "Might any skill apply?" [shape=diamond];
     "Invoke Skill tool" [shape=box];
     "Announce: 'Using [skill] to [purpose]'" [shape=box];
@@ -16,10 +17,11 @@ digraph skill_flow {
     "Follow skill exactly" [shape=box];
     "Respond (including clarifications)" [shape=doublecircle];
 
-    "About to EnterPlanMode?" -> "Already brainstormed?";
-    "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
-    "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
-    "Invoke brainstorming skill" -> "Might any skill apply?";
+    "About to EnterPlanMode?" -> "Need design-stage work?";
+    "Need design-stage work?" -> "Invoke task-brief" [label="yes"];
+    "Invoke task-brief" -> "Invoke design-orchestrator";
+    "Invoke design-orchestrator" -> "Might any skill apply?";
+    "Need design-stage work?" -> "Might any skill apply?" [label="no"];
 
     "User message received" -> "Might any skill apply?";
     "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];

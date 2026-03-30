@@ -66,6 +66,45 @@ Produce or update a `design_state` that includes:
 
 You are not expected to fully close every branch.
 
+## Diagram Conventions
+
+Render the design tree as a character tree diagram inside a code block (no language tag).
+
+**Format:**
+
+```
+design_tree
+├── 1. Problem definition
+│   ├── 1.1 Core problem
+│   └── 1.2 Success metrics ✓
+├── 2. Core flows [OPEN]
+│   ├── 2.1 Happy path
+│   └── 2.2 Error path
+├── 3. Interfaces and data
+│   └── 3.1 API contract [DRAFT]
+└── 4. Decision points
+    └── 4.1 Storage choice [DECISION]
+```
+
+**Character rules:**
+
+- Branches: `├──` (middle), `└──` (last)
+- Continuation: `│   ` (non-last parent), `    ` (last parent, 4 spaces)
+- Numbering: `1.`, `1.1` — required at first two levels
+- Max width: 78 characters
+
+**Status markers:**
+
+| Marker | Meaning |
+|--------|---------|
+| `[OPEN]` | Unresolved, needs refinement or decision |
+| `[DECISION]` | Decision node with multiple real options |
+| `[DRAFT]` | Tentative, may change |
+| `✓` | Complete / verified |
+| `✗` | Rejected / out of scope |
+
+**When to render:** Always include a tree diagram when the design tree has 3+ branches. Omit only if the design is trivially small (1-2 branches).
+
 ## Entry and Exit Criteria
 
 Enter when:
