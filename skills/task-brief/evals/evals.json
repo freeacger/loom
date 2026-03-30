@@ -76,6 +76,50 @@
           "type": "qualitative"
         }
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Add retry logic with exponential backoff to the payment processing endpoint.",
+      "expected_output": "A task brief that detects the solution-as-goal signal (retry with exponential backoff is a specific technique, not a problem statement), reframes the User Goal around the underlying reliability problem, sets Execution Mode to 'clarify-first', and asks one question about what failure mode is being observed (timeouts, dropped connections, 5xx errors, etc.). Should NOT just proceed with implementing retry logic without validating the goal.",
+      "assertions": [
+        {
+          "name": "solution_as_goal_detected",
+          "description": "The brief recognizes that 'add retry logic' is a solution, not a goal, and reframes the User Goal around the underlying problem (e.g., reliability, transient failures)",
+          "type": "qualitative"
+        },
+        {
+          "name": "execution_mode_is_clarify_first",
+          "description": "Execution Mode is 'clarify-first' since the real problem has not been stated",
+          "type": "qualitative"
+        },
+        {
+          "name": "asks_about_failure_mode",
+          "description": "The clarifying question asks about the actual failure behavior being observed, not about implementation preferences",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Fix the 502 errors showing up in the checkout flow.",
+      "expected_output": "A task brief that detects the symptom-as-goal signal (502 errors are a symptom, not a desired outcome), reframes the User Goal as 'restore reliable checkout processing' or similar, sets Execution Mode to 'clarify-first', and asks about the expected behavior or root cause context. Should NOT simply state the goal as 'fix 502 errors' without reframing.",
+      "assertions": [
+        {
+          "name": "symptom_as_goal_detected",
+          "description": "The brief reframes 'fix 502 errors' into a goal about reliable checkout behavior, not just error elimination",
+          "type": "qualitative"
+        },
+        {
+          "name": "execution_mode_is_clarify_first",
+          "description": "Execution Mode is 'clarify-first' since the root cause is unknown",
+          "type": "qualitative"
+        },
+        {
+          "name": "reframes_to_outcome",
+          "description": "The clarifying question or assumptions reframe from the error symptom toward expected behavior or root cause",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

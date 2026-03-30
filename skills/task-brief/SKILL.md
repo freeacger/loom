@@ -41,14 +41,22 @@ Before writing the brief, classify the request into one of three tiers. This det
 | Tier | Signal | Response |
 |------|--------|----------|
 | **Direct** | Single goal, clear scope, no missing critical info | Write brief, set Execution Mode to `direct`, proceed immediately |
-| **Clarify** | One critical unknown — either a missing parameter OR the goal itself is ambiguous between 2+ interpretations | Write brief, surface the ambiguity explicitly, ask exactly one question, set mode to `clarify-first` |
+| **Clarify** | One critical unknown — a missing parameter, ambiguous intent between 2+ interpretations, OR a stated goal that may be inaccurate (solution-as-goal, symptom-as-goal, scope anomaly) | Write brief, surface the ambiguity explicitly, ask exactly one question, set mode to `clarify-first` |
 | **Structured** | Multiple goals, cross-domain, high ambiguity, or handoff needed | Write full brief, set mode to `structured-handoff` or `decompose` |
 
 For Tier 1 (Direct), the brief can be short — 3-4 fields is fine. Don't pad it.
 
-**Tier 2 has two distinct sub-cases — handle them differently:**
+**Tier 2 has three distinct sub-cases — handle them differently:**
 - *Missing parameter*: you know the goal, just lack one detail. Write User Goal normally, list the unknown in Core Questions, ask for the missing value.
 - *Ambiguous intent*: the goal itself could mean two substantially different things. In User Goal, write both interpretations explicitly as **Interpretation A** and **Interpretation B**. Ask the user to choose — do not pick one silently.
+- *Inaccurate goal*: the user stated a solution, a symptom, or an oddly scoped target — not the real intent. Detect three signals:
+  1. **Solution-as-goal**: user names a specific technique ("add Redis caching") rather than the problem it solves. Ask: "What problem are you trying to solve?"
+  2. **Symptom-as-goal**: user describes an error state ("fix timeout errors") rather than a desired outcome. Ask: "What's the expected behavior?"
+  3. **Scope anomaly**: the scope boundary doesn't match the problem's natural boundary — too narrow (retry one endpoint when the whole service is flaky) or too broad. Ask: "Is this issue limited to this area, or does it appear elsewhere?"
+
+  When detected, write User Goal with your best guess at the *actual* underlying goal, flag it as an assumption, and ask one clarifying question. Do not execute on the literal stated goal without confirming.
+
+  Before writing the brief, do a quick search of the codebase for context — check relevant files, existing patterns, or error logs. A brief grounded in code-level facts produces sharper clarifying questions than one based purely on inference from the user's words.
 
 ---
 
@@ -109,6 +117,7 @@ These rules govern how to convert a raw message into the brief. The goal is to p
 - "something's wrong" → specify what behavior is observed vs. expected
 - "soon" / "quickly" → ask for a concrete deadline if it affects approach
 - "the usual format" → infer from context or flag as an assumption
+- "add Redis to the API" → ask: what performance problem is this solving? (solution-as-goal — reframe to underlying problem)
 
 **When intent is ambiguous:**
 - If a request has two or more substantially different valid interpretations, do not pick one and proceed — surface the ambiguity in User Goal as "Interpretation A: … vs Interpretation B: …"
@@ -127,7 +136,7 @@ These rules govern how to convert a raw message into the brief. The goal is to p
 | Mode | When to use |
 |------|-------------|
 | `direct` | All info present, single goal, executor can start immediately |
-| `clarify-first` | One critical unknown — either a missing parameter or an ambiguous goal with 2+ valid interpretations; ask only that one question |
+| `clarify-first` | One critical unknown — a missing parameter, an ambiguous goal with 2+ interpretations, or a goal that may be inaccurate (solution/symptom/scope signal); ask only that one question |
 | `structured-handoff` | Task is complex but well-scoped; brief is complete enough for a separate agent to execute |
 | `decompose` | Request contains 2+ independent sub-tasks that should be executed separately or in parallel |
 
@@ -310,6 +319,45 @@ These require different executors, different files touched, and different succes
 
 ---
 
+### Example 5 — Tier 2 (Inaccurate Goal)
+
+**User input:**
+> "Add Redis caching to our API endpoints."
+
+**Task Brief:**
+
+```
+## Task Brief
+
+**Task Type:** investigation + transformation
+
+**User Goal:**
+Reduce API response latency (assumed — user stated a specific caching technique rather than the problem it solves).
+
+**Core Questions:**
+- What performance problem is prompting this — high latency on specific endpoints, high DB load, or slow responses under heavy traffic?
+
+**Success Criteria:**
+- Identified performance bottleneck and an appropriate mitigation strategy (which may or may not be Redis).
+
+**Constraints:**
+- Scope: API layer
+- Risk: no data consistency issues introduced by caching
+
+**Assumptions:**
+- The user wants faster API responses and believes Redis is the solution. The actual bottleneck has not been confirmed.
+
+**Execution Mode:** clarify-first
+
+**Deliverables:**
+- Deferred until the performance problem is confirmed.
+```
+
+**Clarifying question:**
+> What performance problem are you seeing — slow endpoints under load, high database query times, or something else? Redis caching is one option, but the right fix depends on where the bottleneck actually is.
+
+---
+
 ## Acceptance Criteria
 
 A good task brief passes these checks:
@@ -319,6 +367,7 @@ A good task brief passes these checks:
 3. **Constraint-complete**: Any constraint whose absence would cause a wrong-path execution is present.
 4. **Non-padded**: Fields that add no information are omitted or marked minimal. A 3-field brief for a simple task is correct; a 8-field brief for the same task is over-engineering.
 5. **Actionable deliverables**: Each deliverable is a concrete artifact, not a vague outcome ("a working script" not "something that helps with the problem").
+6. **Goal-honest**: The User Goal reflects the underlying problem, not just the stated technique or observed symptom. If the stated goal appears to be a solution or error description, the brief surfaces this and asks to confirm.
 
 A brief is **not useful** if:
 - It restates the user's message verbatim in different words
