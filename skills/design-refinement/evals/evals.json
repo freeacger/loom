@@ -1,0 +1,76 @@
+{
+  "skill_name": "design-refinement",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "当前设计状态：\n\nproblem: 构建用户通知服务\ndesign_tree:\n  - 通知调度器: 负责触发通知的发送（待细化）\n  - 渠道适配层: 对接各渠道 SDK（待细化）\n  - 模板引擎: 渲染通知内容（待细化）\nopen_branches: [通知调度器, 渠道适配层, 模板引擎]\n\n请细化"通知调度器"这个分支。",
+      "expected_output": "Refined design_tree entry for 通知调度器 where the leaf nodes can answer all five questions from the Leaf Node Standard: (1) what it is responsible for, (2) what it is NOT responsible for, (3) how it interacts with adjacent parts, (4) what failure looks like, (5) how it will be validated. The branch should not remain vague after refinement.",
+      "assertions": [
+        {
+          "name": "responsibility_defined",
+          "description": "Refined branch clearly states what 通知调度器 is responsible for and what it is NOT responsible for",
+          "type": "qualitative"
+        },
+        {
+          "name": "failure_path_included",
+          "description": "Branch includes at least one concrete failure scenario (e.g., downstream unavailable, malformed payload, queue full) and what happens",
+          "type": "qualitative"
+        },
+        {
+          "name": "validation_criteria_present",
+          "description": "Branch describes how 通知调度器 will be validated (unit test scope, integration test scenario, or observable signal)",
+          "type": "qualitative"
+        },
+        {
+          "name": "interaction_with_adjacent_parts",
+          "description": "Branch describes how 通知调度器 interacts with at least one adjacent component (e.g.,渠道适配层 or the caller)",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "当前设计状态：\n\nproblem: 实现一个分布式任务调度系统，多个 Worker 节点消费任务队列\ndesign_tree:\n  - Worker 注册与心跳: 节点启动时注册，定期上报存活（简单描述）\n  - 任务分发逻辑: 将待执行任务分配给可用 Worker（简单描述）\n  - 任务执行与状态回报: Worker 执行任务后回报结果（简单描述）\nopen_branches: [Worker 注册与心跳, 任务分发逻辑, 任务执行与状态回报]\n\n请细化所有分支，重点识别其中隐含的风险和假设。",
+      "expected_output": "Refined design_state where: (1) risks field is populated with at least 2 non-obvious risks surfaced during refinement (e.g., split-brain on worker crash, task duplication on re-delivery), (2) confirmed_assumptions field has at least 2 entries making implicit premises explicit (e.g., at-least-once vs exactly-once delivery, task idempotency requirement), (3) open_branches is reduced or each remaining open branch has a clear reason for being unresolved.",
+      "assertions": [
+        {
+          "name": "risks_populated",
+          "description": "risks field contains at least 2 non-obvious risks surfaced through refinement, not just generic platitudes",
+          "type": "qualitative"
+        },
+        {
+          "name": "assumptions_made_explicit",
+          "description": "confirmed_assumptions field has at least 2 entries that were previously implicit (e.g., about idempotency, delivery guarantee, or node failure behavior)",
+          "type": "qualitative"
+        },
+        {
+          "name": "branches_more_concrete",
+          "description": "At least one refined branch has sub-nodes with concrete behavior descriptions, not just renamed versions of the top-level label",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "当前设计状态：\n\nproblem: 实现一个支持多种数据源的 ETL 管道\ndesign_tree:\n  - 数据源适配器: 从 MySQL、Postgres、CSV 读取数据\n  - 转换引擎: 执行字段映射、过滤、聚合\n  - 数据写入层: 将处理后数据写入目标存储\nopen_branches: [数据源适配器, 转换引擎]\n\n请细化"转换引擎"。",
+      "expected_output": "During refinement of 转换引擎, the skill should surface at least one new decision_node (e.g., whether transformations are defined via config/DSL or code, error handling strategy for bad rows, streaming vs batch processing model). This decision node should be marked as a decision_nodes entry rather than being silently resolved by the skill itself.",
+      "assertions": [
+        {
+          "name": "new_decision_node_surfaced",
+          "description": "Refinement produces at least one new decision_node entry that was not present before — a real choice with alternatives, not something the skill invents a fake resolution for",
+          "type": "qualitative"
+        },
+        {
+          "name": "decision_not_resolved_by_skill",
+          "description": "The skill marks the decision as a decision_node to be evaluated later; it does not unilaterally choose an approach and bury the choice",
+          "type": "qualitative"
+        },
+        {
+          "name": "transformation_engine_is_concrete",
+          "description": "转换引擎 branch has sub-nodes describing specific transformation types, execution model, and error behavior — not just a restatement of 'handles transformations'",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}
