@@ -144,6 +144,22 @@ For `clarify-first`: write the brief first with your best-effort assumption, the
 
 For `decompose`: list each sub-task as a separate mini-brief under a **Sub-Tasks** section. Each sub-task gets its own Goal + Deliverable at minimum.
 
+When sub-tasks have dependencies, include a character DAG after the Sub-Tasks section inside a code block (no language tag):
+
+```
+[Data layer] ──→ [API endpoints]
+      │
+      └───────→ [Frontend]
+[Email service] → [Notifications]
+```
+
+**Rules:**
+
+- Components in `[brackets]`, arrows with `──→`
+- Vertical flow with `│` and `▼` when ordering matters
+- Max width: 78 characters
+- Only include when 3+ sub-tasks have non-trivial dependencies
+
 ---
 
 ## Examples
