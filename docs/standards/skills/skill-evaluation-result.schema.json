@@ -1,0 +1,390 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://loom.dev/schemas/skill-evaluation-result.schema.json",
+  "title": "Skill Evaluation Result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_at",
+    "mode",
+    "skill",
+    "summary",
+    "overall",
+    "recommendation"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "design",
+        "runtime",
+        "full"
+      ]
+    },
+    "skill": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "repo",
+        "path",
+        "ref",
+        "resolved_commit"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "local_repo",
+            "github_file"
+          ]
+        },
+        "repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resolved_commit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "display_name": {
+          "type": "string"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_count",
+        "design_case_count",
+        "runtime_case_count",
+        "high_risk_failures"
+      ],
+      "properties": {
+        "case_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "design_case_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "runtime_case_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "high_risk_failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "design": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/layer_score"
+        },
+        {
+          "$ref": "#/$defs/skipped_layer"
+        }
+      ]
+    },
+    "runtime": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/layer_score"
+        },
+        {
+          "$ref": "#/$defs/skipped_layer"
+        }
+      ]
+    },
+    "overall": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/layer_score"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "diagnosis",
+            "final_verdict"
+          ],
+          "properties": {
+            "diagnosis": {
+              "type": "string",
+              "minLength": 1
+            },
+            "final_verdict": {
+              "type": "string",
+              "enum": [
+                "admit_exemplar",
+                "admit_recommended",
+                "admit_with_caution",
+                "do_not_admit",
+                "reject"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stars",
+        "label",
+        "admission",
+        "reason"
+      ],
+      "properties": {
+        "stars": {
+          "$ref": "#/$defs/star_int"
+        },
+        "label": {
+          "type": "string",
+          "enum": [
+            "卓越",
+            "优秀",
+            "及格",
+            "不及格",
+            "很差"
+          ]
+        },
+        "admission": {
+          "type": "string",
+          "enum": [
+            "recommended_as_exemplar",
+            "admit_and_recommend",
+            "admit_with_caution",
+            "do_not_admit_yet",
+            "reject"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "skipped_layers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "design",
+          "runtime"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/case_result"
+      }
+    }
+  },
+  "$defs": {
+    "star_int": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "dimension_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "score",
+        "weight"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "layer_score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw_score",
+        "stars",
+        "star_label",
+        "dimensions"
+      ],
+      "properties": {
+        "raw_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "stars": {
+          "$ref": "#/$defs/star_int"
+        },
+        "star_label": {
+          "type": "string",
+          "enum": [
+            "卓越",
+            "优秀",
+            "及格",
+            "不及格",
+            "很差"
+          ]
+        },
+        "dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/dimension_score"
+          }
+        },
+        "blocking_issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "skipped_layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "reason"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "const": "skipped"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "case_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "suite",
+        "mode",
+        "verdict"
+      ],
+      "properties": {
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "suite": {
+          "type": "string",
+          "enum": [
+            "design",
+            "runtime",
+            "replay",
+            "negative",
+            "safety"
+          ]
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "baseline",
+            "skill_enabled",
+            "shadow"
+          ]
+        },
+        "expected_trigger": {
+          "type": "boolean"
+        },
+        "actual_triggered": {
+          "type": "boolean"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "pass",
+            "fail",
+            "warn",
+            "skipped"
+          ]
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "latency_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "turn_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
