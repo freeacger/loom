@@ -29,15 +29,59 @@ Do not use this skill when:
 - core decisions are still unresolved
 - the user is asking for a general audit of an external design document
 
-## Core Responsibilities
+## Workflow
 
-Your responsibilities are:
+### Phase A: Context Preparation
 
-1. Check for empty or weak branches in the design tree.
-2. Check for unresolved assumptions and hidden dependencies.
-3. Check for missing failure handling, validation strategy, or non-functional requirements.
-4. Check whether key risks are documented enough for implementation planning.
-5. Return a clear readiness judgment, not a vague summary.
+Goal: Load design state and assemble context for parallel checks.
+
+1. Load the current `design_state` from the conversation context.
+2. Read the design tree content and all related context (open branches, decision nodes, risks, validation state).
+3. If `design_state` does not exist or the design tree is empty, return NOT READY immediately with a handoff to `design-structure`.
+4. Assemble a context package containing: design tree text, open branches, decision nodes, existing risks, validation entries.
+
+### Phase B: Parallel Readiness Checks
+
+Goal: Run four independent checks in parallel using specialized subagents.
+
+5. Launch four parallel Sonnet subagents, each using one of the checker agent templates:
+   - **branch-checker**: reads `skills/design-readiness-check/agents/branch-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
+   - **assumption-checker**: reads `skills/design-readiness-check/agents/assumption-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
+   - **failure-checker**: reads `skills/design-readiness-check/agents/failure-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
+   - **risk-checker**: reads `skills/design-readiness-check/agents/risk-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
+
+6. Collect results from all four subagents.
+
+**Fallback**: If any subagent fails or times out, the main agent performs that check inline using the same rubric from the agent template.
+
+### Phase C: Verdict Synthesis
+
+Goal: Combine check results into a clear readiness judgment.
+
+7. Map each subagent's `status` to a pass/fail entry in the readiness checklist:
+   - branch-checker → "Design tree present" and "Key branches refined"
+   - assumption-checker → "Decisions resolved" (if assumptions are unresolved)
+   - failure-checker → "Failure paths documented" and "Validation strategy defined"
+   - risk-checker → "Blocking risks mitigated"
+
+8. Build the ✓/✗ checklist diagram following Diagram Conventions.
+
+9. Determine verdict:
+   - **READY**: all four checks return `pass`
+   - **NOT READY**: any check returns `fail`
+
+10. If NOT READY, determine the handoff target based on which check failed:
+    - branch-checker fails → hand off to `design-structure` (branches missing) or `design-refinement` (branches weak)
+    - assumption-checker fails → hand off to `design-refinement` (assumptions need expansion)
+    - failure-checker fails → hand off to `design-refinement` (failure paths need adding)
+    - risk-checker fails → hand off to `decision-evaluation` (unresolved risk decision) or `design-refinement` (risk documentation weak)
+
+11. Update `design_state` with:
+    - `status.ready_for_planning`: true or false
+    - `status.blocking_issues`: list from failed checks
+    - Updated `open_branches`, `risks`, `validation` if new information emerged
+
+12. Return the explicit verdict with checklist diagram. Never give a "probably ready" answer.
 
 ## Readiness Standard
 
