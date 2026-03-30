@@ -1,0 +1,76 @@
+{
+  "skill_name": "design-readiness-check",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建企业内部 HR 自助服务门户，员工可查询薪资单、提交请假申请、查看公司政策\nscope:\n  包含: 薪资单展示、请假申请流程、政策文档检索\n  不包含: 薪资核算、HR 管理后台、移动 App\ndesign_tree:\n  - 认证与权限: 集成现有 SSO (SAML)，员工只能看自己数据，已明确接口契约\n  - 薪资单模块: 从 ERP 系统拉取 PDF，展示历史列表，权限隔离，失败时展示错误页\n  - 请假申请流程: 表单提交、审批链路（直属 + HR）、邮件通知、状态追踪，已设计状态机\n  - 政策文档检索: 全文搜索，按部门过滤，文档版本管理，已明确存储方案\ndecision_nodes: []\nopen_branches: []\ndecisions:\n  - sso_integration: 使用现有 Okta SAML，理由：合规要求，统一管理\nrisks:\n  - ERP 接口稳定性: 有 SLA，已设计降级展示缓存数据的方案\nvalidation:\n  - 每个模块有单元测试和集成测试范围定义\n  - E2E 测试覆盖核心路径：登录→查看薪资单、提交请假→审批通过\nstatus:\n  phase: design",
+      "expected_output": "Output returns status.ready_for_planning: true. blocking_issues should be empty or only list genuinely missing items. The skill must give an explicit PASS verdict (not 'mostly ready' or 'seems okay'). If any minor gaps are noted, they should be non-blocking and the design should still pass.",
+      "assertions": [
+        {
+          "name": "explicit_pass_verdict",
+          "description": "Output contains an unambiguous PASS / ready-for-planning verdict — not hedged language like 'mostly ready', 'looks good enough', or 'probably okay'",
+          "type": "qualitative"
+        },
+        {
+          "name": "no_false_blocking_issues",
+          "description": "Output does not invent blocking issues for a design that is demonstrably complete — blocking_issues is either empty or contains only genuinely missing critical items",
+          "type": "qualitative"
+        },
+        {
+          "name": "handoff_to_writing_plans",
+          "description": "Output recommends proceeding to writing-plans as the next step",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建数据分析平台，支持用户上传 CSV、运行 SQL 查询、可视化结果\nscope: 数据上传、查询执行、图表展示\ndesign_tree:\n  - 文件上传: 支持 CSV（待细化）\n  - 查询引擎: 执行用户 SQL（待细化）\n  - 可视化层: 生成图表（待细化）\nopen_branches: [文件上传, 查询引擎, 可视化层]\ndecision_nodes:\n  - sql_sandbox: 如何隔离用户 SQL 执行，防止注入和资源滥用（未解决）\nassumptions: [用户 SQL 是安全的]",
+      "expected_output": "Output returns status.ready_for_planning: false. blocking_issues must specifically call out: (1) all branches are still shallow/marked as 待细化, (2) the unresolved decision_node sql_sandbox is a security-critical issue that cannot be deferred. The verdict must be explicit FAIL/not-ready, not a hedge.",
+      "assertions": [
+        {
+          "name": "explicit_fail_verdict",
+          "description": "Output contains an unambiguous FAIL / not-ready verdict — not 'needs some more work' or 'consider refining before proceeding'",
+          "type": "qualitative"
+        },
+        {
+          "name": "shallow_branches_called_out",
+          "description": "blocking_issues explicitly calls out that all three branches are marked 待细化 and are not implementation-ready",
+          "type": "qualitative"
+        },
+        {
+          "name": "security_decision_blocking",
+          "description": "blocking_issues identifies the unresolved sql_sandbox decision_node as a blocker — SQL isolation is a security requirement that cannot be assumed away",
+          "type": "qualitative"
+        },
+        {
+          "name": "next_route_specified",
+          "description": "Output specifies which skill should be invoked next: design-refinement (for shallow branches) or decision-evaluation (for sql_sandbox), not just 'do more design'",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建 IoT 设备固件远程更新系统\nscope: 固件包管理、设备注册、更新下发、进度追踪\ndesign_tree:\n  - 固件包管理: 上传、版本管理、签名验证 — 已细化，失败处理已定义\n  - 设备注册: 设备证书认证，注册 API 已设计\n  - 更新下发策略: 支持定向、分批灰度、全量推送 — 流程已设计\n  - 设备端接收: 下载、校验、安装、回滚 — 已细化，各步骤失败行为已定义\n  - 进度追踪: 设备上报状态，服务端聚合展示\ndecision_nodes: []\nopen_branches: [进度追踪]\nrisks:\n  - 设备离线时更新: 设备重连后自动检查更新，已设计\nvalidation:\n  - 设备端各阶段有单测\n  - 服务端集成测试覆盖下发和追踪路径\nassumptions: [设备可以通过 HTTPS 访问更新服务器]",
+      "expected_output": "Output must return an explicit FAIL verdict because 进度追踪 branch is still in open_branches. blocking_issues should call out this specific remaining branch. The skill should not give a pass just because most of the design looks good — one open branch is a blocker. Handoff should be to design-refinement.",
+      "assertions": [
+        {
+          "name": "open_branch_is_blocking",
+          "description": "Output identifies 进度追踪 in open_branches as a blocking issue — the skill does not give a pass because 'most branches look good'",
+          "type": "qualitative"
+        },
+        {
+          "name": "explicit_not_ready_verdict",
+          "description": "Output is explicit about not being ready — no hedging, no 'close enough', no conditional pass",
+          "type": "qualitative"
+        },
+        {
+          "name": "routes_to_refinement",
+          "description": "Output recommends design-refinement to close the open branch before coming back to readiness-check",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}
