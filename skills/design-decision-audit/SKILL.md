@@ -1,6 +1,6 @@
 ---
 name: design-decision-audit
-description: Audit design documents for missing decisions, compatibility risks, rollout gaps, and observability omissions. Use whenever the user asks to review a design doc, architecture proposal, implementation-facing design, plan, or design-adjacent markdown file for completeness, migration strategy, rollback, data handling, or suggested additions without directly editing the document. Also trigger on short requests such as `审查 <file>.md`, `review 这个文档 <file>.md`, or `review <file>.md` when the target looks like a design, plan, architecture, proposal, or decision document.
+description: Audit design documents for missing decisions, compatibility risks, rollout gaps, and observability omissions. Use whenever the user asks to review a design doc, architecture proposal, implementation-facing design, plan, or design-adjacent markdown file for completeness, migration strategy, rollback, data handling, or suggested additions without directly editing the document. Also trigger on short requests such as `review <file>.md` or `audit <file>.md` when the target looks like a design, plan, architecture, proposal, or decision document.
 ---
 
 # Design Decision Audit
@@ -47,22 +47,21 @@ If the output language is English:
 - `Report Path`
 
 If the output language is Chinese:
-- `执行摘要`
-- `触发模块`
-- `问题`
-- `建议补写`
-- `开放问题`
-- `报告路径`
+- `Executive Summary` → translate heading
+- `Triggered Modules` → translate heading
+- `Findings` → translate heading
+- `Suggested Additions` → translate heading
+- `Open Questions` → translate heading
+- `Report Path` → translate heading
 
 ## Minimal Prompt Handling
 
 Do not require the user to spell out the full audit scope.
 
 If the user gives a short instruction such as:
-- `审查 <file>.md`
-- `review 这个文档 <file>.md`
 - `review <file>.md`
-- `看下这个方案 <file>.md`
+- `audit <file>.md`
+- `check <file>.md`
 
 infer a full design-decision audit when the target appears to be one of these:
 - design doc
