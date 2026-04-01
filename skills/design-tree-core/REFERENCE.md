@@ -9,6 +9,7 @@ It exists to support consistent behavior across:
 - design-structure
 - design-refinement
 - design-readiness-check
+- decision-evaluation
 
 It is not a template library.
 It is not a project knowledge base.
@@ -16,9 +17,49 @@ It is not a design document store.
 
 ---
 
-## 1. Shared Concepts
+## 1. Shared Design State
 
-### 1.1 Design Tree
+### 1.1 Required Fields
+
+All design-tree skills reason over a shared `design_state` with these required logical fields:
+
+- `problem`
+- `scope`
+- `design_tree`
+- `open_branches`
+- `decision_nodes`
+- `external_dependencies`
+- `decisions`
+- `risks`
+- `validation`
+- `status`
+- `design_target_type`
+
+The family does not require a strict schema validator.
+It does require stable treatment of these fields as required design-stage state.
+
+### 1.2 Required Target Type
+
+`design_target_type` is mandatory.
+
+Allowed values:
+- `system`
+- `workflow`
+- `methodology`
+- `framework`
+
+If a design-state input is missing `design_target_type`, design-tree skills must not silently infer one.
+They must stop, reject the incomplete state, or route the work to the step that can explicitly set the field.
+
+### 1.3 Shared Output Contract
+
+The primary output of design-tree skills is `design_state`.
+
+The family does not share a default persistence contract.
+Saving a design file is a skill-local or repo-local adapter behavior, not a shared design-tree rule.
+
+### 1.4 Design Tree
+
 A design tree is a structured representation of a stable design problem space.
 It should capture:
 - scope
@@ -35,7 +76,8 @@ A design tree is not:
 - a collection of examples
 - a project log
 
-### 1.2 Parent Tree
+### 1.5 Parent Tree
+
 A parent tree is the currently authoritative tree for a design problem domain.
 
 It owns:
@@ -43,7 +85,8 @@ It owns:
 - the original stable scope
 - routing into derived trees when needed
 
-### 1.3 Derived Tree
+### 1.6 Derived Tree
+
 A derived tree is a new tree created when a branch has evolved into a separate stable decision system.
 
 A derived tree must:
@@ -57,12 +100,14 @@ A derived tree must not:
 - act as a dumping ground for overflow detail
 - redefine the parent tree's scope silently
 
-### 1.4 Open Branch
+### 1.7 Open Branch
+
 An open branch is an unresolved area inside a tree that still belongs to that tree's problem domain.
 
 Not every open branch deserves a derived tree.
 
-### 1.5 Stable Decision System
+### 1.8 Stable Decision System
+
 A branch becomes a stable decision system when it:
 - repeatedly appears in work
 - requires its own routing logic
@@ -70,7 +115,8 @@ A branch becomes a stable decision system when it:
 - has its own completion check
 - no longer behaves like a normal branch refinement
 
-### 1.6 Handoff
+### 1.9 Handoff
+
 A handoff is the minimum structured transfer from one tree to another.
 
 A handoff exists to prevent:
@@ -81,9 +127,98 @@ A handoff exists to prevent:
 
 ---
 
-## 2. Derivation Rules
+## 2. Target Type Classification
 
-### 2.1 When to Derive a New Tree
+### 2.1 system
+
+Use `system` when the design is primarily about components, interfaces, data flow, runtime boundaries, or failure behavior between parts of a built system.
+
+Typical questions:
+- What are the core objects or services?
+- How do adjacent parts interact?
+- What fails, where, and how is it validated?
+
+### 2.2 workflow
+
+Use `workflow` when the design is primarily about ordered phases, stage handoffs, operator roles, rollback paths, or quality gates.
+
+Typical questions:
+- What are the stages?
+- What enters and exits each stage?
+- Who or what owns each handoff?
+
+### 2.3 methodology
+
+Use `methodology` when the design is primarily about a repeatable method, decision process, stop condition, or judgment framework for doing work.
+
+Typical questions:
+- When does this method apply?
+- What rules govern progress?
+- When should the user stop or escalate?
+
+### 2.4 framework
+
+Use `framework` when the design is primarily about dimensions, routing rules, classification rules, or coordination contracts that other work operates inside.
+
+Typical questions:
+- What dimensions structure the problem?
+- How is work routed?
+- What are the handoff forms and exit rules?
+
+### 2.5 Classification Rule
+
+If multiple interpretations are plausible, choose the type that best matches the design's primary core question.
+Do not force a workflow or methodology design into `system` just because it can be described with components.
+
+---
+
+## 3. Type-Specific Completion Standards
+
+### 3.1 system
+
+A branch is implementation-ready only when its leaf nodes can answer:
+
+1. What it is responsible for
+2. What it is not responsible for
+3. How it interacts with adjacent parts
+4. What failure looks like
+5. How it will be validated
+
+### 3.2 workflow
+
+A branch is implementation-ready only when its leaf nodes can answer:
+
+1. What the stage is trying to achieve
+2. What inputs enter and outputs leave
+3. Who or what owns the stage
+4. What rollback or retry path exists
+5. What quality gate closes the stage
+
+### 3.3 methodology
+
+A branch is implementation-ready only when its leaf nodes can answer:
+
+1. When the method applies
+2. When it does not apply
+3. What decision rules guide progress
+4. What handoff form it produces
+5. What exit or stop condition ends the method
+
+### 3.4 framework
+
+A branch is implementation-ready only when its leaf nodes can answer:
+
+1. What dimension or module it defines
+2. What it explicitly does not own
+3. What routing or classification rule it applies
+4. What handoff form it expects
+5. What exit condition or completion rule closes it
+
+---
+
+## 4. Derivation Rules
+
+### 4.1 When to Derive a New Tree
 
 Derive a new tree only if all conditions below are true:
 
@@ -95,7 +230,7 @@ Derive a new tree only if all conditions below are true:
 
 If any condition fails, do not derive.
 
-### 2.2 When Not to Derive
+### 4.2 When Not to Derive
 
 Do not derive a new tree when:
 
@@ -106,7 +241,7 @@ Do not derive a new tree when:
 - the content belongs in a checklist, report, template, or script
 - the problem is still clearly part of the parent tree's original core question
 
-### 2.3 Derivation Test
+### 4.3 Derivation Test
 
 Before deriving, ask:
 
@@ -118,22 +253,22 @@ If it is a different stable problem, derive.
 
 ---
 
-## 3. Parent / Child Handoff Contract
+## 5. Parent / Child Handoff Contract
 
-### 3.1 Minimum Handoff Fields
+### 5.1 Minimum Handoff Fields
 
 A parent tree handing off to a derived tree should provide:
 
-- parent_tree_name
-- derived_tree_name
-- reason_for_derivation
-- branch_being_extracted
-- inherited_constraints
-- unresolved_questions
-- expected_output
-- return_conditions
+- `parent_tree_name`
+- `derived_tree_name`
+- `reason_for_derivation`
+- `branch_being_extracted`
+- `inherited_constraints`
+- `unresolved_questions`
+- `expected_output`
+- `return_conditions`
 
-### 3.2 Parent Responsibilities After Derivation
+### 5.2 Parent Responsibilities After Derivation
 
 After a derived tree is created, the parent tree must:
 
@@ -145,7 +280,7 @@ After a derived tree is created, the parent tree must:
 
 The parent must not continue growing a duplicate copy of the child logic.
 
-### 3.3 Child Responsibilities
+### 5.3 Child Responsibilities
 
 A derived tree must:
 
@@ -155,7 +290,7 @@ A derived tree must:
 - avoid redefining the parent problem
 - return results in a form the parent can consume
 
-### 3.4 Return Paths
+### 5.4 Return Paths
 
 A derived tree may return one of these outcomes:
 
@@ -166,15 +301,15 @@ A derived tree may return one of these outcomes:
 
 ---
 
-## 4. Anti-Bloat Governance
+## 6. Anti-Bloat Governance
 
-### 4.1 Core Rule
+### 6.1 Core Rule
 
 Keep trees small enough to preserve routing clarity.
 
 A tree should store stable structure, not accumulated history.
 
-### 4.2 What Belongs in a Tree
+### 6.2 What Belongs in a Tree
 
 Allowed:
 - stable boundaries
@@ -193,8 +328,9 @@ Not allowed:
 - template bodies
 - FAQ accumulation
 - repeated caveats that belong elsewhere
+- persistence adapters that only matter to one repo
 
-### 4.3 Growth Controls
+### 6.3 Growth Controls
 
 When a tree grows, prefer this order:
 
@@ -206,7 +342,7 @@ When a tree grows, prefer this order:
 
 Do not derive a new tree just because the current tree is long.
 
-### 4.4 Eviction Rules
+### 6.4 Eviction Rules
 
 Move content out of a tree when:
 
@@ -216,7 +352,7 @@ Move content out of a tree when:
 - it is repeated in multiple places
 - it no longer changes routing or design decisions
 
-### 4.5 Compaction Trigger
+### 6.5 Compaction Trigger
 
 Run a compaction pass when any of these appear:
 
@@ -227,21 +363,24 @@ Run a compaction pass when any of these appear:
 - parent and child trees both expanding the same branch
 - the tree is harder to route from than to read
 
-### 4.6 Anti-Bloat Priority
+### 6.6 Anti-Bloat Priority
 
 When choosing between preserving detail and preserving structure, preserve structure.
 
 ---
 
-## 5. Use by Other Skills
+## 7. Use by Other Skills
 
 ### design-orchestrator
 Use this reference to decide:
+- whether a design-state input is complete enough to route
 - whether to keep routing within the current tree
 - whether a new tree should be derived
 
 ### design-structure
 Use this reference when:
+- confirming `design_target_type`
+- choosing the initial branch skeleton
 - creating a new derived tree
 - defining parent/child boundaries
 
@@ -249,22 +388,17 @@ Use this reference when:
 Use this reference when:
 - deciding whether a branch should stay in refinement
 - deciding whether refinement has crossed into derivation territory
+- applying the correct completion standard for the current target type
 
 ### design-readiness-check
 Use this reference only to detect:
+- missing required state
 - mixed responsibilities
 - tree drift
 - unresolved branch ownership
+- type-specific readiness gaps
 
----
-
-## 6. Maintenance Rule
-
-This reference should change rarely.
-
-New content may be added only if it is:
-- shared across multiple design skills
-- stable over time
-- directly relevant to derivation, handoff, boundaries, or anti-bloat behavior
-
-If content is useful but not core, move it somewhere else.
+### decision-evaluation
+Use this reference when:
+- confirming that a bounded decision belongs to the current target type
+- feeding the chosen option back into the correct design-state shape

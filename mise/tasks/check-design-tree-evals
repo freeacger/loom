@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+#MISE description="检查 design-tree 家族 eval 元数据与 design_target_type 覆盖"
+set -euo pipefail
+
+python3 - <<'PY'
+import json
+from pathlib import Path
+import sys
+
+skills = [
+    "design-tree-core",
+    "design-orchestrator",
+    "design-structure",
+    "design-refinement",
+    "design-readiness-check",
+    "decision-evaluation",
+]
+
+failures = []
+
+for skill in skills:
+    path = Path("skills") / skill / "evals" / "evals.json"
+    data = json.loads(path.read_text())
+    evals = data.get("evals", [])
+    if not evals:
+        failures.append(f"{skill}: missing evals")
+        continue
+
+    has_negative_or_boundary = False
+    for entry in evals:
+        category = entry.get("category")
+        if category not in {"positive", "negative", "boundary"}:
+            failures.append(f"{skill}: eval {entry.get('id')} has invalid category")
+        if category in {"negative", "boundary"}:
+            has_negative_or_boundary = True
+
+        tags = entry.get("tags")
+        if not isinstance(tags, list) or not tags:
+            failures.append(f"{skill}: eval {entry.get('id')} is missing tags")
+
+        if entry.get("design_state_input"):
+            omitted = set(entry.get("required_fields_omitted", []))
+            prompt = entry.get("prompt", "")
+            if "design_target_type" not in prompt and "design_target_type" not in omitted:
+                failures.append(
+                    f"{skill}: eval {entry.get('id')} uses design_state but does not declare design_target_type"
+                )
+            if omitted and category != "boundary":
+                failures.append(
+                    f"{skill}: eval {entry.get('id')} omits required fields outside boundary category"
+                )
+
+    if not has_negative_or_boundary:
+        failures.append(f"{skill}: missing negative or boundary eval")
+
+decision_eval_path = Path("skills/decision-evaluation/evals/evals.json")
+decision_evals = json.loads(decision_eval_path.read_text()).get("evals", [])
+if not any("non-technical-decision" in entry.get("tags", []) for entry in decision_evals):
+    failures.append("decision-evaluation: missing non-technical decision eval")
+
+if failures:
+    print("✗ design-tree eval checks failed")
+    for failure in failures:
+        print(f"  - {failure}")
+    sys.exit(1)
+
+for skill in skills:
+    print(f"  ✓ {skill}")
+print("✓ design-tree eval metadata is valid")
+PY

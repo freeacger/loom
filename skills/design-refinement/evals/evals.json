@@ -3,103 +3,88 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "当前设计状态：\n\nproblem: 构建用户通知服务\ndesign_tree:\n  - 通知调度器: 负责触发通知的发送（待细化）\n  - 渠道适配层: 对接各渠道 SDK（待细化）\n  - 模板引擎: 渲染通知内容（待细化）\nopen_branches: [通知调度器, 渠道适配层, 模板引擎]\n\n请细化\"通知调度器\"这个分支。",
-      "expected_output": "Refined design_tree entry for 通知调度器 where the leaf nodes can answer all five questions from the Leaf Node Standard: (1) what it is responsible for, (2) what it is NOT responsible for, (3) how it interacts with adjacent parts, (4) what failure looks like, (5) how it will be validated. The branch should not remain vague after refinement.",
+      "category": "positive",
+      "tags": [
+        "system-positive"
+      ],
+      "design_state_input": true,
+      "prompt": "当前设计状态：\n\nproblem: 构建用户通知服务\nscope: 发送系统通知\n\n design_target_type: system\ndesign_tree:\n  - 通知调度器: 负责触发通知的发送（待细化）\n  - 渠道适配层: 对接各渠道 SDK（待细化）\n  - 模板引擎: 渲染通知内容（待细化）\nopen_branches: [通知调度器, 渠道适配层, 模板引擎]\n\n请细化“通知调度器”这个分支。",
+      "expected_output": "The skill should refine the branch using the system completion standard: responsibility, non-responsibility, adjacent interaction, failure, and validation.",
       "assertions": [
         {
-          "name": "responsibility_defined",
-          "description": "Refined branch clearly states what 通知调度器 is responsible for and what it is NOT responsible for",
-          "type": "qualitative"
-        },
-        {
-          "name": "failure_path_included",
-          "description": "Branch includes at least one concrete failure scenario (e.g., downstream unavailable, malformed payload, queue full) and what happens",
-          "type": "qualitative"
-        },
-        {
-          "name": "validation_criteria_present",
-          "description": "Branch describes how 通知调度器 will be validated (unit test scope, integration test scenario, or observable signal)",
-          "type": "qualitative"
-        },
-        {
-          "name": "interaction_with_adjacent_parts",
-          "description": "Branch describes how 通知调度器 interacts with at least one adjacent component (e.g.,渠道适配层 or the caller)",
-          "type": "qualitative"
-        },
-        {
-          "name": "diagram_used_for_interactions",
-          "description": "Since 通知调度器 interacts with adjacent components (3+ components), output includes a character diagram (sequence or data flow) inside a code block without language tag",
+          "name": "uses_system_leaf_standard",
+          "description": "The refined branch answers the system-type completion questions",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 2,
-      "prompt": "当前设计状态：\n\nproblem: 实现一个分布式任务调度系统，多个 Worker 节点消费任务队列\ndesign_tree:\n  - Worker 注册与心跳: 节点启动时注册，定期上报存活（简单描述）\n  - 任务分发逻辑: 将待执行任务分配给可用 Worker（简单描述）\n  - 任务执行与状态回报: Worker 执行任务后回报结果（简单描述）\nopen_branches: [Worker 注册与心跳, 任务分发逻辑, 任务执行与状态回报]\n\n请细化所有分支，重点识别其中隐含的风险和假设。",
-      "expected_output": "Refined design_state where: (1) risks field is populated with at least 2 non-obvious risks surfaced during refinement (e.g., split-brain on worker crash, task duplication on re-delivery), (2) confirmed_assumptions field has at least 2 entries making implicit premises explicit (e.g., at-least-once vs exactly-once delivery, task idempotency requirement), (3) open_branches is reduced or each remaining open branch has a clear reason for being unresolved.",
+      "category": "positive",
+      "tags": [
+        "workflow-positive"
+      ],
+      "design_state_input": true,
+      "prompt": "当前设计状态：\n\nproblem: 建立事故复盘流程\nscope: 从事故确认到复盘关闭\ndesign_target_type: workflow\ndesign_tree:\n  - 事故确认阶段: 目标和输入输出待细化\n  - 原因分析阶段: 责任人和质量门待细化\n  - 行动项关闭阶段: 回退规则待细化\nopen_branches: [事故确认阶段, 原因分析阶段, 行动项关闭阶段]\n\n请细化“原因分析阶段”。",
+      "expected_output": "The skill should refine the branch using the workflow completion standard: stage goal, input/output, owner, rollback path, and quality gate.",
       "assertions": [
         {
-          "name": "risks_populated",
-          "description": "risks field contains at least 2 non-obvious risks surfaced through refinement, not just generic platitudes",
-          "type": "qualitative"
-        },
-        {
-          "name": "assumptions_made_explicit",
-          "description": "confirmed_assumptions field has at least 2 entries that were previously implicit (e.g., about idempotency, delivery guarantee, or node failure behavior)",
-          "type": "qualitative"
-        },
-        {
-          "name": "branches_more_concrete",
-          "description": "At least one refined branch has sub-nodes with concrete behavior descriptions, not just renamed versions of the top-level label",
-          "type": "qualitative"
-        },
-        {
-          "name": "diagram_for_distributed_system",
-          "description": "Since this is a distributed system with multiple components (Worker, task queue, dispatcher), output includes at least one character diagram (sequence, data flow, or state machine) in a code block",
+          "name": "uses_workflow_leaf_standard",
+          "description": "The refined branch answers the workflow-type completion questions",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 3,
-      "prompt": "当前设计状态：\n\nproblem: 实现一个支持多种数据源的 ETL 管道\ndesign_tree:\n  - 数据源适配器: 从 MySQL、Postgres、CSV 读取数据\n  - 转换引擎: 执行字段映射、过滤、聚合\n  - 数据写入层: 将处理后数据写入目标存储\nopen_branches: [数据源适配器, 转换引擎]\n\n请细化\"转换引擎\"。",
-      "expected_output": "During refinement of 转换引擎, the skill should surface at least one new decision_node (e.g., whether transformations are defined via config/DSL or code, error handling strategy for bad rows, streaming vs batch processing model). This decision node should be marked as a decision_nodes entry rather than being silently resolved by the skill itself.",
+      "category": "positive",
+      "tags": [
+        "methodology-positive"
+      ],
+      "design_state_input": true,
+      "prompt": "当前设计状态：\n\nproblem: 建立代码研究方法论\nscope: 决定如何抽样、何时停机、何时回退\ndesign_target_type: methodology\ndesign_tree:\n  - 适用条件: 需要补齐\n  - 停机准则: 需要细化\n  - 交接形式: 需要细化\nopen_branches: [适用条件, 停机准则, 交接形式]\n\n请细化“停机准则”。",
+      "expected_output": "The skill should refine the branch using the methodology completion standard rather than forcing system-style interfaces.",
       "assertions": [
         {
-          "name": "new_decision_node_surfaced",
-          "description": "Refinement produces at least one new decision_node entry that was not present before — a real choice with alternatives, not something the skill invents a fake resolution for",
-          "type": "qualitative"
-        },
-        {
-          "name": "decision_not_resolved_by_skill",
-          "description": "The skill marks the decision as a decision_node to be evaluated later; it does not unilaterally choose an approach and bury the choice",
-          "type": "qualitative"
-        },
-        {
-          "name": "transformation_engine_is_concrete",
-          "description": "转换引擎 branch has sub-nodes describing specific transformation types, execution model, and error behavior — not just a restatement of 'handles transformations'",
+          "name": "uses_methodology_leaf_standard",
+          "description": "The refined branch answers applicability, decision rule, handoff, and exit-condition style questions",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 4,
-      "prompt": "当前设计状态：\n\nproblem: 为代码研究项目建立稳定知识沉淀流程\ndesign_tree:\n  - 研究主树: 研究问题、抽样策略、停机条件，已相对稳定\n  - 笔记生产: 什么时候可以写正式笔记、如何连接阅读路径、何时退回研究（持续在一个分支里膨胀）\nopen_branches: [笔记生产]\n\n请继续细化\"笔记生产\"分支。",
-      "expected_output": "The skill should refuse to keep refining 笔记生产 inline once it recognizes that the branch is answering a second stable core question with its own lifecycle. It should surface the branch as a derivation candidate and hand back to design-orchestrator or design-structure instead of absorbing the branch into the parent tree.",
+      "category": "positive",
+      "tags": [
+        "framework-positive"
+      ],
+      "design_state_input": true,
+      "prompt": "当前设计状态：\n\nproblem: 设计多技能路由框架\nscope: 按任务类型和风险级别路由到不同 skill\ndesign_target_type: framework\ndesign_tree:\n  - 路由维度: 需要细化\n  - handoff 形式: 需要细化\n  - 退出条件: 需要细化\nopen_branches: [路由维度, handoff 形式, 退出条件]\n\n请细化“路由维度”。",
+      "expected_output": "The skill should refine the branch using the framework completion standard around dimensions, routing rules, non-ownership, handoff, and completion conditions.",
       "assertions": [
         {
-          "name": "stops_inline_refinement",
-          "description": "Output does not continue expanding the branch inline once derivation criteria are met",
+          "name": "uses_framework_leaf_standard",
+          "description": "The refined branch answers framework-style completion questions",
           "type": "qualitative"
-        },
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "category": "boundary",
+      "tags": [
+        "missing-design-target-type"
+      ],
+      "design_state_input": true,
+      "required_fields_omitted": [
+        "design_target_type"
+      ],
+      "prompt": "当前设计状态：\n\nproblem: 实现一个支持多种数据源的 ETL 管道\ndesign_tree:\n  - 数据源适配器: 从 MySQL、Postgres、CSV 读取数据\n  - 转换引擎: 执行字段映射、过滤、聚合\n  - 数据写入层: 将处理后数据写入目标存储\nopen_branches: [数据源适配器, 转换引擎]\n\n请细化“转换引擎”。",
+      "expected_output": "The skill should refuse to continue refinement because design_target_type is missing, and it should hand back to design-orchestrator or design-structure instead of assuming system.",
+      "assertions": [
         {
-          "name": "surfaces_derivation_candidate",
-          "description": "Output explicitly states that the branch is now a derivation candidate or separate stable decision system",
-          "type": "qualitative"
-        },
-        {
-          "name": "hands_back_for_derivation",
-          "description": "Output routes back to design-orchestrator or design-structure for explicit derived-tree creation",
+          "name": "blocks_missing_target_type",
+          "description": "Output treats the missing design_target_type as a blocker",
           "type": "qualitative"
         }
       ]

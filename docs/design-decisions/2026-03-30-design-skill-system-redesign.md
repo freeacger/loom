@@ -112,16 +112,27 @@ flowchart TD
 - `risks`
 - `validation`
 - `status`
+- `design_target_type`
 
 字段分工如下：
 
 - `design-structure` 主要初始化 `problem`、`scope`、`design_tree`、`open_branches`、`decision_nodes`、`external_dependencies`
+- `design-structure` 必须先显式确认 `design_target_type`
 - `design-refinement` 主要补充 `design_tree`、`open_branches`、`risks`、`validation`、`external_dependencies`
 - `decision-evaluation` 主要更新 `decision_nodes`、`decisions`、`risks`
 - `design-readiness-check` 主要判断 `status.ready_for_planning` 与 `status.blocking_issues`
 - `design-orchestrator` 主要读取全体状态并调整 `status.phase`
 
 这份契约的目的不是引入严格 schema（模式）约束，而是避免多个技能之间的 handoff 丢失关键状态。
+
+`design_target_type` 的枚举值固定为：
+
+- `system`
+- `workflow`
+- `methodology`
+- `framework`
+
+缺失该字段时，design-tree 技能不应静默推断，也不应默认当作 `system` 处理。
 
 ### 外部依赖追踪 (External Dependency Tracking)
 

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#MISE description="检查 design-tree 最小 canonical 行为矩阵"
+set -euo pipefail
+
+python3 - <<'PY'
+import json
+from pathlib import Path
+import sys
+
+required_tags = {
+    "design-structure": {
+        "all": [
+            "system-positive",
+            "workflow-positive",
+            "methodology-positive",
+            "framework-positive",
+            "report-negative",
+            "summary-negative",
+            "sop-negative",
+        ]
+    },
+    "design-refinement": {
+        "all": [
+            "missing-design-target-type",
+        ]
+    },
+    "design-orchestrator": {
+        "all": [
+            "missing-design-target-type",
+        ]
+    },
+    "design-readiness-check": {
+        "all": [
+            "missing-design-target-type",
+        ]
+    },
+    "decision-evaluation": {
+        "all": [
+            "non-technical-decision",
+            "broad-discovery-negative",
+        ]
+    },
+}
+
+failures = []
+
+for skill, rules in required_tags.items():
+    path = Path("skills") / skill / "evals" / "evals.json"
+    evals = json.loads(path.read_text()).get("evals", [])
+    present = {tag for entry in evals for tag in entry.get("tags", [])}
+    missing = [tag for tag in rules["all"] if tag not in present]
+    if missing:
+        failures.append(f"{skill}: missing tags {', '.join(missing)}")
+
+if failures:
+    print("✗ design-tree canonical matrix is incomplete")
+    for failure in failures:
+        print(f"  - {failure}")
+    sys.exit(1)
+
+for skill in required_tags:
+    print(f"  ✓ {skill}")
+print("✓ design-tree canonical matrix is covered")
+PY

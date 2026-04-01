@@ -9,10 +9,11 @@ description: Build the initial design structure from a vague or partially formed
 
 This skill turns a vague idea into an initial design tree through a two-phase workflow:
 
-1. **Interactive confirmation** — progressively confirm problem, scope, and assumptions with the user
+1. **Interactive confirmation** — progressively confirm `design_target_type`, problem, scope, and assumptions with the user
 2. **Design tree generation** — produce the design tree based on confirmed inputs
 
-All output is written to a file. The conversation stays concise: questions during confirmation, tree diagram and action items during generation.
+Its primary output is `design_state`.
+Saving a file is optional and only happens when the task explicitly requires persistence.
 
 ## When to Use
 
@@ -22,6 +23,7 @@ Use this skill when:
 - the task lacks scope, boundaries, core objects, or key flows
 - there is no clear design tree yet
 - the current design conversation is still at the "what are we even designing?" stage
+- an existing tree is missing `design_target_type` and needs that field to be made explicit
 
 Do not use this skill when:
 
@@ -30,6 +32,8 @@ Do not use this skill when:
 - the main need is to compare options for one explicit decision node
 - the main need is to decide whether the design is ready for planning
 - the current tree only needs deeper refinement rather than a true derived tree
+- the task is a report, note, summary, or documentation rewrite
+- the task is a simple linear SOP with no real design-state boundary
 
 ## Language Strategy
 
@@ -67,33 +71,27 @@ If the output language is English:
 
 Confirm the foundation before generating the design tree. Proceed in order:
 
-1. **Problem** — confirm the core problem and success metrics
-2. **Scope** — confirm what is included and excluded
-3. **Assumptions** — confirm implicit assumptions being made
+1. **Design target type** — confirm one of `system`, `workflow`, `methodology`, `framework`
+2. **Problem** — confirm the core problem and success metrics
+3. **Scope** — confirm what is included and excluded
+4. **Assumptions** — confirm implicit assumptions being made
 
-After each confirmation, immediately write the confirmed section to the design file. Do not repeat confirmed content in subsequent conversation.
+After each confirmation, update the shared `design_state`. Do not repeat confirmed content in subsequent conversation.
 
 Skip a section only if the user explicitly provides it upfront (e.g., "the problem is X and the scope is Y" — confirm both in one round).
 
 ### Phase 2: Design Tree Generation
 
-Based on confirmed inputs, generate the design tree covering (when relevant):
+Based on confirmed inputs, generate the design tree using the branch skeleton that matches `design_target_type`.
 
-1. Problem definition
-2. Scope and boundaries
-3. Core objects
-4. Core flows
-5. Interfaces and data
-6. Decision points
-7. Non-functional requirements
-8. Validation and delivery
+Use `../design-tree-core/REFERENCE.md` for shared type definitions and `REFERENCE.md` for preferred local branch skeletons.
 
 If a branch is not relevant, say so explicitly instead of silently omitting it.
 
-Write the complete design tree to the file. In conversation, show only:
+In conversation, show only:
 - the tree diagram
 - decision nodes that need user action
-- open branch names (point user to file for details)
+- open branch names
 - next step recommendation
 
 ## Derived Tree Creation
@@ -193,60 +191,23 @@ Expected daily request volume?
 - End every question with `↑` marker to signal "your turn"
 - After user confirms, do not repeat the confirmed content (it is already in the file)
 
-## File Output
+## Persistence
 
-### Path
+Persistence is optional.
 
-Write the design file to `docs/design-tree/<feature-name>.md`.
-
-Derive `<feature-name>` from the user's request (e.g., "payment service" → `payment-service`). Create the directory if it does not exist.
-
-### Template
-
-```markdown
-# <Feature Name> Design Tree
-
-## Problem
-[confirmed content]
-
-## Scope
-### Included
-- ...
-### Excluded
-- ...
-
-## Assumptions
-- ...
-
-## Design Tree
-[tree diagram]
-
-## Open Branches
-- ...
-
-## Decision Nodes
-- ...
-
-## Decisions
-[filled later by decision-evaluation]
-```
-
-### Incremental Write
-
-Write each section to the file as soon as it is confirmed or generated. Do not wait until the end. This prevents data loss if the process is interrupted.
+Use `REFERENCE.md` for the local save contract.
+Do not assume file output unless the task explicitly requires it.
 
 ## Design Tree Requirement
 
-Create an initial design tree that covers, at minimum, these branches when relevant:
+Create an initial design tree that:
 
-1. Problem definition
-2. Scope and boundaries
-3. Core objects
-4. Core flows
-5. Interfaces and data
-6. Decision points
-7. Non-functional requirements
-8. Validation and delivery
+- makes `design_target_type` explicit
+- uses the correct branch skeleton for that target type
+- identifies open branches
+- identifies explicit decision nodes
+- captures assumptions rather than relying on them silently
+- keeps the output as `design_state` first, artifact second
 
 If a branch is not relevant, say so explicitly instead of silently omitting it.
 
@@ -255,34 +216,36 @@ If a branch is not relevant, say so explicitly instead of silently omitting it.
 Your responsibilities are:
 
 1. Clarify the real goal of the design through interactive confirmation.
-2. Capture scope, non-goals, and constraints.
-3. Build an initial design tree with first-level and, where useful, second-level branches.
-4. Identify open branches that still need refinement.
-5. Identify explicit decision nodes that should later go to `decision-evaluation`.
-6. Record assumptions instead of silently relying on them.
-7. Write all output to the design file incrementally.
+2. Make `design_target_type` explicit before building the tree.
+3. Capture scope, non-goals, and constraints.
+4. Build an initial design tree with first-level and, where useful, second-level branches.
+5. Identify open branches that still need refinement.
+6. Identify explicit decision nodes that should later go to `decision-evaluation`.
+7. Record assumptions instead of silently relying on them.
 8. Flag nodes that depend on unverified external tools, APIs, libraries, or services. Perform a lightweight feasibility check (web search or doc lookup) at the time of flagging. If the dependency is clearly infeasible, mark `✗` immediately; if confirmed feasible with open questions, mark `[RESEARCH]` with initial findings; if fully confirmed, mark `✓`.
-9. If acting on a parent-tree handoff, create a derived tree with explicit parent/child boundaries rather than repeating the parent tree inline.
+9. Persist the design only when the task explicitly requires it.
+10. If acting on a parent-tree handoff, create a derived tree with explicit parent/child boundaries rather than repeating the parent tree inline.
 
 ## Expected Outputs
 
-### File Output (complete)
+### Required Output
 
-The design file at `docs/design-tree/<name>.md` must contain:
-- Problem — confirmed
-- Scope — confirmed, with explicit non-goals
-- Assumptions — confirmed
-- Design Tree — tree diagram
-- Open Branches — list
-- Decision Nodes — list
-- External Dependencies — list, each entry contains: node, dependency, validation_needed, status (unverified | verified | blocked)
+Produce or update a `design_state` that includes:
 
-If the tree being created is a derived tree, the file must also contain:
-- Parent Tree
-- Derivation Reason
-- Ownership
-- Non-Ownership
-- Parent/Child Handoff
+- `design_target_type`
+- `problem`
+- `scope`
+- `design_tree`
+- `open_branches`
+- `decision_nodes`
+- `external_dependencies`
+- `status`
+
+If the tree being created is a derived tree, also include:
+
+- parent/child ownership
+- derivation reason
+- parent/child handoff
 
 ### Conversation Output (concise)
 
@@ -350,4 +313,6 @@ Exit when:
 - Hand off to `design-refinement` when the tree exists but branches are still too shallow.
 - Hand off to `decision-evaluation` when there is a concrete decision node with real options.
 - Hand back to `design-orchestrator` if the design state changed enough that routing should be re-evaluated.
+- Do not continue past Phase 1 if `design_target_type` is still unresolved.
 - Do not force the conversation into option comparison before the design tree is formed.
+- Do not default to saving a file unless the task explicitly requires persistence.

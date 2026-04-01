@@ -24,12 +24,12 @@ The repository covers the full engineering lifecycle:
 
 | Skill | Purpose |
 |---|---|
-| `design-orchestrator` | Route design-stage work across the specialized design skills |
-| `design-tree-core` | Internal/shared governance core for derivation, handoff, and anti-bloat rules across design-tree skills; not a normal user entrypoint |
-| `design-structure` | Turn a vague idea into an initial design tree and design skeleton |
-| `design-refinement` | Deepen an existing design tree until key branches are implementation-ready |
-| `decision-evaluation` | Compare bounded design options and recommend one with trade-offs |
-| `design-readiness-check` | Decide whether a design is complete enough for implementation planning |
+| `design-orchestrator` | Route design-stage work across the specialized design skills with one explicit next step |
+| `design-tree-core` | Internal/shared governance core for required `design_state`, `design_target_type`, derivation, handoff, and anti-bloat rules |
+| `design-structure` | Turn a vague idea into a `design_state`-first design tree with an explicit target type |
+| `design-refinement` | Deepen an existing typed design tree until key branches meet the right completion standard |
+| `decision-evaluation` | Compare bounded technical or non-technical design options and recommend one with trade-offs |
+| `design-readiness-check` | Decide whether a typed design is complete enough for implementation planning |
 | `design-decision-audit` | Review design or plan documents for missing decisions and rollout gaps |
 
 ### Planning
@@ -109,6 +109,8 @@ This repository pins Python in `mise.toml`. Run Python-dependent commands inside
 ## Agent Skills Alignment
 
 `loom` keeps `skills.sh` as its distribution path. [Agent Skills](https://agentskills.io/home) is treated as a compatibility target and reference specification layer, not as a replacement install source for this repository.
+
+For the design-tree family, the primary shared output is `design_state`, not a default saved file. `design_target_type` is mandatory and must be one of `system`, `workflow`, `methodology`, or `framework`. Any saved design artifact under `docs/design-tree/` is now an explicit persistence choice rather than a family-wide default side effect.
 
 Phase 1 adds an optional validation command:
 

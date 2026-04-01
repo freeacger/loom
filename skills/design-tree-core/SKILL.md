@@ -11,21 +11,23 @@ This skill is the shared governance core for the design-tree skill family.
 
 It is not a general design skill.
 It is not a user-facing entrypoint for normal design work.
-It exists to provide stable shared rules that other design skills can rely on.
+It exists to define the minimum shared contract that all design-tree skills must honor.
 
-Its job is to define and protect the minimum shared rules for:
+Its job is to protect only the rules that stay stable across the family:
 
-- design-tree derivation
-- parent/child tree boundaries
-- handoff contracts
+- required `design_state` fields
+- `design_target_type` vocabulary
+- derivation criteria
+- parent/child handoff contracts
 - anti-bloat governance
-- shared design-tree vocabulary
 
 ## When to Use
 
 Use this skill only when:
 
 - maintaining or revising the design-tree skill system itself
+- changing the shared `design_state` contract
+- aligning multiple design skills on `design_target_type` behavior
 - deciding whether a new design tree should be derived
 - checking whether shared design-tree rules belong in a common core
 - aligning multiple design skills on shared boundary or handoff rules
@@ -47,7 +49,7 @@ This skill owns only rules that are all of the following:
 
 1. Shared across at least two design-tree skills
 2. Stable over time
-3. Directly relevant to design-tree boundaries, routing, derivation, handoff, or anti-bloat governance
+3. Directly relevant to design-state boundaries, routing, derivation, handoff, or anti-bloat governance
 4. Too central to leave implicit
 5. Too shared to belong to only one skill
 
@@ -61,6 +63,7 @@ The following content must not be added to this skill or its references:
 - one-off discussion outcomes
 - long examples or case studies
 - detailed templates
+- persistence adapters or repo-specific save workflows
 - release workflow details
 - single-skill-specific rules
 - content-production rules for reports, notes, or plans
@@ -108,10 +111,19 @@ This skill may define shared rules for when a design tree should be derived into
 It must not define the full operating logic of any derived tree.
 Once a derived tree has its own stable responsibility, that logic belongs in the derived tree, not here.
 
+## Shared Output Contract
+
+Design-tree skills share one primary output contract: they produce or update `design_state`.
+
+They do not share a default file-writing contract.
+If a specific skill or repository wants to persist a design file, that behavior belongs in that skill's local reference or adapter rules, not in the shared core.
+
 ## Output Contract
 
 When this skill is used, the output should be limited to one or more of:
 
+- shared `design_state` clarification
+- `design_target_type` clarification
 - shared rule clarification
 - derivation decision criteria
 - handoff contract clarification
@@ -134,9 +146,11 @@ This skill is healthy only if it remains smaller and more stable than the skills
 ## Relationship to Other Skills
 
 - `design-orchestrator` may use this skill when deciding whether to derive a new tree.
+- `design-orchestrator` may use this skill when rejecting a design flow that is missing `design_target_type`.
 - `design-structure` may use this skill when creating a derived tree.
+- `design-structure` may use this skill when choosing the correct target-type skeleton.
 - `design-refinement` may use this skill when a branch appears to be evolving into a separate stable decision system.
-- `design-readiness-check` may use this skill only to detect tree-structure drift or mixed responsibilities.
+- `design-readiness-check` may use this skill only to detect missing required state, tree-structure drift, or mixed responsibilities.
 
 This skill must not take over their normal responsibilities.
 

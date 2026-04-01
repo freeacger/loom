@@ -24,12 +24,12 @@
 
 | Skill | 用途 |
 |---|---|
-| `design-orchestrator` | 在多个设计技能之间编排和路由设计阶段工作 |
-| `design-tree-core` | 内部/共享治理核心：为 design-tree 技能家族提供派生、handoff 与反膨胀治理规则；不是普通用户入口 |
-| `design-structure` | 将模糊想法整理成初始设计树和设计骨架 |
-| `design-refinement` | 将已有设计树继续细化到关键分支可落地的粒度 |
-| `decision-evaluation` | 对有边界的设计决策做方案比较并给出推荐 |
-| `design-readiness-check` | 判断当前设计是否足够完整，可以进入实现规划 |
+| `design-orchestrator` | 在多个设计技能之间编排和路由设计阶段工作，每轮只给一个明确下一步 |
+| `design-tree-core` | 内部/共享治理核心：定义必需的 `design_state`、`design_target_type`、派生、handoff 与反膨胀规则 |
+| `design-structure` | 将模糊想法整理成以 `design_state` 为主的初始设计树，并显式确认目标类型 |
+| `design-refinement` | 按目标类型对应的完成标准，将已有设计树细化到关键分支可落地的粒度 |
+| `decision-evaluation` | 对有边界的技术或非技术设计决策做方案比较并给出推荐 |
+| `design-readiness-check` | 判断带有显式目标类型的设计是否足够完整，可以进入实现规划 |
 | `design-decision-audit` | 审查设计文档或计划文档中的缺失决策与上线缺口 |
 
 ### 规划 (Planning)
@@ -109,6 +109,8 @@ mise install
 ## Agent Skills 对齐
 
 `loom` 继续使用 `skills.sh` 作为分发路径。[Agent Skills](https://agentskills.io/home) 在本仓库里只作为兼容目标与参考规范层，不是新的安装源。
+
+对于 design-tree 技能家族，主共享产物现在是 `design_state`，而不是默认落盘文件。`design_target_type` 是强制字段，枚举值固定为 `system`、`workflow`、`methodology`、`framework`。`docs/design-tree/` 下的设计文件只在显式要求保存时才会生成，不再是家族级默认副作用。
 
 阶段 1 新增了一个可选校验命令：
 

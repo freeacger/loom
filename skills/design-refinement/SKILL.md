@@ -25,18 +25,31 @@ Do not use this skill when:
 - there is no design tree yet
 - the main problem is a single bounded decision with multiple options
 - the main question is whether the current design is ready for planning
+- `design_target_type` is missing from the current design state
+- the task is really a report, note, or SOP draft
+
+## Required Input
+
+Do not continue refinement without an explicit `design_target_type`.
+
+If the design state is missing that field:
+
+- stop refinement
+- do not silently assume `system`
+- hand back to `design-orchestrator` or `design-structure` so the type can be set explicitly
 
 ## Leaf Node Standard
 
-Treat a branch as implementation-ready only when its leaf nodes can answer:
+Use the target-type-specific completion standard from `../design-tree-core/REFERENCE.md`.
 
-1. What it is responsible for
-2. What it is not responsible for
-3. How it interacts with adjacent parts of the system
-4. What failure looks like
-5. How it will be validated
+In summary:
 
-If those answers are still missing, the branch is not done.
+- `system`: responsibility, non-responsibility, adjacent interaction, failure, validation
+- `workflow`: stage goal, input/output, owner, rollback, quality gate
+- `methodology`: applicability, non-applicability, decision rules, handoff form, exit condition
+- `framework`: dimension or module, non-ownership, routing rule, handoff form, completion rule
+
+If those answers are still missing for the current target type, the branch is not done.
 
 ## Refinement vs Derivation Boundary
 
@@ -64,7 +77,7 @@ Your responsibilities are:
 
 1. Walk unresolved design branches one at a time.
 2. Prioritize high-risk, high-dependency, or high-ambiguity branches first.
-3. Expand branches into concrete sub-branches and leaf nodes.
+3. Expand branches into concrete sub-branches and leaf nodes using the current `design_target_type`.
 4. Surface hidden assumptions and edge cases.
 5. Add failure-path and validation detail where missing.
 6. Explicitly mark newly discovered decision nodes instead of pretending they are settled.
@@ -74,6 +87,7 @@ Your responsibilities are:
 
 Produce or update a `design_state` that includes:
 
+- `design_target_type`
 - refined `design_tree` branches
 - updated `open_branches`
 - `confirmed_assumptions`
@@ -170,5 +184,7 @@ Exit when:
 - Hand off to `decision-evaluation` when you surface a clear decision node with multiple real options.
 - Hand off to `design-readiness-check` when key branches are closed and the main question becomes readiness.
 - Hand back to `design-structure` if the design tree itself is missing a foundational branch.
+- Hand back to `design-orchestrator` or `design-structure` immediately if `design_target_type` is missing.
 - Do not invent fake option comparisons just to make progress.
 - Do not use refinement to absorb a branch that should become a derived tree.
+- Do not force workflow, methodology, or framework branches into system-shaped leaves.

@@ -9,7 +9,7 @@ description: Coordinate design-stage work across specialized design skills. Use 
 
 This skill is the entrypoint for design-stage work.
 
-It does not do the deep design work itself. Its job is to inspect the current design state, choose the right next design skill, and keep the workflow moving until the design is ready for `writing-plans`.
+It does not do the deep design work itself. Its job is to inspect the current design state, choose exactly one next design skill, and keep the workflow moving until the design is ready for `writing-plans`.
 
 ## When to Use
 
@@ -25,6 +25,8 @@ Do not use this skill when:
 - the user is asking for direct execution
 - the task is already in implementation planning
 - the task is a single-step coding or editing request
+- the task is a writing request such as a report, note, or summary
+- the task is a simple linear SOP with no real design state
 
 ## Shared Design State
 
@@ -40,20 +42,35 @@ Assume the design workflow passes around a shared `design_state` with these logi
 - `risks`
 - `validation`
 - `status`
+- `design_target_type`
 
-You do not need a strict schema validator. You do need stable reasoning over these fields.
+Treat `design_target_type` as required. Do not silently infer it from an incomplete design-state input.
 
 ## Core Responsibilities
 
 Your responsibilities are:
 
 1. Determine whether the task is actually in the design stage.
-2. Inspect the current `design_state` and identify the most useful next skill.
+2. Inspect the current `design_state` and identify the single most useful next skill.
 3. Route the task to exactly one next design skill.
 4. Re-evaluate after each handoff until the design either becomes ready for planning or the user stops.
 5. Prevent premature transition into `writing-plans`.
 
 ## Routing Rules
+
+Apply routing in this order.
+
+### 1. Missing Required State
+
+Route to `design-structure` when:
+
+- the task should already be in design-state form, but `design_target_type` is missing
+- a design tree exists, but the target type has not been set explicitly
+
+In this case, do not continue to any other design skill first.
+The next step is to make the target type explicit.
+
+### 2. No Real Tree Yet
 
 Route to `design-structure` when:
 
@@ -61,25 +78,9 @@ Route to `design-structure` when:
 - the task is still a vague idea or feature request
 - scope, boundaries, core objects, or key flows are still missing
 
-Route to `design-refinement` when:
+### 3. Derived Tree Candidate
 
-- a design tree exists
-- major branches are still shallow, vague, or unresolved
-- the main need is deeper decomposition, edge-case coverage, or failure-path clarification
-
-Route to `decision-evaluation` when:
-
-- there is a bounded decision node with real alternatives
-- the task has become a concrete choice such as architecture, auth model, state handling, storage, sync, or coordination style
-
-Route to `design-readiness-check` when:
-
-- the design appears mostly complete
-- the remaining question is whether it is safe to move into implementation planning
-
-## Derived Tree Routing
-
-Before routing to `design-structure` or `design-refinement`, check whether the current tree is beginning to contain a second stable problem domain.
+Before routing to `design-refinement`, check whether the current tree is beginning to contain a second stable problem domain.
 
 Use the shared derivation rules in `../design-tree-core/REFERENCE.md` as the source of truth for this judgment.
 
@@ -101,6 +102,28 @@ If those conditions are not met:
 
 - do not derive
 - continue routing within the current tree
+
+### 4. Explicit Decision Blocker
+
+Route to `decision-evaluation` when:
+
+- there is a bounded decision node with real alternatives
+- the blocking issue is a concrete choice rather than an under-specified branch
+
+### 5. Mostly Complete
+
+Route to `design-readiness-check` when:
+
+- the design appears mostly complete
+- the remaining question is whether it is safe to move into implementation planning
+
+### 6. Everything Else
+
+Route to `design-refinement` when:
+
+- a design tree exists
+- major branches are still shallow, vague, or unresolved
+- the main need is deeper decomposition, edge-case coverage, or failure-path clarification
 
 ## Diagram Conventions
 
@@ -153,5 +176,8 @@ Exit when:
 - If a downstream skill changes the design materially, re-check routing instead of assuming the next step.
 - Only send the task to `writing-plans` after `design-readiness-check` has clearly passed.
 - If a downstream skill cannot be invoked in the current context, still name it explicitly as the next step and stop. Do not execute its responsibilities inline as a substitute.
+- Never route to more than one next step in the same turn.
+- Never continue a design flow that is missing `design_target_type`.
 - Never derive a new tree just because the current tree is long.
 - Never keep expanding a branch inline after deciding that it should become a derived tree.
+- Never absorb report writing, note production, or SOP drafting into design routing.

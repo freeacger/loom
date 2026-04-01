@@ -27,6 +27,12 @@ Typical examples include:
 - sync model
 - state management approach
 - retry or execution model
+- workflow rollback policy
+- workflow approval strategy
+- methodology stop condition
+- methodology evidence threshold
+- framework routing rule
+- framework handoff contract
 - language or runtime selection
 - UI framework selection
 - data-layer library (ORM, query builder, validation) selection
@@ -54,16 +60,20 @@ Filter the candidate list based on confirmed constraints. Only feasible options 
 
 Output: confirmed constraints + filtered candidate list.
 
+When the decision is non-technical but still bounded, do not force technology-selection questions.
+Instead confirm the decision boundary, real alternatives, and the dimensions that matter for this workflow, methodology, or framework choice.
+
 ## Core Responsibilities
 
 Your responsibilities are:
 
 1. Frame the exact decision question. For technology selections, frame the question based on constraints confirmed in the Constraint Gathering step.
-2. Present 3 to 4 real options when real options exist.
-3. Compare trade-offs clearly and concretely.
-4. Recommend one option or a justified combination when appropriate.
-5. Explain why the rejected options are not preferred in this context.
-6. Record the result in a reusable decision record.
+2. Keep the work bounded to one explicit decision node.
+3. Present 3 to 4 real options when real options exist.
+4. Compare trade-offs clearly and concretely.
+5. Recommend one option or a justified combination when appropriate.
+6. Explain why the rejected options are not preferred in this context.
+7. Record the result in a reusable decision record.
 
 ## Comparison Standard
 
@@ -83,6 +93,7 @@ Do not force every dimension into every decision. Use only the ones that actuall
 
 Produce or update a `design_state` that includes:
 
+- `design_target_type`
 - `decision_nodes`
 - `decisions`
 - `risks`
@@ -167,4 +178,5 @@ Exit when:
 - Hand back to `design-refinement` when the chosen option affects unresolved design branches.
 - Hand to `design-readiness-check` when this was the last major unresolved design issue.
 - Hand back to `design-orchestrator` if routing should be reconsidered after the decision lands.
+- Do not force broad design discovery into a bounded decision just to make progress.
 - Do not take over general design clarification work.

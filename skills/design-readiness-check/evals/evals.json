@@ -3,98 +3,88 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建企业内部 HR 自助服务门户，员工可查询薪资单、提交请假申请、查看公司政策\nscope:\n  包含: 薪资单展示、请假申请流程、政策文档检索\n  不包含: 薪资核算、HR 管理后台、移动 App\ndesign_tree:\n  - 认证与权限: 集成现有 SSO (SAML)，员工只能看自己数据，已明确接口契约\n  - 薪资单模块: 从 ERP 系统拉取 PDF，展示历史列表，权限隔离，失败时展示错误页\n  - 请假申请流程: 表单提交、审批链路（直属 + HR）、邮件通知、状态追踪，已设计状态机\n  - 政策文档检索: 全文搜索，按部门过滤，文档版本管理，已明确存储方案\ndecision_nodes: []\nopen_branches: []\ndecisions:\n  - sso_integration: 使用现有 Okta SAML，理由：合规要求，统一管理\nrisks:\n  - ERP 接口稳定性: 有 SLA，已设计降级展示缓存数据的方案\nvalidation:\n  - 每个模块有单元测试和集成测试范围定义\n  - E2E 测试覆盖核心路径：登录→查看薪资单、提交请假→审批通过\nstatus:\n  phase: design",
-      "expected_output": "Output returns status.ready_for_planning: true. blocking_issues should be empty or only list genuinely missing items. The skill must give an explicit PASS verdict (not 'mostly ready' or 'seems okay'). If any minor gaps are noted, they should be non-blocking and the design should still pass.",
+      "category": "positive",
+      "tags": [
+        "system-ready"
+      ],
+      "design_state_input": true,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建企业内部 HR 自助服务门户\nscope:\n  包含: 薪资单展示、请假申请流程、政策文档检索\n  不包含: 薪资核算、HR 管理后台、移动 App\ndesign_target_type: system\ndesign_tree:\n  - 认证与权限: 集成现有 SSO，接口契约已明确\n  - 薪资单模块: 拉取 PDF，失败时展示缓存数据\n  - 请假申请流程: 表单提交、审批链路、邮件通知、状态追踪，失败路径已记录\n  - 政策文档检索: 全文搜索、按部门过滤、文档版本管理，存储方案已明确\ndecision_nodes: []\nopen_branches: []\ndecisions:\n  - sso_integration: 使用现有 Okta SAML\nrisks:\n  - ERP 接口稳定性: 已设计降级展示缓存数据的方案\nvalidation:\n  - 每个模块有单元测试和集成测试范围定义\n  - E2E 测试覆盖核心路径\nstatus:\n  phase: design",
+      "expected_output": "The skill should return an explicit READY verdict because required state is present and the system design looks complete.",
       "assertions": [
         {
-          "name": "explicit_pass_verdict",
-          "description": "Output contains an unambiguous PASS / ready-for-planning verdict — not hedged language like 'mostly ready', 'looks good enough', or 'probably okay'",
-          "type": "qualitative"
-        },
-        {
-          "name": "no_false_blocking_issues",
-          "description": "Output does not invent blocking issues for a design that is demonstrably complete — blocking_issues is either empty or contains only genuinely missing critical items",
-          "type": "qualitative"
-        },
-        {
-          "name": "handoff_to_writing_plans",
-          "description": "Output recommends proceeding to writing-plans as the next step",
+          "name": "explicit_ready_verdict",
+          "description": "Output gives an explicit ready-for-planning verdict",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 2,
-      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建数据分析平台，支持用户上传 CSV、运行 SQL 查询、可视化结果\nscope: 数据上传、查询执行、图表展示\ndesign_tree:\n  - 文件上传: 支持 CSV（待细化）\n  - 查询引擎: 执行用户 SQL（待细化）\n  - 可视化层: 生成图表（待细化）\nopen_branches: [文件上传, 查询引擎, 可视化层]\ndecision_nodes:\n  - sql_sandbox: 如何隔离用户 SQL 执行，防止注入和资源滥用（未解决）\nassumptions: [用户 SQL 是安全的]",
-      "expected_output": "Output returns status.ready_for_planning: false. blocking_issues must specifically call out: (1) all branches are still shallow/marked as 待细化, (2) the unresolved decision_node sql_sandbox is a security-critical issue that cannot be deferred. The verdict must be explicit FAIL/not-ready, not a hedge.",
+      "category": "positive",
+      "tags": [
+        "workflow-ready"
+      ],
+      "design_state_input": true,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 建立线上事故复盘工作流\nscope: 从事故确认到复盘关闭\ndesign_target_type: workflow\ndesign_tree:\n  - 事故确认阶段: 输入输出、责任对象、升级条件已明确\n  - 原因分析阶段: 阶段目标、回退规则、质量门已明确\n  - 行动项跟踪阶段: owner、截止条件、复开规则已明确\n  - 复盘关闭阶段: 关闭标准、例外处理、验证方式已明确\ndecision_nodes: []\nopen_branches: []\nrisks:\n  - 跨团队协作延迟: 已通过升级 SLA 缓解\nvalidation:\n  - 每个阶段有完成检查和抽样复核\nstatus:\n  phase: design",
+      "expected_output": "The skill should return READY for a complete workflow design without forcing system-shaped checks.",
       "assertions": [
         {
-          "name": "explicit_fail_verdict",
-          "description": "Output contains an unambiguous FAIL / not-ready verdict — not 'needs some more work' or 'consider refining before proceeding'",
-          "type": "qualitative"
-        },
-        {
-          "name": "shallow_branches_called_out",
-          "description": "blocking_issues explicitly calls out that all three branches are marked 待细化 and are not implementation-ready",
-          "type": "qualitative"
-        },
-        {
-          "name": "security_decision_blocking",
-          "description": "blocking_issues identifies the unresolved sql_sandbox decision_node as a blocker — SQL isolation is a security requirement that cannot be assumed away",
-          "type": "qualitative"
-        },
-        {
-          "name": "next_route_specified",
-          "description": "Output specifies which skill should be invoked next: design-refinement (for shallow branches) or decision-evaluation (for sql_sandbox), not just 'do more design'",
+          "name": "uses_workflow_readiness_standard",
+          "description": "Output evaluates the design using workflow-style completeness rather than system-only checks",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 3,
-      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建 IoT 设备固件远程更新系统\nscope: 固件包管理、设备注册、更新下发、进度追踪\ndesign_tree:\n  - 固件包管理: 上传、版本管理、签名验证 — 已细化，失败处理已定义\n  - 设备注册: 设备证书认证，注册 API 已设计\n  - 更新下发策略: 支持定向、分批灰度、全量推送 — 流程已设计\n  - 设备端接收: 下载、校验、安装、回滚 — 已细化，各步骤失败行为已定义\n  - 进度追踪: 设备上报状态，服务端聚合展示\ndecision_nodes: []\nopen_branches: [进度追踪]\nrisks:\n  - 设备离线时更新: 设备重连后自动检查更新，已设计\nvalidation:\n  - 设备端各阶段有单测\n  - 服务端集成测试覆盖下发和追踪路径\nassumptions: [设备可以通过 HTTPS 访问更新服务器]",
-      "expected_output": "Output must return an explicit FAIL verdict because 进度追踪 branch is still in open_branches. blocking_issues should call out this specific remaining branch. The skill should not give a pass just because most of the design looks good — one open branch is a blocker. Handoff should be to design-refinement.",
+      "category": "positive",
+      "tags": [
+        "methodology-not-ready"
+      ],
+      "design_state_input": true,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 建立代码研究方法论\nscope: 决定如何抽样、何时停机、何时交接\ndesign_target_type: methodology\ndesign_tree:\n  - 适用条件: 已定义\n  - 停机准则: 仍未明确退出条件\n  - 交接形式: 已定义\nopen_branches: [停机准则]\ndecision_nodes: []\nvalidation:\n  - 已定义基础检查表\nstatus:\n  phase: design",
+      "expected_output": "The skill should return NOT READY because the methodology design still has an open branch and missing exit conditions.",
       "assertions": [
         {
-          "name": "open_branch_is_blocking",
-          "description": "Output identifies 进度追踪 in open_branches as a blocking issue — the skill does not give a pass because 'most branches look good'",
-          "type": "qualitative"
-        },
-        {
-          "name": "explicit_not_ready_verdict",
-          "description": "Output is explicit about not being ready — no hedging, no 'close enough', no conditional pass",
-          "type": "qualitative"
-        },
-        {
-          "name": "routes_to_refinement",
-          "description": "Output recommends design-refinement to close the open branch before coming back to readiness-check",
+          "name": "methodology_gap_is_blocking",
+          "description": "Output treats the missing methodology completion detail as a blocker",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 4,
-      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 为代码研究系统构建稳定知识沉淀流程\ndesign_tree:\n  - 研究主树: 研究问题、抽样策略、停机条件，已完整\n  - 笔记生产: 什么时候能写正式笔记、如何连接阅读路径、何时退回研究，仍然内联扩写在同一棵树中\n  - 研究主树中仍保留一整套关于笔记发布/退回的重复逻辑\nopen_branches: []\ndecision_nodes: []\nrisks: []\nvalidation:\n  - 研究主树本身已完整\n  - 笔记逻辑有独立流程，但尚未显式派生子树",
-      "expected_output": "Output must return an explicit FAIL verdict because the tree has mixed responsibilities and duplicated parent/child logic. The skill should identify structural integrity drift as a blocker and recommend design-orchestrator or design-structure as the next step instead of passing the design as ready.",
+      "category": "boundary",
+      "tags": [
+        "missing-design-target-type"
+      ],
+      "design_state_input": true,
+      "required_fields_omitted": [
+        "design_target_type"
+      ],
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 构建数据分析平台，支持用户上传 CSV、运行 SQL 查询、可视化结果\nscope: 数据上传、查询执行、图表展示\ndesign_tree:\n  - 文件上传: 支持 CSV（待细化）\n  - 查询引擎: 执行用户 SQL（待细化）\n  - 可视化层: 生成图表（待细化）\nopen_branches: [文件上传, 查询引擎, 可视化层]\ndecision_nodes:\n  - sql_sandbox: 如何隔离用户 SQL 执行，防止注入和资源滥用（未解决）",
+      "expected_output": "The skill should return NOT READY immediately because design_target_type is missing and should list that as a blocking issue.",
+      "assertions": [
+        {
+          "name": "missing_target_type_is_blocker",
+          "description": "Output marks missing design_target_type as a blocking issue",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "category": "boundary",
+      "tags": [
+        "structural-drift"
+      ],
+      "design_state_input": true,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 为代码研究系统构建稳定知识沉淀流程\ndesign_target_type: framework\ndesign_tree:\n  - 研究主树: 研究问题、抽样策略、停机条件，已完整\n  - 笔记生产: 什么时候能写正式笔记、如何连接阅读路径、何时退回研究，仍然内联扩写在同一棵树中\n  - 研究主树中仍保留一整套关于笔记发布/退回的重复逻辑\nopen_branches: []\ndecision_nodes: []\nrisks: []\nvalidation:\n  - 研究主树本身已完整\n  - 笔记逻辑有独立流程，但尚未显式派生子树",
+      "expected_output": "The skill should return NOT READY because the tree has mixed responsibilities and duplicated parent/child logic.",
       "assertions": [
         {
           "name": "structural_drift_is_blocking",
-          "description": "Output explicitly identifies mixed responsibilities or duplicated parent/child logic as a blocking issue",
-          "type": "qualitative"
-        },
-        {
-          "name": "explicit_not_ready_due_to_structure",
-          "description": "Output gives an explicit NOT READY verdict because of structure drift, not because of vague branches or missing decisions",
-          "type": "qualitative"
-        },
-        {
-          "name": "routes_to_orchestrator_or_structure",
-          "description": "Output recommends design-orchestrator or design-structure as the next step to resolve ownership and derivation issues",
-          "type": "qualitative"
-        },
-        {
-          "name": "checklist_mentions_structural_integrity",
-          "description": "Output checklist explicitly marks structural integrity as pass or fail instead of hiding the blocker outside the readiness checklist",
+          "description": "Output explicitly identifies structural integrity drift as a blocker",
           "type": "qualitative"
         }
       ]

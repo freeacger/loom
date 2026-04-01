@@ -3,148 +3,161 @@
   "evals": [
     {
       "id": 1,
+      "category": "positive",
+      "tags": [
+        "system-positive"
+      ],
+      "design_state_input": false,
       "prompt": "我想做一个 API 网关服务，供公司内部各个微服务使用。大概需要路由转发、认证鉴权、限流、日志。",
-      "expected_output": "A two-phase interaction: Phase 1 asks the user to confirm problem, scope, and assumptions (using structured Q&A formats); Phase 2 generates a design tree. A design file at docs/design-tree/<name>.md is created with all required sections. The file contains bilingual labels (e.g., 问题(problem), 范围(scope)). The design tree has at least 6 branches covering problem definition, scope, core objects, core flows, interfaces/data, decision points. Conversation output is concise: tree diagram + decision nodes + open branches + next step.",
+      "expected_output": "The skill should first confirm design_target_type=system, then confirm problem, scope, and assumptions, and produce a design_state-first tree using the system skeleton. It should not require file persistence by default.",
       "assertions": [
         {
-          "name": "interactive_confirmation",
-          "description": "Skill initiates interactive confirmation for problem, scope, and assumptions before generating the design tree — asking structured questions rather than outputting everything at once",
+          "name": "target_type_confirmed_first",
+          "description": "The first confirmation step asks for or confirms design_target_type before other sections",
           "type": "qualitative"
         },
         {
-          "name": "design_file_created",
-          "description": "A design file is created at docs/design-tree/<name>.md containing all required sections",
-          "type": "qualitative"
-        },
-        {
-          "name": "bilingual_labels",
-          "description": "Section headings use bilingual format: 问题(problem), 范围(scope), 设计树(design_tree), 开放分支(open_branches), 决策节点(decision_nodes), 假设(assumptions)",
-          "type": "qualitative"
-        },
-        {
-          "name": "all_required_fields_in_file",
-          "description": "Design file includes all six required fields: 问题(problem), 范围(scope), 假设(assumptions), 设计树(design_tree), 开放分支(open_branches), 决策节点(decision_nodes)",
-          "type": "qualitative"
-        },
-        {
-          "name": "scope_has_non_goals",
-          "description": "Scope section in the file explicitly lists non-goals or boundaries (不包含), not just what is included",
-          "type": "qualitative"
-        },
-        {
-          "name": "decision_nodes_identified",
-          "description": "At least one concrete decision node is identified (e.g., auth model, rate-limit algorithm, routing config format)",
-          "type": "qualitative"
-        },
-        {
-          "name": "design_tree_has_branches",
-          "description": "design_tree contains at least 5 named branches with brief descriptions; not just a flat list of features",
-          "type": "qualitative"
-        },
-        {
-          "name": "tree_diagram_present",
-          "description": "Output includes a character tree diagram inside a code block (no language tag) using ├── └── │ characters showing the design tree hierarchy",
-          "type": "qualitative"
-        },
-        {
-          "name": "tree_diagram_status_markers",
-          "description": "Tree diagram uses at least one status marker (e.g., [OPEN], [DECISION], [DRAFT]) to indicate branch state",
-          "type": "qualitative"
-        },
-        {
-          "name": "conversation_output_concise",
-          "description": "Conversation output does not repeat the full content of problem/scope/assumptions that were already confirmed and written to the file",
+          "name": "system_skeleton_used",
+          "description": "The resulting tree uses system-oriented branches such as core objects, core flows, and interfaces/data",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 2,
-      "prompt": "帮我设计一个支持多租户的文件存储服务，用户可以上传、下载、分享文件，支持权限控制。需要能扛住大文件（单文件最大 5GB）。",
-      "expected_output": "Two-phase interaction producing a design file. Scope in the file contains explicit non-goals (e.g., no file editing, no virus scanning, no CDN). design_tree includes a non-functional requirements branch covering the 5GB constraint with notes on chunked upload and streaming. open_branches is not empty. assumptions records at least the scale or storage backend assumptions.",
+      "category": "positive",
+      "tags": [
+        "workflow-positive"
+      ],
+      "design_state_input": false,
+      "prompt": "帮我设计一个线上事故复盘工作流，需要覆盖事故确认、负责人分配、原因分析、行动项跟踪和复盘关闭。",
+      "expected_output": "The skill should confirm design_target_type=workflow and produce a tree centered on stages, handoffs, rollback/escalation, and quality gates rather than system components.",
       "assertions": [
         {
-          "name": "non_goals_explicit",
-          "description": "Scope in the file includes explicit non-goals section (不包含), listing at least 2 things the system will NOT do",
+          "name": "workflow_target_type_used",
+          "description": "The output explicitly sets design_target_type to workflow",
           "type": "qualitative"
         },
         {
-          "name": "nfr_branch_present",
-          "description": "design_tree includes a non-functional requirements (非功能需求) branch that addresses the 5GB constraint",
-          "type": "qualitative"
-        },
-        {
-          "name": "assumptions_recorded",
-          "description": "假设(assumptions) section has at least 2 entries — the skill is not silently relying on unspoken premises",
-          "type": "qualitative"
-        },
-        {
-          "name": "open_branches_not_empty",
-          "description": "开放分支(open_branches) is not empty — skill acknowledges what still needs refinement rather than claiming design is done",
-          "type": "qualitative"
-        },
-        {
-          "name": "tree_diagram_for_large_design",
-          "description": "Since this design has 3+ branches, output includes a character tree diagram inside a code block showing the hierarchy",
-          "type": "qualitative"
-        },
-        {
-          "name": "bilingual_labels_consistent",
-          "description": "All section headings in the file and conversation consistently use bilingual format (中文(english))",
+          "name": "workflow_skeleton_used",
+          "description": "The tree uses workflow branches such as stages, inputs/outputs, handoffs, rollback, and quality gates",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 3,
-      "prompt": "我们需要一个消息推送系统，支持 App 推送、短信、邮件三种渠道，消息有优先级，高优先级要保证送达。",
-      "expected_output": "Two-phase interaction producing a design file. decision_nodes includes at least one explicit architectural choice — likely around delivery guarantee strategy, channel fallback policy, or queue/broker selection. The design tree does not silently resolve these choices; it names them as decisions. The tree covers core flows including the high-priority delivery path. Decision nodes presented with structured format (table with star ratings recommended).",
+      "category": "positive",
+      "tags": [
+        "methodology-positive"
+      ],
+      "design_state_input": false,
+      "prompt": "我想整理一套代码研究方法论，核心是决定读哪些文件、什么时候停下来、什么时候需要回头补样本。",
+      "expected_output": "The skill should confirm design_target_type=methodology and produce a tree around applicability, decision rules, handoff form, and exit conditions.",
       "assertions": [
         {
-          "name": "delivery_guarantee_as_decision",
-          "description": "决策节点(decision_nodes) includes at least one node related to delivery guarantee or retry strategy — this is a real architectural choice, not something to silently assume",
+          "name": "methodology_target_type_used",
+          "description": "The output explicitly sets design_target_type to methodology",
           "type": "qualitative"
         },
         {
-          "name": "core_flows_covered",
-          "description": "design_tree includes a core flows (核心流程) branch that covers at minimum: message intake → routing → channel dispatch → delivery confirmation",
-          "type": "qualitative"
-        },
-        {
-          "name": "no_premature_option_selection",
-          "description": "Skill does not compare or select queue/broker implementations (Kafka vs SQS etc.) — that belongs to decision-evaluation, not structure",
-          "type": "qualitative"
-        },
-        {
-          "name": "decision_format_structured",
-          "description": "When presenting decision nodes to the user, skill uses a structured format (table with options, or at minimum numbered choices) rather than unstructured prose",
+          "name": "methodology_skeleton_used",
+          "description": "The tree uses methodology branches such as applicability, decision rules, handoff form, and exit conditions",
           "type": "qualitative"
         }
       ]
     },
     {
       "id": 4,
-      "prompt": "请基于以下父树 handoff 创建一个派生树：\n\nparent_tree_name: agent-cli-research\nbranch_being_extracted: notebook production\nreason_for_derivation: 笔记生产已经有独立的输入门槛、生成流程、质量门和退回条件\ninherited_constraints:\n- 只能消费 research handoff bundle\n- 不得回写研究侧目录\nunresolved_questions:\n- 何时允许带保留意见发布\nexpected_output:\n- 一棵独立的 notebook production tree\nreturn_conditions:\n- 能明确判断发布、带保留发布、退回研究树\n\n请创建派生树。",
-      "expected_output": "The skill should create a derived tree rather than a generic initial design tree. Output should explicitly name the parent tree and derived tree, explain the derivation reason, define ownership and non-ownership, and include a parent/child handoff section. It must not duplicate the full parent tree inline.",
+      "category": "positive",
+      "tags": [
+        "framework-positive"
+      ],
+      "design_state_input": false,
+      "prompt": "我们要设计一套多技能路由框架，核心是按任务类型和风险级别把工作路由到不同 skill，并定义统一 handoff 形式。",
+      "expected_output": "The skill should confirm design_target_type=framework and produce a tree around dimensions, modules, routing rules, handoff forms, and exit conditions.",
       "assertions": [
         {
-          "name": "derived_tree_identified",
-          "description": "Output explicitly states that it is creating a derived tree from a named parent tree",
+          "name": "framework_target_type_used",
+          "description": "The output explicitly sets design_target_type to framework",
           "type": "qualitative"
         },
         {
-          "name": "ownership_defined",
-          "description": "Output defines what the derived tree owns and what it does not own",
+          "name": "framework_skeleton_used",
+          "description": "The tree uses framework branches such as dimensions, modules, routing rules, handoff forms, and exit conditions",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "category": "negative",
+      "tags": [
+        "report-negative"
+      ],
+      "design_state_input": false,
+      "prompt": "帮我把最近一周的设计讨论整理成一份研究报告，按背景、过程、结论写出来。",
+      "expected_output": "This should not be treated as design-structure. The request is report writing, not initial design-state construction.",
+      "assertions": [
+        {
+          "name": "rejects_report_writing",
+          "description": "Output makes it clear that report writing is outside design-structure's boundary",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "category": "negative",
+      "tags": [
+        "summary-negative"
+      ],
+      "design_state_input": false,
+      "prompt": "我给你一篇设计文档，你帮我读完以后总结重点就行。",
+      "expected_output": "This should not be treated as design-structure. The request is document summarization, not creating a new design tree.",
+      "assertions": [
+        {
+          "name": "rejects_document_summary",
+          "description": "Output keeps document summarization outside the design-structure boundary",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "category": "negative",
+      "tags": [
+        "sop-negative"
+      ],
+      "design_state_input": false,
+      "prompt": "给我一个最简单的发布 SOP，5 步之内，别搞复杂。",
+      "expected_output": "This should not be treated as design-structure. A simple linear SOP without a design-state problem is outside scope.",
+      "assertions": [
+        {
+          "name": "rejects_simple_sop",
+          "description": "Output rejects simple SOP drafting as outside design-structure",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "category": "positive",
+      "tags": [
+        "explicit-save-request"
+      ],
+      "design_state_input": false,
+      "prompt": "帮我设计一个消息推送系统，支持 App 推送、短信、邮件三种渠道。请把设计结果保存到 docs/design-tree 目录里。",
+      "expected_output": "The skill should still confirm design_target_type first, build design_state, and persist to docs/design-tree only because the user explicitly requested saving.",
+      "assertions": [
+        {
+          "name": "persistence_only_when_requested",
+          "description": "The output saves a file only because the prompt explicitly asked for persistence",
           "type": "qualitative"
         },
         {
-          "name": "handoff_fields_present",
-          "description": "Output includes the minimum parent/child handoff fields such as reason_for_derivation, inherited_constraints, expected_output, and return_conditions",
-          "type": "qualitative"
-        },
-        {
-          "name": "no_parent_duplication",
-          "description": "Output does not restate or copy the full parent tree into the derived tree",
+          "name": "design_state_still_primary",
+          "description": "The skill still frames the result as design_state-first rather than file-first",
           "type": "qualitative"
         }
       ]

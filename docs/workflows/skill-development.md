@@ -37,6 +37,10 @@ Never write to install paths directly.
 
 `Agent Skills` validation is tracked separately in phase 1. Use `mise run check-skill-spec` when you want to validate all project skill directories against the reference specification. This command is intentionally not part of `mise run check`, the pre-push hook, or the publish/release flow yet.
 
+For breaking design-tree rollouts, additional family-specific checks are required:
+- `mise run check-design-tree-evals`
+- `mise run check-design-tree-canonical`
+
 ---
 
 ## Standard Workflow: Edit → Release
@@ -72,15 +76,18 @@ mise run release-design-tree "<commit message>"
 
 This stages and publishes:
 - `mise/tasks/check-skill-json`
+- `mise/tasks/check-design-tree-evals`
+- `mise/tasks/check-design-tree-canonical`
 - `skills/design-tree-core`
 - `skills/design-orchestrator`
 - `skills/design-structure`
 - `skills/design-refinement`
 - `skills/design-readiness-check`
+- `skills/decision-evaluation`
 - `mise/tasks/check`
 - related workflow / README documentation
 
-Use this path for shared derivation rules, handoff rules, and anti-bloat governance changes.
+Use this path for shared derivation rules, target-type contract changes, handoff rules, anti-bloat governance changes, and any breaking `design_state` rollout.
 
 ---
 
@@ -90,10 +97,18 @@ Use this path for shared derivation rules, handoff rules, and anti-bloat governa
 mise run check-skill-json               # validate skills/*/evals/evals.json
 mise run check                          # repo health gate: JSON validity + install divergence
 mise run check-skill-spec               # optional Agent Skills spec validation for all project skills
+mise run check-design-tree-evals        # validate design-tree eval metadata and design_target_type coverage
+mise run check-design-tree-canonical    # validate minimal canonical behavior matrix coverage
 mise run publish <name> "<message>"     # git add + commit + push only
 mise run pull                           # npx skills add freeacger/loom -g (all skills)
 mise run release-design-tree "<msg>"    # publish shared design-tree changes + pull
 ```
+
+`release-design-tree` now runs these checks in order before publishing:
+1. `mise run check`
+2. `mise run check-skill-spec`
+3. `mise run check-design-tree-evals`
+4. `mise run check-design-tree-canonical`
 
 ## Agent Skills Validation (Phase 1)
 
@@ -163,5 +178,7 @@ mise run release <name> "<commit message>"
 - [ ] Edit was made in `skills/<name>/SKILL.md`, not in an install path
 - [ ] `mise run check` passes (eval JSON syntax + install divergence), or any temporary divergence is expected and will be resolved by release
 - [ ] `mise run check-skill-spec` was run when touching any project skill
+- [ ] `mise run check-design-tree-evals` was run for design-tree contract changes
+- [ ] `mise run check-design-tree-canonical` was run for design-tree contract changes
 - [ ] `skills/<name>/CHANGELOG.md` updated if the change is user-visible
 - [ ] After push: verify `https://skills.sh/freeacger/loom/<name>` shows the updated version

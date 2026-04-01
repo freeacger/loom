@@ -6,16 +6,24 @@ set -euo pipefail
 msg="${1:?Usage: mise run release-design-tree '<commit message>'}"
 
 mise run check
+mise run check-skill-spec
+mise run check-design-tree-evals
+mise run check-design-tree-canonical
 
 git add \
   "mise/tasks/check-skill-json" \
+  "mise/tasks/check-design-tree-evals" \
+  "mise/tasks/check-design-tree-canonical" \
   "skills/design-tree-core" \
   "skills/design-orchestrator" \
   "skills/design-structure" \
   "skills/design-refinement" \
   "skills/design-readiness-check" \
+  "skills/decision-evaluation" \
   "mise/tasks/check" \
   "docs/workflows/skill-development.md" \
+  "docs/design-decisions/2026-03-30-design-skill-system-redesign.md" \
+  "docs/design-decisions/2026-03-30-loom-vs-mattpocock-skills-review.md" \
   "README.md" \
   "README.zh-CN.md"
 
