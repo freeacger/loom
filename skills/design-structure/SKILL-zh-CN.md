@@ -1,6 +1,6 @@
 ---
 name: design-structure
-description: "把一个模糊或部分成形的想法整理成初始设计结构（initial design structure）。当任务缺少清晰的设计树（design tree）、scope 边界、核心对象、关键流程或显式决策点时使用。只要用户给出的是一个想法、功能请求或系统目标，而你需要先把它变成结构化设计骨架，供后续深入细化，就应触发。本技能不用于处理已经有设计树、且主要需求是深化或验证的任务。"
+description: "把一个模糊或部分成形的想法整理成初始设计结构（initial design structure）。当任务缺少清晰的设计树（design tree）、范围（scope）边界、核心对象、关键流程或显式决策点时使用。只要用户给出的是一个想法、功能请求或系统目标，而你需要先把它变成结构化设计骨架，供后续深入细化，就应触发。本技能不用于处理已经有设计树、且主要需求是深化或验证的任务。"
 ---
 
 # 设计结构化 (Design Structure)
@@ -9,7 +9,7 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 
 这个技能通过一个两阶段工作流，把模糊想法转换成初始设计树：
 
-1. **交互式确认（Interactive confirmation）**：逐步与用户确认 `design_target_type`、problem、scope 与 assumptions
+1. **交互式确认（Interactive confirmation）**：逐步与用户确认 `design_target_type`、问题（problem）、范围（scope）与假设（assumptions）
 2. **设计树生成（Design tree generation）**：基于已确认输入产出设计树
 
 它的首要产物是 `design_state`。
@@ -20,7 +20,7 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 在以下情况下使用：
 
 - 用户有一个想法，但还没有设计
-- 任务缺少 scope、边界、核心对象或关键流程
+- 任务缺少范围（scope）、边界、核心对象或关键流程
 - 还没有清晰的设计树
 - 当前设计对话还停留在“我们到底在设计什么？”这个阶段
 - 现有树缺少 `design_target_type`，需要把它显式补出来
@@ -31,9 +31,9 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 - 主要需求是深化已有分支
 - 主要需求是比较某个明确决策节点的选项
 - 主要需求是判断设计是否已准备好进入规划
-- 当前树只需要更深 refinement，而不是创建真正的 derived tree
+- 当前树只需要更深的细化（refinement），而不是创建真正的派生树（derived tree）
 - 任务是报告、笔记、摘要或文档改写
-- 任务只是简单线性 SOP，没有真实的 design-state 边界
+- 任务只是简单线性 SOP，没有真实的设计状态（design state）边界
 
 ## 语言策略 (Language Strategy)
 
@@ -44,7 +44,7 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 1. 用户显式要求的输出语言
 2. 当前用户指令的主导自然语言
 3. 同一任务里最近几条用户指令的主导自然语言
-4. 如果信号弱或含糊，则使用 English
+4. 如果信号弱或含糊，则使用英文（English）
 
 规则：
 
@@ -74,16 +74,16 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 
 1. **Design target type**：确认 `system`、`workflow`、`methodology`、`framework` 之一
 2. **Problem**：确认核心问题与成功指标（success metrics）
-3. **Scope**：确认包含内容与排除内容
+3. **Scope**：确认纳入范围与排除范围
 4. **Assumptions**：确认当前正在依赖的隐含假设
 
 每确认一项，就更新共享 `design_state`。在后续对话中不要重复已经确认的内容。
 
-只有当用户一开始就明确提供了某一部分时，才可以跳过该小节，例如“problem 是 X、scope 是 Y”，此时可以一轮同时确认两者。
+只有当用户一开始就明确提供了某一部分时，才可以跳过该小节，例如“问题是 X、范围是 Y”，此时可以一轮同时确认两者。
 
 ### 阶段 2：设计树生成 (Phase 2: Design Tree Generation)
 
-基于已确认输入，按照 `design_target_type` 对应的分支骨架生成设计树。
+基于已确认输入，按照 `design_target_type` 对应的分支骨架（branch skeleton）生成设计树。
 
 共享类型定义看 `../design-tree-core/REFERENCE.md`，本地优先分支骨架看 `REFERENCE.md`。
 
@@ -93,22 +93,22 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 
 - 树图（tree diagram）
 - 需要用户动作的决策节点
-- 开放分支名称
+- 开放分支（open branches）名称
 - 对下一步的建议
 
 ## 派生树创建 (Derived Tree Creation)
 
-当父树已经识别出一个新的稳定问题域时，也可以用这个技能创建 derived tree。
+当父树已经识别出一个新的稳定问题域时，也可以用这个技能创建派生树（derived tree）。
 
 以 `../design-tree-core/REFERENCE.md` 中的共享派生与交接规则为准。
 
-创建 derived tree 时，必须完成以下事项：
+创建派生树时，必须完成以下事项：
 
-1. 显式命名 parent tree 与 derived tree
+1. 显式命名父树（parent tree）与派生树（derived tree）
 2. 说明为什么要派生
-3. 定义 derived tree 负责什么
-4. 定义 derived tree 不负责什么
-5. 记录最小 parent/child handoff：
+3. 定义派生树负责什么
+4. 定义派生树不负责什么
+5. 记录最小父子交接（parent/child handoff）：
    - 被抽出的分支
    - 继承的约束
    - 未解决问题
@@ -130,7 +130,7 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 - 每个问题最多 4 个选项
 - 使用结构化文本（问题 + 可选选项）
 
-**回退方式（Fallback）：** 如果当前环境没有专门的提问工具，就使用自然语言提示，参考下面的格式模板。
+**回退方案（Fallback）：** 如果当前环境没有专门的提问工具，就使用自然语言提示，参考下面的格式模板。
 
 ### 问题类型与格式 (Question Types and Formats)
 
@@ -210,7 +210,7 @@ Expected daily request volume?
 - 使用该目标类型对应的正确分支骨架
 - 识别开放分支（open branches）
 - 识别显式决策节点（explicit decision nodes）
-- 记录 assumptions，而不是静默依赖它们
+- 记录假设（assumptions），而不是静默依赖它们
 - 保持“`design_state` 优先，工件其次（artifact second）”的输出顺序
 
 如果某个分支不相关，要显式说明，而不是静默省略。
@@ -221,14 +221,14 @@ Expected daily request volume?
 
 1. 通过交互式确认澄清设计的真实目标。
 2. 在建树前显式确定 `design_target_type`。
-3. 捕获 scope、non-goals 与 constraints。
+3. 捕获范围（scope）、非目标（non-goals）与约束（constraints）。
 4. 构建初始设计树，至少包括一级分支，并在有价值时加二级分支。
-5. 识别仍需 refinement 的开放分支。
+5. 识别仍需细化（refinement）的开放分支。
 6. 识别应在后续交给 `decision-evaluation` 的显式决策节点。
-7. 记录 assumptions，而不是静默依赖它们。
-8. 标记依赖未验证外部工具、API、库或服务的节点。在标记时做一次轻量 feasibility check（web search 或 doc lookup）。如果依赖明显不可行，立刻标 `✗`；如果确认大体可行但仍有未决问题，标 `[RESEARCH]` 并记录初步发现；如果已完全确认，则标 `✓`。
+7. 记录假设（assumptions），而不是静默依赖它们。
+8. 标记依赖未验证外部工具、API、库或服务的节点。在标记时做一次轻量可行性检查（feasibility check，例如 web search 或 doc lookup）。如果依赖明显不可行，立刻标 `✗`；如果确认大体可行但仍有未决问题，标 `[RESEARCH]` 并记录初步发现；如果已完全确认，则标 `✓`。
 9. 只有当任务明确要求时才持久化设计。
-10. 如果是在执行父树 handoff，就创建一个边界明确的 derived tree，而不是把父树原样内联重复。
+10. 如果是在执行父树交接（handoff），就创建一个边界明确的派生树，而不是把父树原样内联重复。
 
 ## 预期输出 (Expected Outputs)
 
@@ -245,11 +245,11 @@ Expected daily request volume?
 - `external_dependencies`
 - `status`
 
-如果创建的是 derived tree，还应额外包含：
+如果创建的是派生树，还应额外包含：
 
-- parent/child ownership
-- derivation reason
-- parent/child handoff
+- 父子所有权（parent/child ownership）
+- 派生原因（derivation reason）
+- 父子交接（parent/child handoff）
 
 ### 对话输出（精简）(Conversation Output)
 
@@ -291,7 +291,7 @@ design_tree
 
 | 标记 | 含义 |
 |--------|---------|
-| `[OPEN]` | 未解决，仍需 refinement 或 decision |
+| `[OPEN]` | 未解决，仍需细化（refinement）或决策（decision） |
 | `[DECISION]` | 存在多个真实选项的决策节点 |
 | `[DRAFT]` | 暂定，后续可能变 |
 | `[RESEARCH]` | 依赖外部工具、API、库或服务；已通过初步可行性检查，但仍需深入验证 |
@@ -316,7 +316,7 @@ design_tree
 
 - 当树已经存在，但分支仍然过浅时，交给 `design-refinement`
 - 当出现一个带真实选项的具体决策节点时，交给 `decision-evaluation`
-- 如果 design state 变化足够大，需要重新评估路由，交回 `design-orchestrator`
+- 如果 `design_state` 变化足够大，需要重新评估路由，交回 `design-orchestrator`
 - 如果 `design_target_type` 仍未解决，不要继续第一阶段之后的工作
 - 不要在设计树尚未成形前强行把对话推进到方案比较
 - 除非任务明确要求持久化，否则不要默认落盘
