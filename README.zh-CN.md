@@ -106,6 +106,24 @@ mise install
 
 本仓库已在 `mise.toml` 中固定 Python 版本。后续运行依赖 Python 的命令时，应优先使用仓库内的 `mise` 环境，而不是依赖系统自带的 `python3`。
 
+## Agent Skills 对齐
+
+`loom` 继续使用 `skills.sh` 作为分发路径。[Agent Skills](https://agentskills.io/home) 在本仓库里只作为兼容目标与参考规范层，不是新的安装源。
+
+阶段 1 新增了一个可选校验命令：
+
+```bash
+mise run check-skill-spec
+```
+
+这个命令会校验 `skills/` 下的所有顶层 skill 目录。
+
+说明：
+
+- `check-skill-spec` 是推荐检查项，不是阶段 1 的 push 门禁
+- 如果缺少 `skills-ref`，命令会立即失败并输出参考文档
+- 阶段 1 不会替换 `skills.sh`，也不会自动安装 `agentskills`
+
 ## 致谢
 
 部分 skill 的初始版本来源于或参考了 [obra/superpowers](https://github.com/obra/superpowers)，感谢其奠定的基础。这些 skill 在本仓库中已被大幅重写和扩展。

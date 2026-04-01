@@ -13,14 +13,19 @@ if ! command -v skills-ref >/dev/null 2>&1; then
   exit 1
 fi
 
-targets=(
-  "skills/design-decision-audit"
-  "skills/task-brief"
-)
+targets=()
+while IFS= read -r target; do
+  targets+=("$target")
+done < <(find skills -mindepth 1 -maxdepth 1 -type d | sort)
+
+if [ "${#targets[@]}" -eq 0 ]; then
+  echo "✓ 未找到可校验的 skill 目录"
+  exit 0
+fi
 
 fail=0
 
-echo "→ 运行 Agent Skills 规范校验（试点目录）..."
+echo "→ 运行 Agent Skills 规范校验（全项目）..."
 for target in "${targets[@]}"; do
   echo "  → $target"
   if skills-ref validate "$target"; then

@@ -116,16 +116,13 @@ Phase 1 adds an optional validation command:
 mise run check-skill-spec
 ```
 
-This command currently validates only the pilot directories:
-
-- `skills/design-decision-audit`
-- `skills/task-brief`
+This command validates every top-level directory under `skills/`.
 
 Notes:
 
 - `check-skill-spec` is a recommended check, not a push gate in phase 1
 - if `skills-ref` is missing, the command fails fast and prints the reference doc
-- phase 1 does not replace `skills.sh`, auto-install `agentskills`, or require a repo-wide frontmatter rewrite
+- phase 1 does not replace `skills.sh` or auto-install `agentskills`
 
 ## Acknowledgments
 

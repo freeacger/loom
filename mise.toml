@@ -2,7 +2,7 @@
 python = "3.13.11"
 
 [tasks.check-skill-spec]
-description = "Validate Agent Skills frontmatter for the pilot skill set"
+description = "Validate Agent Skills frontmatter for all project skills"
 run = "bash scripts/check-skill-spec.sh"
 
 [tasks.release]

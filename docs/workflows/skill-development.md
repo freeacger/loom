@@ -35,7 +35,7 @@ Never write to install paths directly.
 - `skills/*/evals/evals.json` syntax via `python3 -m json.tool`
 - divergence between repo skill directories and installed copies
 
-`Agent Skills` validation is tracked separately in phase 1. Use `mise run check-skill-spec` when you want to validate the current pilot skill set against the reference specification. This command is intentionally not part of `mise run check`, the pre-push hook, or the publish/release flow yet.
+`Agent Skills` validation is tracked separately in phase 1. Use `mise run check-skill-spec` when you want to validate all project skill directories against the reference specification. This command is intentionally not part of `mise run check`, the pre-push hook, or the publish/release flow yet.
 
 ---
 
@@ -89,7 +89,7 @@ Use this path for shared derivation rules, handoff rules, and anti-bloat governa
 ```bash
 mise run check-skill-json               # validate skills/*/evals/evals.json
 mise run check                          # repo health gate: JSON validity + install divergence
-mise run check-skill-spec               # optional Agent Skills spec validation for pilot skills
+mise run check-skill-spec               # optional Agent Skills spec validation for all project skills
 mise run publish <name> "<message>"     # git add + commit + push only
 mise run pull                           # npx skills add freeacger/loom -g (all skills)
 mise run release-design-tree "<msg>"    # publish shared design-tree changes + pull
@@ -97,10 +97,7 @@ mise run release-design-tree "<msg>"    # publish shared design-tree changes + p
 
 ## Agent Skills Validation (Phase 1)
 
-`Agent Skills` is a compatibility target and reference specification for this repository. In phase 1, only the spec-validation pilot is wired in, and it covers:
-
-- `skills/design-decision-audit`
-- `skills/task-brief`
+`Agent Skills` is a compatibility target and reference specification for this repository. In phase 1, `check-skill-spec` validates every top-level directory under `skills/`.
 
 Run:
 
@@ -110,7 +107,7 @@ mise run check-skill-spec
 
 Behavior contract:
 
-- If `skills-ref` is installed, the command validates the pilot directories and returns a non-zero exit code on any spec failure.
+- If `skills-ref` is installed, the command validates all project skills and returns a non-zero exit code on any spec failure.
 - If `skills-ref` is missing, the command fails fast with installation guidance instead of pretending the check passed.
 - This check is recommended during the pilot, but it is not a push gate and is not called by `mise run check`.
 
@@ -165,6 +162,6 @@ mise run release <name> "<commit message>"
 
 - [ ] Edit was made in `skills/<name>/SKILL.md`, not in an install path
 - [ ] `mise run check` passes (eval JSON syntax + install divergence), or any temporary divergence is expected and will be resolved by release
-- [ ] `mise run check-skill-spec` was run when touching the current Agent Skills pilot set (`design-decision-audit`, `task-brief`)
+- [ ] `mise run check-skill-spec` was run when touching any project skill
 - [ ] `skills/<name>/CHANGELOG.md` updated if the change is user-visible
 - [ ] After push: verify `https://skills.sh/freeacger/loom/<name>` shows the updated version
