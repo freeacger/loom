@@ -120,6 +120,153 @@
           "type": "qualitative"
         }
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "I have a half-formed request: we need to redesign onboarding, clean up analytics events, and maybe also update the welcome email. Help me figure out what the actual task should be before anyone starts implementing.",
+      "expected_output": "This should trigger task-brief because the request has multiple sub-goals, unclear priority order, and explicitly asks for help clarifying the real task before execution. The response should normalize the request into a brief instead of jumping into design or implementation.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger task-brief because it is a raw, multi-goal request that needs normalization before execution",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that task-brief applies because the request is ambiguous, multi-part, and asks for clarification before work starts",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response stays within task-brief scope and does not turn into a design tree or implementation plan",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "I'm not sure how to ask this. We migrated vendors and now invoicing, dashboard totals, and exports all seem related. Can you turn this into a brief another engineer can execute?",
+      "expected_output": "This should trigger task-brief because the user explicitly asks to turn a messy cross-domain problem into a brief for handoff. The response should produce a structured brief and clarify the likely execution mode rather than debugging or planning implementation details directly.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger task-brief because it requests a model-agnostic handoff brief for a cross-domain problem",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response identifies cross-domain ambiguity and handoff preparation as the reason task-brief is the right fit",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The output produces a brief instead of prematurely debugging vendor migration issues or writing an implementation plan",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "We need to add retry logic to webhooks, maybe queueing too, or maybe the real issue is duplicate deliveries. Help me make this request clearer before we start.",
+      "expected_output": "This should trigger task-brief because the request is still at the problem-framing stage and mixes multiple possible solutions with an unclear underlying goal. The response should reframe the request and clarify the execution target before implementation begins.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger task-brief because it mixes solution ideas with an unclear problem statement and explicitly asks to clarify the request",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that task-brief is needed to normalize the request before any implementation skill is used",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The output does not jump directly into retry implementation or debugging workflow details",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "prompt": "Rename `AuthSvc` to `AuthService` in `src/auth.ts` and update the imports.",
+      "expected_output": "This should NOT trigger task-brief because the request is a single, unambiguous code change with an obvious execution path. The response should either execute directly or keep the routing untriggered rather than creating an unnecessary brief.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger task-brief because it is a straightforward rename request with clear scope",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that task-brief is unnecessary because the task is already direct and well-scoped",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_keep_untriggered",
+          "description": "The routing should stay untriggered rather than manufacturing a task brief for a simple rename",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not invent extra planning or decomposition work for a direct execution request",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "I have an idea for a Slack-based incident bot. Turn it into an implementation-ready design tree with the key branches and decisions.",
+      "expected_output": "This should NOT trigger task-brief because the user is explicitly asking for design-stage decomposition. The more appropriate route is design-orchestrator, not a generic normalization brief.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger task-brief because the user is explicitly requesting design-tree work",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that design-stage routing is more appropriate than a generic task brief",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_preferred_skill_design-orchestrator",
+          "description": "The response points to design-orchestrator as the better fit for turning the idea into a design tree",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not produce a full task brief when design decomposition is the actual requested outcome",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "prompt": "Actually, use the PostgreSQL export instead of the CSV file.",
+      "expected_output": "This should NOT trigger task-brief because it is a narrow follow-up clarification for an existing task, not a new ambiguous request that needs normalization.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger task-brief because it is a follow-up clarification rather than a fresh ambiguous request",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that follow-up clarifications in an existing task do not need task-brief",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_keep_untriggered",
+          "description": "The routing should stay untriggered because this is just a correction to existing task context",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response keeps the clarification narrow and does not expand it into a standalone task brief",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

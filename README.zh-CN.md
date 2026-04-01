@@ -98,6 +98,14 @@ npx skills add freeacger/loom -y -g
 
 也可以从 `skills/` 中挑选单个目录手动复制到本地 skill 目录。
 
+对于仓库内的开发与校验命令，先安装仓库固定的工具链：
+
+```bash
+mise install
+```
+
+本仓库已在 `mise.toml` 中固定 Python 版本。后续运行依赖 Python 的命令时，应优先使用仓库内的 `mise` 环境，而不是依赖系统自带的 `python3`。
+
 ## 致谢
 
 部分 skill 的初始版本来源于或参考了 [obra/superpowers](https://github.com/obra/superpowers)，感谢其奠定的基础。这些 skill 在本仓库中已被大幅重写和扩展。

@@ -98,6 +98,35 @@ This installs into `~/.claude/skills/` and `~/.agents/skills/` automatically.
 
 Alternatively, pick individual skill folders from `skills/` and copy them into your local skill directory.
 
+For repository tasks, install the pinned toolchain first:
+
+```bash
+mise install
+```
+
+This repository pins Python in `mise.toml`. Run Python-dependent commands inside the repo through the `mise` environment instead of relying on the system `python3`.
+
+## Agent Skills Alignment
+
+`loom` keeps `skills.sh` as its distribution path. [Agent Skills](https://agentskills.io/home) is treated as a compatibility target and reference specification layer, not as a replacement install source for this repository.
+
+Phase 1 adds an optional validation command:
+
+```bash
+mise run check-skill-spec
+```
+
+This command currently validates only the pilot directories:
+
+- `skills/design-decision-audit`
+- `skills/task-brief`
+
+Notes:
+
+- `check-skill-spec` is a recommended check, not a push gate in phase 1
+- if `skills-ref` is missing, the command fails fast and prints the reference doc
+- phase 1 does not replace `skills.sh`, auto-install `agentskills`, or require a repo-wide frontmatter rewrite
+
 ## Acknowledgments
 
 Some skills originated from or were inspired by [obra/superpowers](https://github.com/obra/superpowers). Those foundations are appreciated, though the skills here have been significantly reworked and extended.

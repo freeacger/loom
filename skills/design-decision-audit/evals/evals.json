@@ -194,6 +194,170 @@
         "The audit still identifies the state-machine style triggered modules",
         "At least one material finding includes a three-option comparison table, one recommended option, and reasons the other options were not selected"
       ]
+    },
+    {
+      "id": 14,
+      "prompt": "review docs/design-decisions/2026-03-30-design-skill-system-redesign.md for missing rollout, compatibility, or observability decisions. Do not edit the document.",
+      "expected_output": "This should trigger design-decision-audit because the request explicitly asks for a design-style review over a design decision document and focuses on missing decisions rather than implementation or copy editing. The output should stay in audit mode and avoid editing the source document.",
+      "files": [
+        "docs/design-decisions/2026-03-30-design-skill-system-redesign.md",
+        "AGENTS.md"
+      ],
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger design-decision-audit because it explicitly requests a design review over a decision document",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that the task is about missing design decisions, compatibility, and observability rather than implementation or editing",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The output stays in audit mode and does not rewrite the design or switch to implementation planning",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "prompt": "请审查 docs/exec-plans/active/2026-03-31-skill-evaluation-implementation.md，把它当成 implementation-facing design 来看前置决策、兼容性风险和数据处理问题，不要直接改文档。",
+      "expected_output": "This should trigger design-decision-audit because the task asks for a design-style audit of an implementation-facing plan, specifically focused on missing decisions and compatibility or data-handling risks. The response should keep the audit structure and avoid direct editing.",
+      "files": [
+        "docs/exec-plans/active/2026-03-31-skill-evaluation-implementation.md",
+        "AGENTS.md"
+      ],
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger design-decision-audit because it requests a design review over an implementation-facing document",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response identifies missing design decisions, compatibility risks, and data-handling review as the reason to use this skill",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response stays in review mode and does not transform into an implementation task list",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "prompt": "audit skills/design-decision-audit/evals/files/standalone-generic-design.md as a standalone design document and tell me which decisions are missing before implementation starts.",
+      "expected_output": "This should trigger design-decision-audit because the prompt explicitly asks for a standalone design audit that identifies missing decisions before implementation. The response should use the audit structure and stay focused on reviewable design gaps.",
+      "files": [
+        "skills/design-decision-audit/evals/files/standalone-generic-design.md"
+      ],
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger design-decision-audit because it directly asks for a standalone design audit before implementation",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that the job is to identify missing design decisions rather than execute or rewrite the document",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The output remains a structured audit and does not expand into implementation work",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "prompt": "Review README.md for wording, concision, and tone. Suggest copy edits but do not perform a design review.",
+      "expected_output": "This should NOT trigger design-decision-audit because the task is a writing-quality review over documentation, not a design or implementation-facing audit. The more appropriate route is writing-clearly-and-concisely.",
+      "files": [
+        "README.md"
+      ],
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger design-decision-audit because it asks for copy editing and tone review, not design review",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that wording and concision review is outside the design-audit boundary",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_preferred_skill_writing-clearly-and-concisely",
+          "description": "The response points to writing-clearly-and-concisely as the better fit for documentation wording review",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not force the documentation request into a design-audit structure",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "prompt": "The login API started returning 500 after today's deploy. Investigate the root cause and propose the smallest safe fix.",
+      "expected_output": "This should NOT trigger design-decision-audit because the task is a live debugging investigation over unexpected behavior, not a review of design decisions in a document. The more appropriate route is systematic-debugging.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger design-decision-audit because it is a debugging request about a production issue",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that this is root-cause investigation rather than a document audit",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_preferred_skill_systematic-debugging",
+          "description": "The response points to systematic-debugging as the better fit for investigating the regression",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not try to recast a runtime debugging task as a design-document audit",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "prompt": "Turn docs/design-decisions/2026-03-30-design-skill-system-redesign.md into an implementation plan with concrete steps and files to touch.",
+      "expected_output": "This should NOT trigger design-decision-audit because the user is asking for an implementation plan, not a review of missing design decisions. The more appropriate route is writing-plans.",
+      "files": [
+        "docs/design-decisions/2026-03-30-design-skill-system-redesign.md"
+      ],
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger design-decision-audit because it asks for execution planning rather than design review",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that the task has moved from audit into concrete implementation planning",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_preferred_skill_writing-plans",
+          "description": "The response points to writing-plans as the better fit for producing a step-by-step implementation plan",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not keep the task inside the audit skill once the requested output is an implementation plan",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

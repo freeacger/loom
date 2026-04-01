@@ -1,0 +1,155 @@
+{
+  "skill_name": "systematic-debugging",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Our test suite started failing right after a dependency bump. Three integration tests now time out. Please debug the root cause before we change any code.",
+      "expected_output": "This should trigger systematic-debugging because the task is explicitly about investigating a test regression and finding root cause before attempting fixes. The response should center investigation and evidence gathering rather than jumping into a speculative patch.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger systematic-debugging because it explicitly asks for root-cause investigation on failing tests",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that the task is a debugging workflow over a regression rather than a feature request",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response stays focused on investigation-first debugging instead of immediately proposing code changes",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "After yesterday's deploy, checkout sometimes double-charges and logs show retries from multiple services. Help me debug what is actually breaking before we decide on a fix.",
+      "expected_output": "This should trigger systematic-debugging because the task describes unexpected runtime behavior in a multi-component flow and explicitly asks to debug what is breaking before selecting a fix. The response should frame the work as root-cause investigation.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger systematic-debugging because it is a production debugging request over a multi-component failure",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response identifies unexpected production behavior and investigation-before-fix as the key routing signals",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not prematurely prescribe retries, locks, or architecture changes before investigation",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The build passes locally but fails in CI with missing env vars and a signing error. Investigate where the breakage happens.",
+      "expected_output": "This should trigger systematic-debugging because the task is to investigate a build failure and identify where configuration or environment propagation is breaking. The response should emphasize evidence collection across component boundaries.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_true",
+          "description": "This prompt should trigger systematic-debugging because it asks to investigate a CI build failure and locate the failure point",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that the request is a debugging investigation over environment propagation and build failure",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response stays within debugging workflow guidance instead of switching into implementation planning",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Implement retry logic with exponential backoff for the payment API.",
+      "expected_output": "This should NOT trigger systematic-debugging because the request is phrased as direct implementation work rather than root-cause investigation over a bug or failure. The more appropriate route is test-driven-development or direct execution.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger systematic-debugging because it is a direct implementation request, not a debugging investigation",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that no bug, test failure, or unexpected behavior is being investigated here",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_preferred_skill_test-driven-development",
+          "description": "The response points to test-driven-development as the better fit for implementing the requested behavior change",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not manufacture a debugging workflow for a straightforward implementation request",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Review docs/design-decisions/2026-03-30-design-skill-system-redesign.md for missing rollout decisions and compatibility risks.",
+      "expected_output": "This should NOT trigger systematic-debugging because the task is a document audit over design decisions, not a technical issue investigation. The more appropriate route is design-decision-audit.",
+      "files": [
+        "docs/design-decisions/2026-03-30-design-skill-system-redesign.md"
+      ],
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger systematic-debugging because it is a design review request rather than a runtime or test failure investigation",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that the task concerns missing design decisions rather than root-cause debugging",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_preferred_skill_design-decision-audit",
+          "description": "The response points to design-decision-audit as the better fit for reviewing rollout and compatibility risks",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not force a document audit into a debugging workflow",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Take this messy multi-part request and turn it into a task brief for another agent.",
+      "expected_output": "This should NOT trigger systematic-debugging because the user is asking for request normalization and handoff preparation, not investigation of a technical failure. The more appropriate route is task-brief.",
+      "assertions": [
+        {
+          "name": "routing_should_trigger_false",
+          "description": "This prompt should not trigger systematic-debugging because there is no bug, failure, or unexpected behavior to investigate",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_reason_matches_boundary",
+          "description": "The response explains that the task is about structuring a request rather than debugging a technical issue",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_preferred_skill_task-brief",
+          "description": "The response points to task-brief as the better fit for producing a structured handoff brief",
+          "type": "qualitative"
+        },
+        {
+          "name": "routing_output_stays_in_scope",
+          "description": "The response does not invent a debugging workflow when the task is actually request normalization",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}

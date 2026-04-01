@@ -1,3 +1,10 @@
+[tools]
+python = "3.13.11"
+
+[tasks.check-skill-spec]
+description = "Validate Agent Skills frontmatter for the pilot skill set"
+run = "bash scripts/check-skill-spec.sh"
+
 [tasks.release]
 description = "Publish a skill then pull all loom skills — usage: mise run release <name> '<message>'"
 run = """
