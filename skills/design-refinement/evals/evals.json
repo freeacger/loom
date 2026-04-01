@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "当前设计状态：\n\nproblem: 构建用户通知服务\ndesign_tree:\n  - 通知调度器: 负责触发通知的发送（待细化）\n  - 渠道适配层: 对接各渠道 SDK（待细化）\n  - 模板引擎: 渲染通知内容（待细化）\nopen_branches: [通知调度器, 渠道适配层, 模板引擎]\n\n请细化"通知调度器"这个分支。",
+      "prompt": "当前设计状态：\n\nproblem: 构建用户通知服务\ndesign_tree:\n  - 通知调度器: 负责触发通知的发送（待细化）\n  - 渠道适配层: 对接各渠道 SDK（待细化）\n  - 模板引擎: 渲染通知内容（待细化）\nopen_branches: [通知调度器, 渠道适配层, 模板引擎]\n\n请细化\"通知调度器\"这个分支。",
       "expected_output": "Refined design_tree entry for 通知调度器 where the leaf nodes can answer all five questions from the Leaf Node Standard: (1) what it is responsible for, (2) what it is NOT responsible for, (3) how it interacts with adjacent parts, (4) what failure looks like, (5) how it will be validated. The branch should not remain vague after refinement.",
       "assertions": [
         {
@@ -62,7 +62,7 @@
     },
     {
       "id": 3,
-      "prompt": "当前设计状态：\n\nproblem: 实现一个支持多种数据源的 ETL 管道\ndesign_tree:\n  - 数据源适配器: 从 MySQL、Postgres、CSV 读取数据\n  - 转换引擎: 执行字段映射、过滤、聚合\n  - 数据写入层: 将处理后数据写入目标存储\nopen_branches: [数据源适配器, 转换引擎]\n\n请细化"转换引擎"。",
+      "prompt": "当前设计状态：\n\nproblem: 实现一个支持多种数据源的 ETL 管道\ndesign_tree:\n  - 数据源适配器: 从 MySQL、Postgres、CSV 读取数据\n  - 转换引擎: 执行字段映射、过滤、聚合\n  - 数据写入层: 将处理后数据写入目标存储\nopen_branches: [数据源适配器, 转换引擎]\n\n请细化\"转换引擎\"。",
       "expected_output": "During refinement of 转换引擎, the skill should surface at least one new decision_node (e.g., whether transformations are defined via config/DSL or code, error handling strategy for bad rows, streaming vs batch processing model). This decision node should be marked as a decision_nodes entry rather than being silently resolved by the skill itself.",
       "assertions": [
         {
@@ -78,6 +78,28 @@
         {
           "name": "transformation_engine_is_concrete",
           "description": "转换引擎 branch has sub-nodes describing specific transformation types, execution model, and error behavior — not just a restatement of 'handles transformations'",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "当前设计状态：\n\nproblem: 为代码研究项目建立稳定知识沉淀流程\ndesign_tree:\n  - 研究主树: 研究问题、抽样策略、停机条件，已相对稳定\n  - 笔记生产: 什么时候可以写正式笔记、如何连接阅读路径、何时退回研究（持续在一个分支里膨胀）\nopen_branches: [笔记生产]\n\n请继续细化\"笔记生产\"分支。",
+      "expected_output": "The skill should refuse to keep refining 笔记生产 inline once it recognizes that the branch is answering a second stable core question with its own lifecycle. It should surface the branch as a derivation candidate and hand back to design-orchestrator or design-structure instead of absorbing the branch into the parent tree.",
+      "assertions": [
+        {
+          "name": "stops_inline_refinement",
+          "description": "Output does not continue expanding the branch inline once derivation criteria are met",
+          "type": "qualitative"
+        },
+        {
+          "name": "surfaces_derivation_candidate",
+          "description": "Output explicitly states that the branch is now a derivation candidate or separate stable decision system",
+          "type": "qualitative"
+        },
+        {
+          "name": "hands_back_for_derivation",
+          "description": "Output routes back to design-orchestrator or design-structure for explicit derived-tree creation",
           "type": "qualitative"
         }
       ]

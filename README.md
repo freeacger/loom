@@ -18,13 +18,14 @@ The repository covers the full engineering lifecycle:
 
 ## Skills
 
-19 skills organized by phase:
+20 skills organized by phase:
 
 ### Design
 
 | Skill | Purpose |
 |---|---|
 | `design-orchestrator` | Route design-stage work across the specialized design skills |
+| `design-tree-core` | Internal/shared governance core for derivation, handoff, and anti-bloat rules across design-tree skills |
 | `design-structure` | Turn a vague idea into an initial design tree and design skeleton |
 | `design-refinement` | Deepen an existing design tree until key branches are implementation-ready |
 | `decision-evaluation` | Compare bounded design options and recommend one with trade-offs |
@@ -66,6 +67,8 @@ loom/
 ├── skills/                  # Skill definitions
 │   └── <skill-name>/
 │       ├── SKILL.md         # Main skill document
+│       ├── REFERENCE.md     # Shared or advanced reference material (optional)
+│       ├── CHANGELOG.md     # User-visible changes (optional)
 │       ├── agents/          # Parallel agent templates (optional)
 │       └── evals/           # Evaluation test cases (optional)
 ├── docs/

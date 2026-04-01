@@ -1,0 +1,56 @@
+{
+  "skill_name": "design-tree-core",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "请为 design tree 系统补一条共享规则：当原树开始稳定回答第二个核心问题，并且这个问题反复出现、有自己的输入输出和完成标准时，应考虑派生第二棵树。",
+      "expected_output": "The skill should accept this as valid core content because it is a stable shared derivation rule affecting multiple design skills. Output should classify it as derivation or shared governance rather than rejecting it as project-specific detail.",
+      "assertions": [
+        {
+          "name": "accepts_shared_derivation_rule",
+          "description": "Output accepts the proposed addition as valid shared core content rather than rejecting it",
+          "type": "qualitative"
+        },
+        {
+          "name": "classifies_as_shared_rule",
+          "description": "Output identifies that the rule belongs to derivation, boundaries, or anti-bloat governance",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "请把上周某个代码研究仓库里关于 Claude Code 逆向笔记的具体结论和目录结构直接补进 design-tree-core，方便以后参考。",
+      "expected_output": "The skill should reject this addition because it is project-specific content, not a shared stable rule for the design-tree skill family. It should recommend moving such content into a design doc, report, note, or project-specific artifact instead of the core.",
+      "assertions": [
+        {
+          "name": "rejects_project_specific_content",
+          "description": "Output rejects the request because the content is project-specific and not suitable for the shared core",
+          "type": "qualitative"
+        },
+        {
+          "name": "suggests_better_destination",
+          "description": "Output recommends a more natural destination such as design docs, reports, notes, or project artifacts",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "为了让 design-tree-core 更完整，请加入一个很长的 FAQ、多个详细案例、模板正文，以及各 skill 的单独注意事项。",
+      "expected_output": "The skill should reject the request because FAQ accumulation, long examples, template bodies, and single-skill rules are forbidden in the shared core. It should recommend moving such material into examples, templates, or skill-specific reference files.",
+      "assertions": [
+        {
+          "name": "rejects_bloat_patterns",
+          "description": "Output explicitly rejects FAQ accumulation, long examples, template bodies, and single-skill rules as forbidden content",
+          "type": "qualitative"
+        },
+        {
+          "name": "points_to_eviction_targets",
+          "description": "Output recommends moving the content to examples, templates, or skill-specific references instead of the core",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}

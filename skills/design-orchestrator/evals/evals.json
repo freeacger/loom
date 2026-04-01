@@ -110,6 +110,45 @@
           "type": "qualitative"
         }
       ]
+    },
+    {
+      "id": 6,
+      "prompt": "当前设计状态如下：\n\nproblem: 研究一个大型 CLI 产品并沉淀稳定学习资料\ndesign_tree:\n  - 研究主树：研究什么、如何抽样、何时停机，已存在且大体稳定\n  - 笔记生产：什么时候可以写正式笔记、落到哪个目录、什么时候退回研究\nopen_branches: [笔记生产]\ndecision_nodes: []\n\n请继续路由下一步。",
+      "expected_output": "The orchestrator should recognize that 笔记生产 is no longer just a branch refinement but a second stable problem domain with its own core question and lifecycle. It should route to design-structure for explicit derived-tree creation, require a parent/child handoff, and explain why this is derivation rather than normal refinement.",
+      "assertions": [
+        {
+          "name": "routes_to_structure_for_derivation",
+          "description": "Output routes to design-structure for derived-tree creation rather than continuing inline refinement",
+          "type": "qualitative"
+        },
+        {
+          "name": "derivation_reason_stated",
+          "description": "Output explains that the branch has become a second stable problem domain with its own core question or lifecycle",
+          "type": "qualitative"
+        },
+        {
+          "name": "handoff_required",
+          "description": "Output requires an explicit parent/child handoff instead of implying that the child tree can be created ad hoc",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "当前设计树有 12 个分支，正文越来越长。除了变长之外，没有新的独立问题域，也没有新的输入输出或完成标准。请问下一步要不要拆出第二棵树？",
+      "expected_output": "The orchestrator should explicitly refuse derivation in this case. It should say that tree length alone is not a sufficient reason to derive a new tree, and route the work back to refinement or compaction within the current tree rather than creating a child tree.",
+      "assertions": [
+        {
+          "name": "rejects_length_only_derivation",
+          "description": "Output explicitly says that tree length alone is not a sufficient reason to derive a new tree",
+          "type": "qualitative"
+        },
+        {
+          "name": "stays_with_current_tree",
+          "description": "Output keeps the work within the current tree via refinement or compaction instead of routing to derived-tree creation",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

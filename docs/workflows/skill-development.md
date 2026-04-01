@@ -50,6 +50,26 @@ If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 
 > **Note:** skills.sh may have a cache delay — if you just pushed, wait 2 minutes and re-run `mise run pull`.
 
+### Shared Design-Tree Changes
+
+When a change spans the shared design-tree core and multiple design skills, do not publish each skill separately by memory.
+
+Use:
+
+```bash
+mise run release-design-tree "<commit message>"
+```
+
+This stages and publishes:
+- `skills/design-tree-core`
+- `skills/design-orchestrator`
+- `skills/design-structure`
+- `skills/design-refinement`
+- `skills/design-readiness-check`
+- related workflow / README documentation
+
+Use this path for shared derivation rules, handoff rules, and anti-bloat governance changes.
+
 ---
 
 ## Individual Tasks
@@ -58,6 +78,7 @@ If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 mise run check                          # diff repo vs all install paths
 mise run publish <name> "<message>"     # git add + commit + push only
 mise run pull                           # npx skills add freeacger/loom -g (all skills)
+mise run release-design-tree "<msg>"    # publish shared design-tree changes + pull
 ```
 
 ---

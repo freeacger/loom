@@ -18,13 +18,14 @@
 
 ## Skills
 
-19 个 skill，按阶段分组：
+20 个 skill，按阶段分组：
 
 ### 设计 (Design)
 
 | Skill | 用途 |
 |---|---|
 | `design-orchestrator` | 在多个设计技能之间编排和路由设计阶段工作 |
+| `design-tree-core` | 内部/共享治理核心：为 design-tree 技能家族提供派生、handoff 与反膨胀治理规则 |
 | `design-structure` | 将模糊想法整理成初始设计树和设计骨架 |
 | `design-refinement` | 将已有设计树继续细化到关键分支可落地的粒度 |
 | `decision-evaluation` | 对有边界的设计决策做方案比较并给出推荐 |
@@ -66,6 +67,8 @@ loom/
 ├── skills/                  # Skill 定义
 │   └── <skill-name>/
 │       ├── SKILL.md         # 主 skill 文档
+│       ├── REFERENCE.md     # 共享或高级参考材料（可选）
+│       ├── CHANGELOG.md     # 用户可见变更记录（可选）
 │       ├── agents/          # 并行 agent 模板（可选）
 │       └── evals/           # 评估测试用例（可选）
 ├── docs/

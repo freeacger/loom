@@ -39,18 +39,23 @@ Goal: Load design state and assemble context for parallel checks.
 2. Read the design tree content and all related context (open branches, decision nodes, risks, validation state).
 3. If `design_state` does not exist or the design tree is empty, return NOT READY immediately with a handoff to `design-structure`.
 4. Assemble a context package containing: design tree text, open branches, decision nodes, existing risks, validation entries.
+5. Perform a lightweight structural integrity check using the shared rules in `design-tree-core/REFERENCE.md`:
+   - mixed responsibilities inside one tree
+   - parent/child ownership confusion
+   - duplicated parent/child logic on the same branch
+   - branches that likely should have been derived but were kept inline
 
 ### Phase B: Parallel Readiness Checks
 
 Goal: Run four independent checks in parallel using specialized subagents.
 
-5. Launch four parallel Sonnet subagents, each using one of the checker agent templates:
+6. Launch four parallel Sonnet subagents, each using one of the checker agent templates:
    - **branch-checker**: reads `skills/design-readiness-check/agents/branch-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
    - **assumption-checker**: reads `skills/design-readiness-check/agents/assumption-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
    - **failure-checker**: reads `skills/design-readiness-check/agents/failure-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
    - **risk-checker**: reads `skills/design-readiness-check/agents/risk-checker.md`. Fill `{{DESIGN_TREE}}` and `{{CONTEXT}}`.
 
-6. Collect results from all four subagents.
+7. Collect results from all four subagents.
 
 **Fallback**: If any subagent fails or times out, the main agent performs that check inline using the same rubric from the agent template.
 
@@ -58,30 +63,31 @@ Goal: Run four independent checks in parallel using specialized subagents.
 
 Goal: Combine check results into a clear readiness judgment.
 
-7. Map each subagent's `status` to a pass/fail entry in the readiness checklist:
+8. Map each subagent's `status` to a pass/fail entry in the readiness checklist:
    - branch-checker → "Design tree present" and "Key branches refined"
    - assumption-checker → "Decisions resolved" (if assumptions are unresolved)
    - failure-checker → "Failure paths documented" and "Validation strategy defined"
    - risk-checker → "Blocking risks mitigated"
 
-8. Build the ✓/✗ checklist diagram following Diagram Conventions.
+9. Build the ✓/✗ checklist diagram following Diagram Conventions.
 
-9. Determine verdict:
-   - **READY**: all four checks return `pass`
-   - **NOT READY**: any check returns `fail`
+10. Determine verdict:
+   - **READY**: all four checks return `pass` and no structural integrity issue is blocking
+   - **NOT READY**: any check returns `fail` or structural integrity issues are blocking
 
-10. If NOT READY, determine the handoff target based on which check failed:
+11. If NOT READY, determine the handoff target based on which check failed:
     - branch-checker fails → hand off to `design-structure` (branches missing) or `design-refinement` (branches weak)
     - assumption-checker fails → hand off to `design-refinement` (assumptions need expansion)
     - failure-checker fails → hand off to `design-refinement` (failure paths need adding)
     - risk-checker fails → hand off to `decision-evaluation` (unresolved risk decision) or `design-refinement` (risk documentation weak)
+    - structural integrity fails → hand off to `design-orchestrator` (re-route ownership), `design-structure` (derive a child tree), or `design-refinement` (shrink duplicated inline logic)
 
-11. Update `design_state` with:
+12. Update `design_state` with:
     - `status.ready_for_planning`: true or false
     - `status.blocking_issues`: list from failed checks
     - Updated `open_branches`, `risks`, `validation` if new information emerged
 
-12. Return the explicit verdict with checklist diagram. Never give a "probably ready" answer.
+13. Return the explicit verdict with checklist diagram. Never give a "probably ready" answer.
 
 ## Readiness Standard
 
@@ -92,6 +98,7 @@ A design is ready for planning only when:
 - major decision nodes are resolved or explicitly deferred with acceptable rationale
 - failure paths and validation strategy are not missing
 - blocking risks are either mitigated or clearly acknowledged
+- tree responsibilities are not mixed in a way that breaks routing clarity
 
 ## Expected Outputs
 
@@ -148,4 +155,5 @@ Exit when:
 - Hand off to `design-structure` when foundational branches are still missing.
 - Hand off to `design-refinement` when important branches exist but are still weak.
 - Hand off to `decision-evaluation` when the real blocker is an unresolved decision node.
+- Hand off to `design-orchestrator` when the real blocker is tree ownership or routing drift rather than branch weakness.
 - Never give a "probably ready" answer. The result must be explicit.

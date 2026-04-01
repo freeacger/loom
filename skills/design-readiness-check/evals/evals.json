@@ -71,6 +71,28 @@
           "type": "qualitative"
         }
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "请检查以下设计是否可以进入实现规划阶段：\n\nproblem: 为代码研究系统构建稳定知识沉淀流程\ndesign_tree:\n  - 研究主树: 研究问题、抽样策略、停机条件，已完整\n  - 笔记生产: 什么时候能写正式笔记、如何连接阅读路径、何时退回研究，仍然内联扩写在同一棵树中\n  - 研究主树中仍保留一整套关于笔记发布/退回的重复逻辑\nopen_branches: []\ndecision_nodes: []\nrisks: []\nvalidation:\n  - 研究主树本身已完整\n  - 笔记逻辑有独立流程，但尚未显式派生子树",
+      "expected_output": "Output must return an explicit FAIL verdict because the tree has mixed responsibilities and duplicated parent/child logic. The skill should identify structural integrity drift as a blocker and recommend design-orchestrator or design-structure as the next step instead of passing the design as ready.",
+      "assertions": [
+        {
+          "name": "structural_drift_is_blocking",
+          "description": "Output explicitly identifies mixed responsibilities or duplicated parent/child logic as a blocking issue",
+          "type": "qualitative"
+        },
+        {
+          "name": "explicit_not_ready_due_to_structure",
+          "description": "Output gives an explicit NOT READY verdict because of structure drift, not because of vague branches or missing decisions",
+          "type": "qualitative"
+        },
+        {
+          "name": "routes_to_orchestrator_or_structure",
+          "description": "Output recommends design-orchestrator or design-structure as the next step to resolve ownership and derivation issues",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

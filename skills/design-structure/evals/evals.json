@@ -121,6 +121,33 @@
           "type": "qualitative"
         }
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "请基于以下父树 handoff 创建一个派生树：\n\nparent_tree_name: agent-cli-research\nbranch_being_extracted: notebook production\nreason_for_derivation: 笔记生产已经有独立的输入门槛、生成流程、质量门和退回条件\ninherited_constraints:\n- 只能消费 research handoff bundle\n- 不得回写研究侧目录\nunresolved_questions:\n- 何时允许带保留意见发布\nexpected_output:\n- 一棵独立的 notebook production tree\nreturn_conditions:\n- 能明确判断发布、带保留发布、退回研究树\n\n请创建派生树。",
+      "expected_output": "The skill should create a derived tree rather than a generic initial design tree. Output should explicitly name the parent tree and derived tree, explain the derivation reason, define ownership and non-ownership, and include a parent/child handoff section. It must not duplicate the full parent tree inline.",
+      "assertions": [
+        {
+          "name": "derived_tree_identified",
+          "description": "Output explicitly states that it is creating a derived tree from a named parent tree",
+          "type": "qualitative"
+        },
+        {
+          "name": "ownership_defined",
+          "description": "Output defines what the derived tree owns and what it does not own",
+          "type": "qualitative"
+        },
+        {
+          "name": "handoff_fields_present",
+          "description": "Output includes the minimum parent/child handoff fields such as reason_for_derivation, inherited_constraints, expected_output, and return_conditions",
+          "type": "qualitative"
+        },
+        {
+          "name": "no_parent_duplication",
+          "description": "Output does not restate or copy the full parent tree into the derived tree",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#MISE description="发布 design-tree 共享内核及相关技能，然后拉取最新 skills"
+#USAGE arg "<message>" help="提交信息"
+set -euo pipefail
+
+msg="${1:?Usage: mise run release-design-tree '<commit message>'}"
+
+git add \
+  "skills/design-tree-core" \
+  "skills/design-orchestrator" \
+  "skills/design-structure" \
+  "skills/design-refinement" \
+  "skills/design-readiness-check" \
+  "docs/workflows/skill-development.md" \
+  "README.md" \
+  "README.zh-CN.md"
+
+if git diff --cached --quiet; then
+  echo "⚠ nothing to commit for design-tree rollout, skipping publish"
+  exit 0
+fi
+
+git commit -m "$msg"
+git push
+mise run pull
+echo "✓ design-tree rollout published"

@@ -77,6 +77,31 @@ Route to `design-readiness-check` when:
 - the design appears mostly complete
 - the remaining question is whether it is safe to move into implementation planning
 
+## Derived Tree Routing
+
+Before routing to `design-structure` or `design-refinement`, check whether the current tree is beginning to contain a second stable problem domain.
+
+Use the shared derivation rules in `design-tree-core/REFERENCE.md` as the source of truth for this judgment.
+
+A derived tree should be created only if all of the following are true:
+
+- the current tree is starting to answer a second distinct core question
+- that question appears repeatedly, not as a one-off exception
+- the branch now behaves like a stable decision system
+- a child tree can define its own scope and done criteria
+- deriving it will make the parent tree smaller and clearer
+
+If those conditions are met:
+
+- route to `design-structure` to create a derived tree
+- require an explicit parent/child handoff
+- require the parent tree to shrink the extracted branch after derivation
+
+If those conditions are not met:
+
+- do not derive
+- continue routing within the current tree
+
 ## Diagram Conventions
 
 After routing, show the current workflow position as a character DAG inside a code block (no language tag):
@@ -128,3 +153,5 @@ Exit when:
 - If a downstream skill changes the design materially, re-check routing instead of assuming the next step.
 - Only send the task to `writing-plans` after `design-readiness-check` has clearly passed.
 - If a downstream skill cannot be invoked in the current context, still name it explicitly as the next step and stop. Do not execute its responsibilities inline as a substitute.
+- Never derive a new tree just because the current tree is long.
+- Never keep expanding a branch inline after deciding that it should become a derived tree.

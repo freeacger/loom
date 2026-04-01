@@ -29,6 +29,7 @@ Do not use this skill when:
 - the main need is deeper decomposition of existing branches
 - the main need is to compare options for one explicit decision node
 - the main need is to decide whether the design is ready for planning
+- the current tree only needs deeper refinement rather than a true derived tree
 
 ## Language Strategy
 
@@ -94,6 +95,28 @@ Write the complete design tree to the file. In conversation, show only:
 - decision nodes that need user action
 - open branch names (point user to file for details)
 - next step recommendation
+
+## Derived Tree Creation
+
+This skill may also be used to create a derived tree when a parent tree has already identified a new stable problem domain.
+
+Use the shared derivation and handoff rules in `design-tree-core/REFERENCE.md` as the source of truth.
+
+When creating a derived tree, do all of the following:
+
+1. Name the parent tree and the derived tree explicitly.
+2. State the reason for derivation.
+3. Define what the derived tree owns.
+4. Define what the derived tree does not own.
+5. Record the minimum parent/child handoff:
+   - branch being extracted
+   - inherited constraints
+   - unresolved questions
+   - expected output
+   - return conditions
+
+Do not copy the parent tree into the derived tree.
+Do not use derivation as a way to dump overflow detail.
 
 ## Interactive Q&A
 
@@ -239,6 +262,7 @@ Your responsibilities are:
 6. Record assumptions instead of silently relying on them.
 7. Write all output to the design file incrementally.
 8. Flag nodes that depend on unverified external tools, APIs, libraries, or services. Perform a lightweight feasibility check (web search or doc lookup) at the time of flagging. If the dependency is clearly infeasible, mark `✗` immediately; if confirmed feasible with open questions, mark `[RESEARCH]` with initial findings; if fully confirmed, mark `✓`.
+9. If acting on a parent-tree handoff, create a derived tree with explicit parent/child boundaries rather than repeating the parent tree inline.
 
 ## Expected Outputs
 
@@ -252,6 +276,13 @@ The design file at `docs/design-tree/<name>.md` must contain:
 - Open Branches — list
 - Decision Nodes — list
 - External Dependencies — list, each entry contains: node, dependency, validation_needed, status (unverified | verified | blocked)
+
+If the tree being created is a derived tree, the file must also contain:
+- Parent Tree
+- Derivation Reason
+- Ownership
+- Non-Ownership
+- Parent/Child Handoff
 
 ### Conversation Output (concise)
 
