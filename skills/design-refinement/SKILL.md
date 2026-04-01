@@ -42,7 +42,7 @@ If those answers are still missing, the branch is not done.
 
 Refinement should continue only while a branch remains part of the current tree's original core question.
 
-Use the shared derivation rules in `design-tree-core/REFERENCE.md` as the source of truth.
+Use the shared derivation rules in `../design-tree-core/REFERENCE.md` as the source of truth.
 
 Stop refining inline when a branch begins to show all of the following:
 

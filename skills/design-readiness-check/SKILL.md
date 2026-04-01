@@ -39,7 +39,7 @@ Goal: Load design state and assemble context for parallel checks.
 2. Read the design tree content and all related context (open branches, decision nodes, risks, validation state).
 3. If `design_state` does not exist or the design tree is empty, return NOT READY immediately with a handoff to `design-structure`.
 4. Assemble a context package containing: design tree text, open branches, decision nodes, existing risks, validation entries.
-5. Perform a lightweight structural integrity check using the shared rules in `design-tree-core/REFERENCE.md`:
+5. Perform a lightweight structural integrity check using the shared rules in `../design-tree-core/REFERENCE.md`:
    - mixed responsibilities inside one tree
    - parent/child ownership confusion
    - duplicated parent/child logic on the same branch
@@ -68,6 +68,7 @@ Goal: Combine check results into a clear readiness judgment.
    - assumption-checker → "Decisions resolved" (if assumptions are unresolved)
    - failure-checker → "Failure paths documented" and "Validation strategy defined"
    - risk-checker → "Blocking risks mitigated"
+   - structural integrity check → "Structural integrity preserved"
 
 9. Build the ✓/✗ checklist diagram following Diagram Conventions.
 
@@ -126,7 +127,8 @@ Readiness Check
 ├── Decisions resolved           ✗ (storage choice pending)
 ├── Failure paths documented     ✓
 ├── Validation strategy defined  ✓
-└── Blocking risks mitigated     ✗ (migration cutover risk)
+├── Blocking risks mitigated     ✗ (migration cutover risk)
+└── Structural integrity preserved ✓
 
 Verdict: NOT READY — 2 blocking issues
 ```

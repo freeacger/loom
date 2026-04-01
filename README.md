@@ -25,7 +25,7 @@ The repository covers the full engineering lifecycle:
 | Skill | Purpose |
 |---|---|
 | `design-orchestrator` | Route design-stage work across the specialized design skills |
-| `design-tree-core` | Internal/shared governance core for derivation, handoff, and anti-bloat rules across design-tree skills |
+| `design-tree-core` | Internal/shared governance core for derivation, handoff, and anti-bloat rules across design-tree skills; not a normal user entrypoint |
 | `design-structure` | Turn a vague idea into an initial design tree and design skeleton |
 | `design-refinement` | Deepen an existing design tree until key branches are implementation-ready |
 | `decision-evaluation` | Compare bounded design options and recommend one with trade-offs |

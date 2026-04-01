@@ -1,6 +1,6 @@
 ---
 name: design-tree-core
-description: Shared core rules for design-tree skills. Use only when maintaining the design-tree system itself or when another design skill needs shared governance rules for derivation, handoff, boundaries, or anti-bloat controls. Do not use as a general design entrypoint or as a replacement for design-orchestrator, design-structure, or design-refinement.
+description: Internal/shared core rules for design-tree skills. Use only when maintaining the design-tree system itself or when another design skill needs shared governance rules for derivation, handoff, boundaries, or anti-bloat controls. Do not trigger for ordinary user design requests, and do not use as a replacement for design-orchestrator, design-structure, or design-refinement.
 ---
 
 # Design Tree Core

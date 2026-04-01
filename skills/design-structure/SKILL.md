@@ -100,7 +100,7 @@ Write the complete design tree to the file. In conversation, show only:
 
 This skill may also be used to create a derived tree when a parent tree has already identified a new stable problem domain.
 
-Use the shared derivation and handoff rules in `design-tree-core/REFERENCE.md` as the source of truth.
+Use the shared derivation and handoff rules in `../design-tree-core/REFERENCE.md` as the source of truth.
 
 When creating a derived tree, do all of the following:
 

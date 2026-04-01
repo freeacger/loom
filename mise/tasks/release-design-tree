@@ -5,12 +5,16 @@ set -euo pipefail
 
 msg="${1:?Usage: mise run release-design-tree '<commit message>'}"
 
+mise run check
+
 git add \
+  "mise/tasks/check-skill-json" \
   "skills/design-tree-core" \
   "skills/design-orchestrator" \
   "skills/design-structure" \
   "skills/design-refinement" \
   "skills/design-readiness-check" \
+  "mise/tasks/check" \
   "docs/workflows/skill-development.md" \
   "README.md" \
   "README.zh-CN.md"

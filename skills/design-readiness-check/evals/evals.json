@@ -91,6 +91,11 @@
           "name": "routes_to_orchestrator_or_structure",
           "description": "Output recommends design-orchestrator or design-structure as the next step to resolve ownership and derivation issues",
           "type": "qualitative"
+        },
+        {
+          "name": "checklist_mentions_structural_integrity",
+          "description": "Output checklist explicitly marks structural integrity as pass or fail instead of hiding the blocker outside the readiness checklist",
+          "type": "qualitative"
         }
       ]
     }

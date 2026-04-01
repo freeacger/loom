@@ -25,7 +25,7 @@
 | Skill | 用途 |
 |---|---|
 | `design-orchestrator` | 在多个设计技能之间编排和路由设计阶段工作 |
-| `design-tree-core` | 内部/共享治理核心：为 design-tree 技能家族提供派生、handoff 与反膨胀治理规则 |
+| `design-tree-core` | 内部/共享治理核心：为 design-tree 技能家族提供派生、handoff 与反膨胀治理规则；不是普通用户入口 |
 | `design-structure` | 将模糊想法整理成初始设计树和设计骨架 |
 | `design-refinement` | 将已有设计树继续细化到关键分支可落地的粒度 |
 | `decision-evaluation` | 对有边界的设计决策做方案比较并给出推荐 |

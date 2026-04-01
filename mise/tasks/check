@@ -1,30 +1,35 @@
 #!/usr/bin/env bash
 #MISE description="Check for divergence between repo skills and install paths"
-set -uo pipefail
+set -euo pipefail
+
+echo "→ checking skill eval JSON files..."
+mise run check-skill-json
+
+echo "→ checking installed skill directories..."
 
 fail=0
 for skill_dir in skills/*/; do
   name=$(basename "$skill_dir")
-  src="$skill_dir/SKILL.md"
-  claude_path="$HOME/.claude/skills/$name/SKILL.md"
-  agents_path="$HOME/.agents/skills/$name/SKILL.md"
+  src_dir="${skill_dir%/}"
+  claude_path="$HOME/.claude/skills/$name"
+  agents_path="$HOME/.agents/skills/$name"
   skill_fail=0
 
-  if [ ! -f "$claude_path" ]; then
+  if [ ! -d "$claude_path" ]; then
     echo "  ⚠ $name: not installed at ~/.claude/skills/"
-  elif ! diff -q "$src" "$claude_path" > /dev/null 2>&1; then
+  elif ! diff -qr --exclude '.DS_Store' "$src_dir" "$claude_path" > /dev/null 2>&1; then
     echo "  ✗ $name: diverged at ~/.claude/skills/"
     skill_fail=1
   fi
 
-  if [ ! -f "$agents_path" ]; then
+  if [ ! -d "$agents_path" ]; then
     echo "  ⚠ $name: not installed at ~/.agents/skills/"
-  elif ! diff -q "$src" "$agents_path" > /dev/null 2>&1; then
+  elif ! diff -qr --exclude '.DS_Store' "$src_dir" "$agents_path" > /dev/null 2>&1; then
     echo "  ✗ $name: diverged at ~/.agents/skills/"
     skill_fail=1
   fi
 
-  if [ $skill_fail -eq 0 ] && [ -f "$claude_path" ] && [ -f "$agents_path" ]; then
+  if [ $skill_fail -eq 0 ] && [ -d "$claude_path" ] && [ -d "$agents_path" ]; then
     echo "  ✓ $name"
   fi
 

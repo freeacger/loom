@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#MISE description="Check skill eval JSON files for syntax validity"
+set -euo pipefail
+
+eval_jsons=$(find skills -path '*/evals/evals.json' -type f | sort)
+
+if [ -z "$eval_jsons" ]; then
+  echo "✓ no skill eval JSON files found"
+  exit 0
+fi
+
+while IFS= read -r json_file; do
+  if python3 -m json.tool "$json_file" > /dev/null 2>&1; then
+    echo "  ✓ $json_file"
+  else
+    echo "  ✗ invalid JSON: $json_file"
+    exit 1
+  fi
+done <<EOF
+$eval_jsons
+EOF
+
+echo "✓ skill eval JSON files are valid"

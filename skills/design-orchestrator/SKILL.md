@@ -81,7 +81,7 @@ Route to `design-readiness-check` when:
 
 Before routing to `design-structure` or `design-refinement`, check whether the current tree is beginning to contain a second stable problem domain.
 
-Use the shared derivation rules in `design-tree-core/REFERENCE.md` as the source of truth for this judgment.
+Use the shared derivation rules in `../design-tree-core/REFERENCE.md` as the source of truth for this judgment.
 
 A derived tree should be created only if all of the following are true:
 

@@ -10,7 +10,7 @@ Install the git pre-push hook (one-time per clone):
 mise run install-hooks
 ```
 
-This symlinks `scripts/hooks/pre-push` → `.git/hooks/pre-push`. The hook runs `mise run check` before every push and aborts if any install path has diverged from the repo.
+This symlinks `scripts/hooks/pre-push` → `.git/hooks/pre-push`. The hook runs `mise run check` before every push and aborts if repo health checks fail.
 
 ---
 
@@ -28,6 +28,10 @@ loom/skills/<name>/SKILL.md   ← canonical source, always edit here
 Install paths are always populated from skills.sh via `mise run pull`.
 Never write to install paths directly.
 
+`mise run check` is the unified health gate for this repo. It currently verifies:
+- `skills/*/evals/evals.json` syntax via `python3 -m json.tool`
+- divergence between repo skill directories and installed copies
+
 ---
 
 ## Standard Workflow: Edit → Release
@@ -43,8 +47,9 @@ mise run release <name> "<commit message>"
 ```
 
 This runs in sequence:
-1. `git add skills/<name>` → `git commit` → `git push`
-2. `cd ~ && npx skills add freeacger/loom -y -g` (updates all skills globally)
+1. `mise run check`
+2. `git add skills/<name>` → `git commit` → `git push`
+3. `cd ~ && npx skills add freeacger/loom -y -g` (updates all skills globally)
 
 If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 
@@ -61,11 +66,13 @@ mise run release-design-tree "<commit message>"
 ```
 
 This stages and publishes:
+- `mise/tasks/check-skill-json`
 - `skills/design-tree-core`
 - `skills/design-orchestrator`
 - `skills/design-structure`
 - `skills/design-refinement`
 - `skills/design-readiness-check`
+- `mise/tasks/check`
 - related workflow / README documentation
 
 Use this path for shared derivation rules, handoff rules, and anti-bloat governance changes.
@@ -75,7 +82,8 @@ Use this path for shared derivation rules, handoff rules, and anti-bloat governa
 ## Individual Tasks
 
 ```bash
-mise run check                          # diff repo vs all install paths
+mise run check-skill-json               # validate skills/*/evals/evals.json
+mise run check                          # repo health gate: JSON validity + install divergence
 mise run publish <name> "<message>"     # git add + commit + push only
 mise run pull                           # npx skills add freeacger/loom -g (all skills)
 mise run release-design-tree "<msg>"    # publish shared design-tree changes + pull
@@ -124,6 +132,6 @@ mise run release <name> "<commit message>"
 ## Pre-Commit Checklist
 
 - [ ] Edit was made in `skills/<name>/SKILL.md`, not in an install path
-- [ ] `mise run check` passes (or divergence is intentional and will be resolved by release)
+- [ ] `mise run check` passes (eval JSON syntax + install divergence), or any temporary divergence is expected and will be resolved by release
 - [ ] `skills/<name>/CHANGELOG.md` updated if the change is user-visible
 - [ ] After push: verify `https://skills.sh/freeacger/loom/<name>` shows the updated version
