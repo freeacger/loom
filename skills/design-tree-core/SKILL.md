@@ -15,8 +15,8 @@ It exists to define the minimum shared contract that all design-tree skills must
 
 Its job is to protect only the rules that stay stable across the family:
 
-- required `design_state` fields
-- `design_target_type` vocabulary
+- required `design_state` fields (including the mandatory `design_target_type`)
+- `design_target_type` vocabulary and the prohibition on silent inference
 - derivation criteria
 - parent/child handoff contracts
 - anti-bloat governance
@@ -142,6 +142,14 @@ Keep this skill small and rigid.
 - Prefer deletion over historical clutter.
 
 This skill is healthy only if it remains smaller and more stable than the skills that depend on it.
+
+## Mandatory Target Type Rule
+
+`design_target_type` is a mandatory field of `design_state`.
+No design-tree skill may silently infer, assume, default, or derive a `design_target_type` value.
+When it is missing, every design-tree skill must treat the state as invalid and either stop or route to the step that can set it explicitly.
+
+See REFERENCE.md section 1.2 for the full rule.
 
 ## Relationship to Other Skills
 

@@ -40,7 +40,8 @@ It does require stable treatment of these fields as required design-stage state.
 
 ### 1.2 Required Target Type
 
-`design_target_type` is mandatory.
+`design_target_type` is a mandatory field of `design_state`.
+It is not optional. It is not a defaultable field. It is not a post-hoc annotation.
 
 Allowed values:
 - `system`
@@ -48,8 +49,15 @@ Allowed values:
 - `methodology`
 - `framework`
 
-If a design-state input is missing `design_target_type`, design-tree skills must not silently infer one.
-They must stop, reject the incomplete state, or route the work to the step that can explicitly set the field.
+If a design-state input is missing `design_target_type`, every design-tree skill must treat the state as invalid.
+No design-tree skill may silently infer, assume, default, or derive a `design_target_type` value from context, problem description, or any other field.
+
+Required remediation paths when `design_target_type` is absent:
+1. **Stop and reject**: treat the state as incomplete and refuse to proceed.
+2. **Route to the step that can set it explicitly**: hand back to the user, the orchestrator, or the entry skill that is responsible for establishing the initial design state.
+
+A skill may ask the user to provide the type explicitly.
+A skill may not choose the type on the user's behalf without an explicit user decision.
 
 ### 1.3 Shared Output Contract
 
