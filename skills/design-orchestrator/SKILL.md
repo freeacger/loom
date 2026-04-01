@@ -125,6 +125,11 @@ Route to `design-refinement` when:
 - major branches are still shallow, vague, or unresolved
 - the main need is deeper decomposition, edge-case coverage, or failure-path clarification
 
+When `design-structure` has just completed the initial tree's main body:
+
+- expect that tree to be persisted before routing onward
+- treat `design-refinement` as the default next step unless a bounded decision or readiness check is the clearer blocker
+
 ## Diagram Conventions
 
 After routing, show the current workflow position as a character DAG inside a code block (no language tag):
@@ -174,6 +179,7 @@ Exit when:
 - Never expand a branch in depth yourself if a specialized design skill should do it.
 - Never compare options broadly if the real next step is to structure or refine the design.
 - If a downstream skill changes the design materially, re-check routing instead of assuming the next step.
+- After `design-structure` completes a main tree, prefer `design-refinement` as the default continuation.
 - Only send the task to `writing-plans` after `design-readiness-check` has clearly passed.
 - If a downstream skill cannot be invoked in the current context, still name it explicitly as the next step and stop. Do not execute its responsibilities inline as a substitute.
 - Never route to more than one next step in the same turn.

@@ -110,7 +110,7 @@ This repository pins Python in `mise.toml`. Run Python-dependent commands inside
 
 `loom` keeps `skills.sh` as its distribution path. [Agent Skills](https://agentskills.io/home) is treated as a compatibility target and reference specification layer, not as a replacement install source for this repository.
 
-For the design-tree family, the primary shared output is `design_state`, not a default saved file. `design_target_type` is mandatory and must be one of `system`, `workflow`, `methodology`, or `framework`. Any saved design artifact under `docs/design-tree/` is now an explicit persistence choice rather than a family-wide default side effect.
+For the design-tree family, the primary shared state is still `design_state`, and `design_target_type` remains mandatory with allowed values `system`, `workflow`, `methodology`, and `framework`. In this repository, once `design-structure` completes the initial tree's main body, that tree should be persisted under `docs/design-tree/` as `draft` before the workflow continues, with `design-refinement` as the default next step. Promote the document to `ready-for-planning` only after `design-readiness-check` passes.
 
 Phase 1 adds an optional validation command:
 

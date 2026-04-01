@@ -91,6 +91,7 @@ Goal: Combine check results into a clear readiness judgment.
     - `status.ready_for_planning`: true or false
     - `status.blocking_issues`: list from failed checks
     - Updated `open_branches`, `risks`, `validation` if new information emerged
+    - If a persisted design artifact exists, keep its document status aligned with the verdict: `draft` for NOT READY, `ready-for-planning` for READY
 
 14. Return the explicit verdict with checklist diagram. Never give a "probably ready" answer.
 
@@ -121,6 +122,11 @@ Always return an explicit result:
 
 - ready for planning
 - not ready for planning
+
+If a persisted design file is part of the workflow, its document status should also be explicit:
+
+- `draft` while the design is not ready
+- `ready-for-planning` after the readiness gate passes
 
 ## Diagram Conventions
 

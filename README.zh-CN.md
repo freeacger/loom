@@ -110,7 +110,7 @@ mise install
 
 `loom` 继续使用 `skills.sh` 作为分发路径。[Agent Skills](https://agentskills.io/home) 在本仓库里只作为兼容目标与参考规范层，不是新的安装源。
 
-对于 design-tree 技能家族，主共享产物现在是 `design_state`，而不是默认落盘文件。`design_target_type` 是强制字段，枚举值固定为 `system`、`workflow`、`methodology`、`framework`。`docs/design-tree/` 下的设计文件只在显式要求保存时才会生成，不再是家族级默认副作用。
+对于 design-tree 技能家族，共享主状态仍然是 `design_state`，`design_target_type` 仍是强制字段，枚举值固定为 `system`、`workflow`、`methodology`、`framework`。在本仓库里，一旦 `design-structure` 完成初始设计树主体，就应先以 `draft` 状态把该树落盘到 `docs/design-tree/`，再继续后续流程；默认下一步是 `design-refinement`。只有在 `design-readiness-check` 通过后，才能把文档升级为 `ready-for-planning`。
 
 阶段 1 新增了一个可选校验命令：
 

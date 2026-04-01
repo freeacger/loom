@@ -91,6 +91,7 @@ description: "检查一个设计是否已经完整到足以进入实现规划（
    - `status.ready_for_planning`：true 或 false
    - `status.blocking_issues`：失败检查生成的列表
    - 如果有新信息，也更新 `open_branches`、`risks`、`validation`
+   - 如果当前工作流包含已落盘的设计文件，还要让文档状态与结论保持一致：NOT READY 时保持 `draft`，READY 时升级为 `ready-for-planning`
 
 14. 返回明确结论与检查清单图（checklist diagram）。绝不要说 “probably ready”。
 
@@ -121,6 +122,11 @@ description: "检查一个设计是否已经完整到足以进入实现规划（
 
 - ready for planning
 - not ready for planning
+
+如果当前工作流包含已落盘的设计文件，文档状态也必须明确：
+
+- 设计未就绪时保持 `draft`
+- readiness gate 通过后升级为 `ready-for-planning`
 
 ## 图表示意规范 (Diagram Conventions)
 

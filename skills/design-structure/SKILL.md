@@ -13,7 +13,7 @@ This skill turns a vague idea into an initial design tree through a two-phase wo
 2. **Design tree generation** — produce the design tree based on confirmed inputs
 
 Its primary output is `design_state`.
-Saving a file is optional and only happens when the task explicitly requires persistence.
+When the initial tree's main body is complete, persist it as the authoritative design artifact before handing off to the next design step.
 
 ## When to Use
 
@@ -189,14 +189,15 @@ Expected daily request volume?
 **Rules for all types:**
 - One question type per message
 - End every question with `↑` marker to signal "your turn"
-- After user confirms, do not repeat the confirmed content (it is already in the file)
+- After user confirms, do not repeat the confirmed content (it is already captured in `design_state` and will be persisted when the main body is complete)
 
 ## Persistence
 
-Persistence is optional.
-
 Use `REFERENCE.md` for the local save contract.
-Do not assume file output unless the task explicitly requires it.
+
+When the tree's main body is complete, save it to `docs/design-tree/<feature-name>.md`.
+Mark the saved document status as `draft`.
+Do this before handing off to `design-refinement` or any other next design step.
 
 ## Design Tree Requirement
 
@@ -207,7 +208,8 @@ Create an initial design tree that:
 - identifies open branches
 - identifies explicit decision nodes
 - captures assumptions rather than relying on them silently
-- keeps the output as `design_state` first, artifact second
+- reaches a stable "main body complete" threshold before handoff
+- keeps the output as `design_state` first and the saved artifact as the authoritative persisted record
 
 If a branch is not relevant, say so explicitly instead of silently omitting it.
 
@@ -223,7 +225,7 @@ Your responsibilities are:
 6. Identify explicit decision nodes that should later go to `decision-evaluation`.
 7. Record assumptions instead of silently relying on them.
 8. Flag nodes that depend on unverified external tools, APIs, libraries, or services. Perform a lightweight feasibility check (web search or doc lookup) at the time of flagging. If the dependency is clearly infeasible, mark `✗` immediately; if confirmed feasible with open questions, mark `[RESEARCH]` with initial findings; if fully confirmed, mark `✓`.
-9. Persist the design only when the task explicitly requires it.
+9. Persist the design as soon as the main body is complete and mark the saved document as `draft`.
 10. If acting on a parent-tree handoff, create a derived tree with explicit parent/child boundaries rather than repeating the parent tree inline.
 
 ## Expected Outputs
@@ -250,7 +252,7 @@ If the tree being created is a derived tree, also include:
 ### Conversation Output (concise)
 
 - Phase 1: one question at a time (see Question Types)
-- Phase 2: tree diagram + decision node summaries + open branch names + next step
+- Phase 2: tree diagram + decision node summaries + open branch names + saved file path + `draft` status + next step
 
 You are not expected to fully close every branch.
 
@@ -310,9 +312,11 @@ Exit when:
 
 ## Handoff Rules
 
-- Hand off to `design-refinement` when the tree exists but branches are still too shallow.
+- Persist the tree before any downstream design handoff once the main body is complete.
+- The first persisted version of the tree must be marked `draft`.
+- Hand off to `design-refinement` as the default next step when the main body exists but branches are still too shallow.
 - Hand off to `decision-evaluation` when there is a concrete decision node with real options.
 - Hand back to `design-orchestrator` if the design state changed enough that routing should be re-evaluated.
 - Do not continue past Phase 1 if `design_target_type` is still unresolved.
 - Do not force the conversation into option comparison before the design tree is formed.
-- Do not default to saving a file unless the task explicitly requires persistence.
+- Do not delay persistence after the main body completion threshold has been reached.
