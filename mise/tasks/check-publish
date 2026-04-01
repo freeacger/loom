@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="Push-safe repo health gate without install-path divergence checks"
+set -euo pipefail
+
+echo "→ checking skill eval JSON files..."
+mise run check-skill-json
+
+echo "✓ publish-safe checks passed"

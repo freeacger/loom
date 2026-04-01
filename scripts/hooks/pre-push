@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 set -e
-echo "→ pre-push: checking skill divergence..."
-mise run check
+echo "→ pre-push: running publish-safe checks..."
+mise run check-publish

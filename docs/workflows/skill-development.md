@@ -11,7 +11,7 @@ mise install
 mise run install-hooks
 ```
 
-This symlinks `scripts/hooks/pre-push` → `.git/hooks/pre-push`. The hook runs `mise run check` before every push and aborts if repo health checks fail.
+This symlinks `scripts/hooks/pre-push` → `.git/hooks/pre-push`. The hook runs `mise run check-publish` before every push and aborts if publish-safe repo checks fail.
 
 The repository pins Python in `mise.toml`. Run Python-dependent commands inside the repo through the `mise` environment instead of depending on the system `python3`.
 
@@ -35,6 +35,8 @@ Never write to install paths directly.
 - `skills/*/evals/evals.json` syntax via `python3 -m json.tool`
 - divergence between repo skill directories and installed copies
 
+`mise run check-publish` is the push-safe gate. It validates repo-local publish prerequisites without checking install-path divergence, so it works with the required `publish -> pull` order.
+
 `Agent Skills` validation is tracked separately in phase 1. Use `mise run check-skill-spec` when you want to validate all project skill directories against the reference specification. This command is intentionally not part of `mise run check`, the pre-push hook, or the publish/release flow yet.
 
 For breaking design-tree rollouts, additional family-specific checks are required:
@@ -56,7 +58,7 @@ mise run release <name> "<commit message>"
 ```
 
 This runs in sequence:
-1. `mise run check`
+1. `mise run check-publish`
 2. `git add skills/<name>` → `git commit` → `git push`
 3. `cd ~ && npx skills add freeacger/loom -y -g` (updates all skills globally)
 
@@ -95,6 +97,7 @@ Use this path for shared derivation rules, target-type contract changes, handoff
 
 ```bash
 mise run check-skill-json               # validate skills/*/evals/evals.json
+mise run check-publish                  # push-safe repo health gate without install sync checks
 mise run check                          # repo health gate: JSON validity + install divergence
 mise run check-skill-spec               # optional Agent Skills spec validation for all project skills
 mise run check-design-tree-evals        # validate design-tree eval metadata and design_target_type coverage
@@ -105,7 +108,7 @@ mise run release-design-tree "<msg>"    # publish shared design-tree changes + p
 ```
 
 `release-design-tree` now runs these checks in order before publishing:
-1. `mise run check`
+1. `mise run check-publish`
 2. `mise run check-skill-spec`
 3. `mise run check-design-tree-evals`
 4. `mise run check-design-tree-canonical`
@@ -176,7 +179,8 @@ mise run release <name> "<commit message>"
 ## Pre-Commit Checklist
 
 - [ ] Edit was made in `skills/<name>/SKILL.md`, not in an install path
-- [ ] `mise run check` passes (eval JSON syntax + install divergence), or any temporary divergence is expected and will be resolved by release
+- [ ] `mise run check-publish` passes before pushing
+- [ ] `mise run check` passes after pull when install paths are expected to be in sync
 - [ ] `mise run check-skill-spec` was run when touching any project skill
 - [ ] `mise run check-design-tree-evals` was run for design-tree contract changes
 - [ ] `mise run check-design-tree-canonical` was run for design-tree contract changes

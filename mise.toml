@@ -12,7 +12,7 @@ run = """
 set -euo pipefail
 name="${1:?Usage: mise run release <name> '<commit message>'}"
 msg="${2:?Usage: mise run release <name> '<commit message>'}"
-mise run check
+mise run check-publish
 mise run publish "$name" "$msg"
 mise run pull
 """

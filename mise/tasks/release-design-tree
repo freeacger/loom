@@ -5,7 +5,7 @@ set -euo pipefail
 
 msg="${1:?Usage: mise run release-design-tree '<commit message>'}"
 
-mise run check
+mise run check-publish
 mise run check-skill-spec
 mise run check-design-tree-evals
 mise run check-design-tree-canonical
