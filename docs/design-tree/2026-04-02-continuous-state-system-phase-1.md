@@ -53,6 +53,20 @@
 - `docs/` 可创建或可写
 - 使用方接受 `docs/` 下出现状态工件与记忆工件
 
+### 任务标识规则 (Task ID Rule)
+
+- `task-id` 采用固定命名规范：`YYYYMMDD-<task-name>-<2位随机字符>`
+- `<task-name>` 使用稳定、可读的 `kebab-case`
+- `task-id` 必须在仓库内唯一
+
+### 脚本协同规则 (Script Collaboration Rule)
+
+- Phase 1 的状态维护机制不应只靠自然语言 skill 执行
+- 对 `events.jsonl`、`states/*.json`、恢复与校验相关的确定性操作，应由脚本协同完成
+- 脚本应放在对应 skill 目录下的 `scripts/` 子目录
+- Phase 1 默认脚本语言为 Python
+- shell 只允许作为薄包装（thin wrapper），不得承载核心状态逻辑
+
 ## 主树 (Primary Design Tree)
 
 ```text
@@ -145,6 +159,8 @@ docs/
       <memory-id>.json
 ```
 
+任务目录不使用 `active/` 与 `completed/` 子目录区分状态。任务是否完成，只能由状态文件中的 `lifecycle_state` 表达，而不能由目录位置表达。
+
 ## 提交策略 (Commit Policy)
 
 ### `docs/tasks/`
@@ -152,6 +168,8 @@ docs/
 - `docs/tasks/<task-id>/status.md`、`events.jsonl`、`states/*.json` 属于任务级状态工件（task-scoped state artifacts）
 - 默认视为应提交工件（commit-worthy artifacts），因为它们共同定义了任务的当前真相、历史事件与恢复基础
 - 如果某个使用方环境不希望将这些工件提交到版本控制（version control），则该环境不在当前 Phase 1 设计的默认支持范围内
+- Phase 1 不使用目录迁移表达任务完成
+- 若后续需要归档，归档只能作为可选维护动作（optional maintenance action），不能替代状态真相
 
 ### `docs/memory/`
 
@@ -184,6 +202,12 @@ docs/
   }
 }
 ```
+
+任务完成的判定规则如下：
+
+- 任务是否完成，只由 `execution-state.json.status.lifecycle_state = completed` 判定
+- 目录位置不参与完成态判断
+- 如果未来引入归档（archive），归档只能是派生存储动作，不是状态机语义
 
 ### 版本锚点 (Version Anchors)
 
@@ -232,6 +256,14 @@ append event -> update state snapshot -> refresh status.md
 - 再更新状态快照，形成当前真相
 - 最后刷新 `status.md`，提供人读总览
 
+上述流程在实现上默认由脚本承担关键动作，包括：
+
+- 追加 `events.jsonl`
+- 原子更新 `states/*.json`
+- 校验 `last_applied_event_id`
+- 执行 replay / recovery
+- 执行一致性校验
+
 ### 阶段交接流程 (Phase Handoff Flow)
 
 Phase 1 只覆盖两段 handoff：
@@ -245,6 +277,413 @@ Phase 1 只覆盖两段 handoff：
 - 上游版本号
 - 上游事件锚点
 - `handoff_completed` 事件
+
+## 并发与 Ownership (Concurrency and Ownership)
+
+Phase 1 采用单写者 + ownership 模型：
+
+- 任一时刻，同一 `task-id` 只允许一个 writer 修改 `events.jsonl` 与 `states/*.json`
+- 当前 writer 对该任务拥有显式 ownership
+- 未取得 ownership 的其他会话、agent 或人工流程默认只能只读
+- 如果需要交接写入者，应先显式转移 ownership，再继续写入
+
+该规则用于保护：
+
+- 事件流与快照的一致性
+- 版本锚点的可追溯性
+- stale / recovery / invalid 状态判断的稳定性
+
+### 唯一写入口规则 (Single Write Path Rule)
+
+Phase 1 明确采用唯一写入口（single write path）：
+
+- 只有 `skills/task-state-management/scripts/` 下的脚本允许直接写入：
+  - `docs/tasks/<task-id>/events.jsonl`
+  - `docs/tasks/<task-id>/states/*.json`
+  - `docs/tasks/<task-id>/status.md`
+- 其他 skill 不得直接 patch 或覆写上述状态工件
+- `design-*`、`writing-plans`、`executing-plans` 等业务 skill 只能通过调用 `task-state-management` 脚本触发状态变化
+- 如果某个实现绕过脚本直接修改状态工件，则视为违反 Phase 1 状态契约
+
+### Ownership 最小契约 (Ownership Minimum Contract)
+
+Phase 1 的 ownership 至少满足以下最小运行契约：
+
+- ownership 必须有独立记录，不与 `design-state.json`、`plan-state.json`、`execution-state.json` 混写
+- ownership 记录至少包含：
+  - `task_id`
+  - `owner_id`
+  - `acquired_at`
+  - `lease_expires_at`
+- `acquire_ownership.py` 负责：
+  - 首次获取 ownership
+  - 续租（renew）
+  - 冲突检测
+  - 必要时的强制接管（force takeover）
+- `transfer_ownership.py` 负责显式转移 ownership
+- 未持有 ownership 的写入请求必须失败，而不是降级为 best effort 写入
+
+### 脚本调用责任映射 (Script Invocation Responsibility Mapping)
+
+Phase 1 采用“状态脚本拥有能力、业务 skill 负责调用”的分工：
+
+- `design-*` 相关 skill 负责在设计阶段调用：
+  - `create_task.py`
+  - `append_event.py`
+  - `update_state.py`
+  - `handoff_state.py`
+  - `refresh_status_view.py`
+- `writing-plans` 负责在 planning 阶段调用：
+  - `append_event.py`
+  - `update_state.py`
+  - `handoff_state.py`
+  - `add_blocker.py`
+  - `clear_blocker.py`
+  - `refresh_status_view.py`
+- `executing-plans` 负责在 execution 阶段调用：
+  - `append_event.py`
+  - `update_state.py`
+  - `add_blocker.py`
+  - `clear_blocker.py`
+  - `revalidate_state.py`
+  - `complete_task.py`
+  - `refresh_status_view.py`
+- `validate_state.py` 与 `replay_events.py` 由所有业务 skill 共享调用，但仍归 `task-state-management` 拥有
+
+### 第一批实现切片 (First Verifiable Slice)
+
+Phase 1 不要求 13 个脚本同时完成。第一批可验证切片（first verifiable slice）建议先落这 5 个：
+
+- `create_task.py`
+- `append_event.py`
+- `update_state.py`
+- `refresh_status_view.py`
+- `validate_state.py`
+
+这 5 个脚本应先验证以下最小闭环：
+
+- 创建任务目录与初始状态
+- 追加事件并分配 `event_seq`
+- 更新快照并推进 `state_version`
+- 由快照重建 `status.md`
+- 对任务目录执行一致性校验
+
+第二批再补：
+
+- `handoff_state.py`
+- `add_blocker.py`
+- `clear_blocker.py`
+- `revalidate_state.py`
+- `complete_task.py`
+
+Ownership 相关脚本可与第二批并行，也可以在第一批后立即补齐，取决于实现时是否需要真正支持多会话竞争同一 `task-id`。
+
+## 技能与脚本组织 (Skill and Script Organization)
+
+Phase 1 相关脚本默认由独立的 `task-state-management` skill 拥有。其他 skill 可以调用这些脚本，但不拥有它们。
+
+推荐组织方式如下：
+
+```text
+skills/task-state-management/
+  SKILL.md
+  REFERENCE.md
+  scripts/
+    create_task.py
+    acquire_ownership.py
+    transfer_ownership.py
+    append_event.py
+    update_state.py
+    handoff_state.py
+    add_blocker.py
+    clear_blocker.py
+    complete_task.py
+    refresh_status_view.py
+    revalidate_state.py
+    replay_events.py
+    validate_state.py
+```
+
+组织原则如下：
+
+- `task-state-management` 是状态维护脚本的单一真相（single source of truth）
+- `design-*`、`writing-plans`、`executing-plans` 等其他 skill 可以调用这些脚本，但不应复制或分叉维护它们
+- `SKILL.md` 负责定义规则、触发条件、边界与异常升级条件
+- `REFERENCE.md` 负责补充细节说明
+- `scripts/` 负责状态维护相关的确定性动作
+- 状态机语义保留在设计文档与 skill 文本中
+- 原子写入、重放、校验与恢复等高风险动作默认下沉到 Python 脚本
+
+### 脚本接口总规则 (Script Interface Rules)
+
+Phase 1 的状态维护脚本统一采用以下接口约定：
+
+- 输入（input）优先通过显式命令行参数传递；结构化负载（structured payload）较复杂时允许读取 JSON 文件路径
+- 输出（output）默认写到标准输出（stdout），且采用单个 JSON 对象，便于其他 skill 或脚本继续消费
+- 错误信息写到标准错误（stderr），并返回非零退出码（non-zero exit code）
+- 成功时必须返回至少以下字段：
+  - `ok`
+  - `task_id`
+  - `changed_files`
+  - `result`
+- 任何会修改状态的脚本，都必须显式接收 `task-id`
+- 任何会推进事件流的脚本，都必须返回本次写入或消费的 `event_id`；若有顺序分配，还必须返回 `event_seq`
+- 任何会更新快照的脚本，都必须返回受影响状态文件的 `state_version`
+
+### Phase 1 脚本范围与输入输出 (Phase 1 Script Scope and Inputs/Outputs)
+
+#### `create_task.py`
+
+- 输入：
+  - `task_name`
+  - 可选 `date`
+  - 可选 `random_suffix`
+  - 可选 `initial_goal`
+- 输出：
+  - `task_id`
+  - `task_dir`
+  - `changed_files`
+  - 初始化后的 `design-state.json`、`plan-state.json`、`execution-state.json` 路径
+  - 首个 `task_created` 事件的 `event_id` 与 `event_seq`
+
+#### `acquire_ownership.py`
+
+- 输入：
+  - `task_id`
+  - `owner_id`
+  - 可选 `lease_seconds`
+  - 可选 `force`
+- 输出：
+  - `task_id`
+  - `owner_id`
+  - ownership 文件路径或 ownership 记录位置
+  - `lease_expires_at`
+  - `changed_files`
+
+#### `transfer_ownership.py`
+
+- 输入：
+  - `task_id`
+  - `from_owner_id`
+  - `to_owner_id`
+  - 可选 `reason`
+- 输出：
+  - `task_id`
+  - 原 ownership 信息
+  - 新 ownership 信息
+  - `changed_files`
+
+#### `append_event.py`
+
+- 输入：
+  - `task_id`
+  - `event_type`
+  - `phase`
+  - `source`
+  - `summary`
+  - `payload` 或事件负载文件路径
+- 输出：
+  - `task_id`
+  - 新增事件的 `event_id`
+  - 新增事件的 `event_seq`
+  - `events_file`
+  - `changed_files`
+
+#### `update_state.py`
+
+- 输入：
+  - `task_id`
+  - `state_kind`：`design|plan|execution`
+  - `patch` 或补丁文件路径
+  - `expected_last_applied_event_id`
+  - 可选 `expected_state_version`
+- 输出：
+  - `task_id`
+  - `state_file`
+  - 更新后的 `state_version`
+  - 更新后的 `last_applied_event_id`
+  - `changed_files`
+
+#### `handoff_state.py`
+
+- 输入：
+  - `task_id`
+  - `from_phase`
+  - `to_phase`
+  - `source_state_version`
+  - `source_event_id`
+  - handoff 摘要或 handoff 文件路径
+- 输出：
+  - `task_id`
+  - `from_state_file`
+  - `to_state_file`
+  - 下游状态写入结果
+  - 产生的 `handoff_completed` 事件的 `event_id` 与 `event_seq`
+  - `changed_files`
+
+#### `add_blocker.py`
+
+- 输入：
+  - `task_id`
+  - `state_kind`
+  - `blocking_issue`
+- 输出：
+  - `task_id`
+  - `state_file`
+  - 新增 blocker 的 `blocking_issue_id`
+  - 对应事件的 `event_id` 与 `event_seq`
+  - `changed_files`
+
+#### `clear_blocker.py`
+
+- 输入：
+  - `task_id`
+  - `state_kind`
+  - `blocking_issue_id`
+- 输出：
+  - `task_id`
+  - `state_file`
+  - 清除结果
+  - 若状态从 `blocked` 恢复，则返回更新后的 `lifecycle_state`
+  - 对应事件的 `event_id` 与 `event_seq`
+  - `changed_files`
+
+#### `complete_task.py`
+
+- 输入：
+  - `task_id`
+  - `completion_summary`
+  - 可选 `expected_validity_state`
+  - 可选 `expected_no_blockers`
+- 输出：
+  - `task_id`
+  - `execution-state.json` 路径
+  - 更新后的 `lifecycle_state`
+  - `task_completed` 事件的 `event_id` 与 `event_seq`
+  - `changed_files`
+
+#### `refresh_status_view.py`
+
+- 输入：
+  - `task_id`
+  - 可选 `state_kind`
+  - 可选 `template`
+- 输出：
+  - `task_id`
+  - `status.md` 路径
+  - 刷新后的视图摘要
+  - `changed_files`
+
+#### `revalidate_state.py`
+
+- 输入：
+  - `task_id`
+  - `state_kind`
+  - `against_source_version`
+  - `reason`
+- 输出：
+  - `task_id`
+  - `state_file`
+  - 更新后的 `validity_state`
+  - 更新后的 `state_version`
+  - `state_revalidated` 事件的 `event_id` 与 `event_seq`
+  - `changed_files`
+
+#### `replay_events.py`
+
+- 输入：
+  - `task_id`
+  - 可选 `from_event_seq`
+  - 可选 `to_event_seq`
+  - 可选 `state_kind`
+- 输出：
+  - `task_id`
+  - 被重放的事件范围
+  - 被重建或修复的状态文件列表
+  - 每个状态文件的最终 `state_version`
+  - `changed_files`
+
+#### `validate_state.py`
+
+- 输入：
+  - `task_id`
+  - 可选 `strict`
+  - 可选 `state_kind`
+- 输出：
+  - `task_id`
+  - 校验结果：`ok|warning|recovery_needed|invalid`
+  - 发现列表（findings）
+  - 建议动作（recommended_actions）
+  - `changed_files`，默认为空
+
+### Python 规范 (Python Conventions)
+
+Phase 1 脚本默认采用 Python，并遵循以下实现规范：
+
+- 目标 Python 版本固定为 `Python 3.11+`
+- 每个脚本只负责一个清晰动作（single clear action），不要把创建、校验、修复混在同一入口
+- 命令行接口（CLI interface）优先使用 `argparse`
+- 成功输出固定为单个 JSON 对象；不得混入解释性自然语言
+- 错误输出固定写到 `stderr`，并附带稳定的错误码（error code）或错误类型（error type）
+- 写入 `states/*.json` 时必须采用“临时文件 + 原子替换（atomic replace）”策略
+- 读写 JSON 时必须显式处理 UTF-8、空文件、损坏文件与 schema 缺失字段
+- 任何修改状态的脚本都必须先校验 ownership，再执行写入
+- 任何推进事件流的脚本都必须保证 `event_seq` 单调递增
+- 任何重放（replay）逻辑都必须基于 `last_applied_event_id` 或 `event_seq` 保持幂等（idempotent）
+- Python 注释、错误消息模板与帮助文本都应服务状态维护，不写冗长解释
+- 如果未来需要 shell 包装，shell 只负责参数转发与环境准备，不得复制 Python 中的状态机逻辑
+
+### 脚本验证标准 (Script Validation Criteria)
+
+Phase 1 的状态维护脚本在进入可用状态前，至少应满足以下验证标准：
+
+#### 接口验证 (Interface Validation)
+
+- 每个脚本都必须覆盖缺失参数、非法参数、非法 `task_id` 与非法 `state_kind` 的失败路径
+- 成功输出必须始终是单个 JSON 对象，且包含约定字段：
+  - `ok`
+  - `task_id`
+  - `changed_files`
+  - `result`
+- 错误输出必须写入 `stderr`，并返回稳定的非零退出码
+- 任何声明会产出 `event_id`、`event_seq`、`state_version` 的脚本，都必须在成功返回中稳定提供这些字段
+
+#### 一致性验证 (Consistency Validation)
+
+- `append_event.py` 必须保证同一任务下 `event_seq` 单调递增
+- `update_state.py`、`handoff_state.py`、`revalidate_state.py` 必须保证：
+  - `last_applied_event_id` 与实际事件链一致
+  - `state_version` 单调递增
+  - `source_*_version` 与 `source_*_event_id` 不回退
+- `refresh_status_view.py` 生成的 `status.md` 必须完全可由 `states/*.json` 推导，不得引入新的机器真相字段
+- `validate_state.py` 必须能识别至少以下结果：
+  - `ok`
+  - `warning`
+  - `recovery_needed`
+  - `invalid`
+
+#### 恢复验证 (Recovery Validation)
+
+- 当事件已成功写入、但状态快照未更新时，`replay_events.py` 必须能基于事件流恢复快照
+- 当 `status.md` 过期时，`refresh_status_view.py` 必须能在不修改核心状态的前提下重建视图
+- 当快照损坏、缺失或与事件链冲突时，`validate_state.py` 必须显式报告 `recovery_needed` 或 `invalid`
+- `replay_events.py` 必须保持幂等：重复执行同一重放范围，不得重复推进 `state_version` 或重复应用 blocker、handoff、完成态等副作用
+
+#### Ownership 与并发验证 (Ownership and Concurrency Validation)
+
+- 任何修改状态的脚本都必须在写入前验证当前 ownership
+- 未持有 ownership 的写入请求必须被拒绝，而不是静默覆盖
+- `acquire_ownership.py` 必须能覆盖首次获取、续租、冲突获取与强制接管等路径
+- `transfer_ownership.py` 必须保证 ownership 变更前后状态可追溯，且不会产生“双写者可同时写入”的窗口
+
+#### 生命周期验证 (Lifecycle Validation)
+
+- `add_blocker.py` 与 `clear_blocker.py` 必须正确驱动 `lifecycle_state` 在 `in_progress`、`blocked` 间迁移
+- `revalidate_state.py` 必须是 `stale -> valid` 的唯一合法自动化入口
+- `complete_task.py` 只能在满足完成前提时写入 `completed`，例如：
+  - `validity_state = valid`
+  - blocker 已清空，或调用方显式放宽该要求
+- 已完成任务在重复刷新 `status.md`、重复执行校验或重复读取时，不得回退为未完成状态
 
 ## 真相裁定与恢复 (Truth Order and Recovery)
 
@@ -320,6 +759,7 @@ Phase 1 明确不保证：
 - memory 自动注入与排序
 - 跨任务自动经验共享
 - stale 自动恢复为 valid
+- 多写者并发修改同一任务目录
 
 ## 已冻结决策 (Frozen Decisions)
 
@@ -330,6 +770,12 @@ Phase 1 明确不保证：
 - `events.jsonl` 是 append-only 事件流
 - stale 只能通过当前阶段 owner 的再验证清除
 - `injected` 与 `applied` 必须严格分离
+- Phase 1 采用单写者 + ownership 模型
+- 任务完成只由状态字段表达，不由目录迁移表达
+- `task-id` 固定采用 `YYYYMMDD-<task-name>-<2位随机字符>`
+- 状态维护相关的确定性操作默认脚本化
+- Phase 1 默认脚本语言为 Python
+- 状态维护脚本由独立的 `task-state-management` skill 拥有
 
 ## Phase 切分 (Phase Split)
 
@@ -342,6 +788,9 @@ Phase 1 只实现任务状态系统最小闭环：
 - `status.md`
 - handoff、版本锚点、stale / recovery / invalid
 - 基本一致性校验与 revalidation
+- 单写者 + ownership
+- 通过状态字段表达任务完成
+- Python 脚本承担状态维护关键动作
 
 ### Phase 2
 
