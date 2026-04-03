@@ -13,7 +13,7 @@ This skill turns a vague idea into an initial design tree through a two-phase wo
 2. **Design tree generation** — produce the design tree based on confirmed inputs
 
 Its primary output is `design_state`.
-When the initial tree's main body is complete, persist it as the authoritative design artifact before handing off to the next design step.
+When the initial tree first becomes stable enough to reference safely, persist it as the authoritative design artifact in the designated directory `docs/design-tree/` before handing off to the next design step.
 
 ## When to Use
 
@@ -189,13 +189,14 @@ Expected daily request volume?
 **Rules for all types:**
 - One question type per message
 - End every question with `↑` marker to signal "your turn"
-- After user confirms, do not repeat the confirmed content (it is already captured in `design_state` and will be persisted when the main body is complete)
+- After user confirms, do not repeat the confirmed content (it is already captured in `design_state` and will be persisted once the tree is stable enough to reference safely)
 
 ## Persistence
 
-Use `REFERENCE.md` for the local save contract.
+Use `REFERENCE.md` for the repo-local save and naming contract.
+This persistence behavior is a repo-local rule for this repository, not a shared default for the design-tree family.
 
-When the tree's main body is complete, save it to `docs/design-tree/<feature-name>.md`.
+When the tree first reaches a stable-to-reference threshold, save it to the designated directory `docs/design-tree/` using the path `docs/design-tree/<feature-slug>.md`.
 Mark the saved document status as `draft`.
 Do this before handing off to `design-refinement` or any other next design step.
 
@@ -208,7 +209,7 @@ Create an initial design tree that:
 - identifies open branches
 - identifies explicit decision nodes
 - captures assumptions rather than relying on them silently
-- reaches a stable "main body complete" threshold before handoff
+- reaches a stable-to-reference threshold before handoff
 - keeps the output as `design_state` first and the saved artifact as the authoritative persisted record
 
 If a branch is not relevant, say so explicitly instead of silently omitting it.
@@ -225,7 +226,7 @@ Your responsibilities are:
 6. Identify explicit decision nodes that should later go to `decision-evaluation`.
 7. Record assumptions instead of silently relying on them.
 8. Flag nodes that depend on unverified external tools, APIs, libraries, or services. Perform a lightweight feasibility check (web search or doc lookup) at the time of flagging. If the dependency is clearly infeasible, mark `✗` immediately; if confirmed feasible with open questions, mark `[RESEARCH]` with initial findings; if fully confirmed, mark `✓`.
-9. Persist the design as soon as the main body is complete and mark the saved document as `draft`.
+9. Persist the design as soon as it first reaches a stable-to-reference threshold into the designated directory `docs/design-tree/`, and mark the saved document as `draft`.
 10. If acting on a parent-tree handoff, create a derived tree with explicit parent/child boundaries rather than repeating the parent tree inline.
 
 ## Expected Outputs
@@ -312,11 +313,11 @@ Exit when:
 
 ## Handoff Rules
 
-- Persist the tree before any downstream design handoff once the main body is complete.
+- Persist the tree before any downstream design handoff once it first reaches the stable-to-reference threshold.
 - The first persisted version of the tree must be marked `draft`.
 - Hand off to `design-refinement` as the default next step when the main body exists but branches are still too shallow.
 - Hand off to `decision-evaluation` when there is a concrete decision node with real options.
 - Hand back to `design-orchestrator` if the design state changed enough that routing should be re-evaluated.
 - Do not continue past Phase 1 if `design_target_type` is still unresolved.
 - Do not force the conversation into option comparison before the design tree is formed.
-- Do not delay persistence after the main body completion threshold has been reached.
+- Do not delay persistence after the stable-to-reference threshold has been reached.

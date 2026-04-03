@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.0 - Scope Contraction
+
+- Removes `Execution Mode`, including `structured-handoff` and `decompose`
+- Removes `Core Questions`, `Sub-Tasks`, and DAG output guidance
+- Adds `Clarifying Question` and `Needs Design` to the brief protocol
+- Reorders the output for faster scanning
+- Clarifies rendering rules: English canonical template, bilingual headings only for Chinese responses
+- Removes default codebase-search guidance from the skill boundary
+- Updates examples and evals to match the narrowed task-brief scope
+
 ## v0.3.0 — Diagram Conventions
 
 - Adds character DAG diagram rules for decompose mode (3+ sub-tasks with dependencies)

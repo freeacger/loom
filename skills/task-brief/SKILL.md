@@ -1,84 +1,121 @@
 ---
 name: task-brief
-description: "Use this skill to turn a raw user request into a structured, model-agnostic task brief before executing. Invoke whenever the request is complex, multi-step, cross-domain, ambiguous, or will be handed off to another model or agent. Also trigger when the user says things like 'help me figure out what I need', 'I'm not sure how to ask this', 'I want to do X but I don't know where to start', 'take this and make it clearer', or when the task mixes multiple goals or domains. Do NOT trigger for simple one-line requests with clear intent (e.g., 'fix the typo on line 42', 'rename this variable')."
+description: "Use this skill to turn a raw user request into a structured, model-agnostic task brief before execution. Invoke whenever the request is complex, multi-step, cross-domain, ambiguous, or will be handed off to another model or agent. Also trigger when the user says things like 'help me figure out what I need', 'I'm not sure how to ask this', 'I want to do X but I don't know where to start', 'take this and make it clearer', or when the task mixes multiple goals or domains. Do NOT trigger for simple one-line requests with clear intent (e.g., 'fix the typo on line 42', 'rename this variable')."
 ---
 
 # Task Brief
 
 ## Overview
 
-Turn a raw natural-language request into a structured task brief that any execution model can act on without reading the original message.
+Turn a raw natural-language request into a structured task brief that another executor can use without reading the original message.
 
-**This skill is a task specification normalizer.** Its job is to surface the real goal, fill in missing constraints, and decide how to proceed. It does not do design-stage routing or design decomposition (that belongs to `design-orchestrator` and the specialized design skills), write implementation steps (that's `writing-plans`), or execute the task itself.
+**This skill is a task specification normalizer.** Its job is to surface the real goal, capture the completion standard, and make critical constraints explicit. It does not do design-stage routing, task decomposition, implementation planning, or execution.
 
-The value is straightforward: a well-formed brief reduces misunderstanding, prevents wasted work on the wrong sub-problem, and makes the task portable — another model, agent, or human can pick it up cold.
+The value is straightforward: a good brief reduces misunderstanding, prevents wasted work on the wrong problem, and makes handoff cleaner for another model, agent, or human.
+
+---
+
+## Core Responsibilities
+
+`task-brief` should only:
+
+1. Restate the real user goal, not just the surface wording.
+2. Define the success criteria in observable terms.
+3. Capture the deliverables the task is expected to produce.
+4. Surface constraints that materially change execution.
+5. Record short assumptions when the user has left gaps.
+6. Ask at most one clarifying question when one critical unknown remains.
+7. Make one lightweight judgment about whether the task needs design work.
+
+`task-brief` should not:
+
+- route the task between design skills
+- decompose the task into sub-tasks
+- draw dependency diagrams
+- write implementation steps
+- propose migration sequencing
+- default to codebase investigation just to sharpen the brief
+
+If the real task is root-cause investigation, use `systematic-debugging` instead of turning `task-brief` into a debugging workflow.
 
 ---
 
 ## When to Use
 
 **Trigger on:**
-- Requests with multiple sub-goals or unclear priority order
-- Requests that span domains (e.g., data + UI + API)
-- Requests where the stated problem may not be the real problem
-- Requests that will be delegated to another model or agent
-- Requests where missing context would cause the executor to make large assumptions
-- When the user explicitly asks for clarification of their own request
+
+- requests with multiple sub-goals or unclear priority order
+- requests that span domains (for example data + UI + API)
+- requests where the stated problem may not be the real problem
+- requests that will likely be handed off to another executor
+- requests where missing context would force high-impact assumptions
+- requests where the user explicitly asks for help clarifying the task itself
 
 **Do NOT trigger on:**
-- Single, unambiguous actions ("delete this function", "run the tests")
-- Requests where the intent is clear and the execution path is obvious
-- Follow-up messages that clarify an existing task in progress
 
-If in doubt: ask yourself whether an executor seeing only the brief (not the original message) would be able to start work immediately. If yes, the brief is good enough and you probably don't need to go deeper.
+- single, unambiguous actions ("delete this function", "run the tests")
+- requests where the intent is already clear and the execution path is obvious
+- follow-up messages that only refine an existing task in progress
+- requests that explicitly ask for a design tree or design-stage decomposition
+
+If in doubt, ask this question: can an executor start correctly from the brief alone? If yes, the brief is probably sufficient.
 
 ---
 
 ## Complexity Tiers
 
-Before writing the brief, classify the request into one of three tiers. This determines how much structure to apply and whether to ask a question first.
+Classify the request into one of these tiers before writing the brief.
 
 | Tier | Signal | Response |
 |------|--------|----------|
-| **Direct** | Single goal, clear scope, no missing critical info | Write brief, set Execution Mode to `direct`, proceed immediately |
-| **Clarify** | One critical unknown — a missing parameter, ambiguous intent between 2+ interpretations, OR a stated goal that may be inaccurate (solution-as-goal, symptom-as-goal, scope anomaly) | Write brief, surface the ambiguity explicitly, ask exactly one question, set mode to `clarify-first` |
-| **Structured** | Multiple goals, cross-domain, high ambiguity, or handoff needed | Write full brief, set mode to `structured-handoff` or `decompose` |
+| **Direct** | Single goal, clear scope, no critical missing information | Write a concise brief. Usually `Needs Design` is `no`. |
+| **Clarify** | One critical unknown remains, or the stated goal may be inaccurate | Write the brief first, ask exactly one clarifying question, and keep the rest minimal. |
+| **Structured** | Multiple goals, cross-domain context, or a handoff-friendly brief is needed | Write the full brief, but stop at the brief. Do not decompose or route inside this skill. |
 
-For Tier 1 (Direct), the brief can be short — 3-4 fields is fine. Don't pad it.
+**Clarify** has three common sub-cases:
 
-**Tier 2 has three distinct sub-cases — handle them differently:**
-- *Missing parameter*: you know the goal, just lack one detail. Write User Goal normally, list the unknown in Core Questions, ask for the missing value.
-- *Ambiguous intent*: the goal itself could mean two substantially different things. In User Goal, write both interpretations explicitly as **Interpretation A** and **Interpretation B**. Ask the user to choose — do not pick one silently.
-- *Inaccurate goal*: the user stated a solution, a symptom, or an oddly scoped target — not the real intent. Detect three signals:
-  1. **Solution-as-goal**: user names a specific technique ("add Redis caching") rather than the problem it solves. Ask: "What problem are you trying to solve?"
-  2. **Symptom-as-goal**: user describes an error state ("fix timeout errors") rather than a desired outcome. Ask: "What's the expected behavior?"
-  3. **Scope anomaly**: the scope boundary doesn't match the problem's natural boundary — too narrow (retry one endpoint when the whole service is flaky) or too broad. Ask: "Is this issue limited to this area, or does it appear elsewhere?"
+- *Missing parameter*: you know the goal, but one detail is missing.
+- *Ambiguous intent*: the goal could reasonably mean two substantially different things.
+- *Inaccurate goal*: the user stated a solution, symptom, or oddly scoped target instead of the underlying goal.
 
-  When detected, write User Goal with your best guess at the *actual* underlying goal, flag it as an assumption, and ask one clarifying question. Do not execute on the literal stated goal without confirming.
+For inaccurate goals, detect these signals:
 
-  Before writing the brief, do a quick search of the codebase for context — check relevant files, existing patterns, or error logs. A brief grounded in code-level facts produces sharper clarifying questions than one based purely on inference from the user's words.
+1. **Solution-as-goal**: the user names a technique ("add Redis caching") rather than the problem it solves.
+2. **Symptom-as-goal**: the user names an error state ("fix timeout errors") rather than the desired outcome.
+3. **Scope anomaly**: the stated scope looks unnaturally narrow or broad for the problem.
+
+When one of those signals appears:
+
+- rewrite the `User Goal` around the best-guess underlying intent
+- mark that guess as an assumption
+- ask one clarifying question that confirms the real target
+
+Do not default to codebase search just to sharpen the question. If the task is actually debugging, route to `systematic-debugging`.
 
 ---
 
 ## Output: Task Brief
 
-Always output the brief in this format. Omit fields that are genuinely not applicable (mark as `N/A` only if the field is relevant but unknown).
+Always output the brief in this format. Omit `Clarifying Question` if none is needed. Omit fields only when they add no value.
 
 ```
 ## Task Brief
 
-**Task Type:** [analysis | transformation | generation | investigation | orchestration | other]
+**Task Type:** [analysis | transformation | generation | investigation | other]
 
 **User Goal:**
-[1-2 sentences. State the real intent, not the surface request. Start with a verb. E.g., "Identify which API endpoints are missing authentication middleware and produce a prioritized fix list."]
-
-**Core Questions:**
-- [What must be answered to complete this task?]
-- [Include only questions whose answer changes execution — not exhaustive sub-tasks]
+[1-2 sentences. State the real intent, not the surface request. Start with a verb.]
 
 **Success Criteria:**
-- [How will the executor know the task is done?]
-- [Prefer observable outcomes: "a working script", "a diff applied", "a ranked list with rationale"]
+- [Observable completion signal 1]
+- [Observable completion signal 2]
+
+**Deliverables:**
+- [Concrete artifact 1]
+- [Concrete artifact 2]
+
+**Clarifying Question:**
+[Exactly one question when one critical unknown remains. Omit this field if no question is needed.]
 
 **Constraints:**
 - Scope: [data source, file range, system boundary, etc.]
@@ -87,84 +124,64 @@ Always output the brief in this format. Omit fields that are genuinely not appli
 - Other: [time range, locale, performance budget, etc.]
 
 **Assumptions:**
-- [State what you're inferring because the user didn't specify. Keep it short.]
+- [Short inference made because the user did not specify it]
 
-**Execution Mode:** [direct | clarify-first | structured-handoff | decompose]
-
-**Deliverables:**
-- [Concrete artifact 1]
-- [Concrete artifact 2]
+**Needs Design:** [yes | no]
 ```
+
+---
+
+## Output Rendering
+
+Keep the English field names and enum literals canonical for protocol stability.
+
+- English responses should render the headings in English only.
+- Chinese responses may render bilingual headings with Chinese first and English in parentheses.
+- Do not hardcode bilingual headings into this canonical English template.
 
 ---
 
 ## Compression Rules
 
-These rules govern how to convert a raw message into the brief. The goal is to preserve intent while removing noise.
+These rules govern how to convert a raw message into the brief.
 
 **Keep:**
-- The underlying goal (what the user actually wants to happen in the world)
-- Constraints that eliminate whole categories of solutions
-- Domain context that changes how the task should be approached
+
+- the underlying goal
+- constraints that eliminate whole categories of solutions
+- domain context that changes the execution path
 
 **Remove:**
-- Filler phrases ("I was thinking maybe...", "not sure if this is the right way but...")
-- Redundant restatements of the same goal
-- Reasoning the executor doesn't need to act
 
-**Convert (vague → actionable):**
-- "make it better" → identify the specific dimension: performance, readability, UX, security
-- "something's wrong" → specify what behavior is observed vs. expected
-- "soon" / "quickly" → ask for a concrete deadline if it affects approach
-- "the usual format" → infer from context or flag as an assumption
-- "add Redis to the API" → ask: what performance problem is this solving? (solution-as-goal — reframe to underlying problem)
+- filler phrases
+- repeated restatements of the same goal
+- reasoning the executor does not need to act
+
+**Convert (vague -> actionable):**
+
+- "make it better" -> identify the dimension: performance, readability, UX, security
+- "something's wrong" -> specify observed vs. expected behavior
+- "soon" / "quickly" -> ask for a concrete deadline only if it affects approach
+- "the usual format" -> infer from context or mark it as an assumption
+- "add Redis to the API" -> ask what problem the user is trying to solve
 
 **When intent is ambiguous:**
-- If a request has two or more substantially different valid interpretations, do not pick one and proceed — surface the ambiguity in User Goal as "Interpretation A: … vs Interpretation B: …"
-- Ask one question that forces a choice between the interpretations, not an open-ended "what do you mean?"
-- Keep Deliverables as "deferred until intent confirmed" rather than leaving them blank or guessing
+
+- if two substantially different interpretations are plausible, surface both explicitly
+- ask one question that forces the choice
+- defer deliverables that depend on that choice rather than guessing
 
 **Don't over-correct:**
-- Preserve the user's framing when it carries intent
-- Don't introduce goals or constraints the user didn't imply
-- If you're unsure whether a detail is essential, keep it and mark it as an assumption
 
----
-
-## Execution Modes
-
-| Mode | When to use |
-|------|-------------|
-| `direct` | All info present, single goal, executor can start immediately |
-| `clarify-first` | One critical unknown — a missing parameter, an ambiguous goal with 2+ interpretations, or a goal that may be inaccurate (solution/symptom/scope signal); ask only that one question |
-| `structured-handoff` | Task is complex but well-scoped; brief is complete enough for a separate agent to execute |
-| `decompose` | Request contains 2+ independent sub-tasks that should be executed separately or in parallel |
-
-For `clarify-first`: write the brief first with your best-effort assumption, then ask the question. Don't block brief generation on the answer.
-
-For `decompose`: list each sub-task as a separate mini-brief under a **Sub-Tasks** section. Each sub-task gets its own Goal + Deliverable at minimum.
-
-When sub-tasks have dependencies, include a character DAG after the Sub-Tasks section inside a code block (no language tag):
-
-```
-[Data layer] ──→ [API endpoints]
-      │
-      └───────→ [Frontend]
-[Email service] → [Notifications]
-```
-
-**Rules:**
-
-- Components in `[brackets]`, arrows with `──→`
-- Vertical flow with `│` and `▼` when ordering matters
-- Max width: 78 characters
-- Only include when 3+ sub-tasks have non-trivial dependencies
+- preserve the user's framing when it carries real intent
+- do not invent goals or constraints the user did not imply
+- if uncertain whether a detail matters, keep it and mark it as an assumption
 
 ---
 
 ## Examples
 
-### Example 1 — Tier 1 (Direct)
+### Example 1 - Direct
 
 **User input:**
 > "Extract all TODO comments from the codebase and output them as a markdown list grouped by file."
@@ -177,31 +194,26 @@ When sub-tasks have dependencies, include a character DAG after the Sub-Tasks se
 **Task Type:** transformation
 
 **User Goal:**
-Collect all TODO comments across the codebase and organize them into a readable markdown list, grouped by file.
-
-**Core Questions:**
-- None — intent and scope are clear.
+Collect all TODO comments across the codebase and organize them into a readable markdown list grouped by file.
 
 **Success Criteria:**
-- A markdown file (or inline output) listing TODOs grouped by filename, with line numbers.
+- The output lists TODO comments grouped by file.
+- Each TODO entry includes a line number.
+
+**Deliverables:**
+- Markdown list of TODO comments grouped by file
 
 **Constraints:**
-- Scope: entire codebase (all files in the repo)
+- Scope: entire repository
 - Format: markdown output
 
 **Assumptions:**
-- "TODO" means the literal string `TODO` or `TODO:` in comments (case-insensitive).
-- No filtering by age, author, or priority.
+- "TODO" means the literal string `TODO` or `TODO:`.
 
-**Execution Mode:** direct
-
-**Deliverables:**
-- Markdown list of TODO comments grouped by file, with line numbers
+**Needs Design:** no
 ```
 
----
-
-### Example 2 — Tier 2 (Clarify)
+### Example 2 - Clarify
 
 **User input:**
 > "I need to migrate our auth system to JWT. Can you help me figure out what needs to change?"
@@ -211,40 +223,32 @@ Collect all TODO comments across the codebase and organize them into a readable 
 ```
 ## Task Brief
 
-**Task Type:** investigation + generation
+**Task Type:** investigation
 
 **User Goal:**
-Identify what changes are required to replace the current authentication system with JWT-based auth, and produce an actionable change list or implementation plan.
-
-**Core Questions:**
-- What does the current auth system use? (session cookies, API keys, OAuth tokens?)
-- Should the migration maintain backward compatibility with existing sessions?
+Identify what needs to change to migrate the current authentication system to JWT-based auth without mis-scoping the migration.
 
 **Success Criteria:**
-- A list of components/files that need to change, with the nature of each change described.
-- Enough detail to begin implementation or hand off to another developer.
-
-**Constraints:**
-- Scope: authentication-related code only
-- Risk: must not break existing authenticated sessions during cutover
-
-**Assumptions:**
-- JWT means standard stateless tokens (not JWE).
-- The target stack is server-side (not client-only).
-
-**Execution Mode:** clarify-first
+- The affected auth components are identified.
+- The migration target is clear enough to begin design or impact analysis.
 
 **Deliverables:**
-- Impact analysis: which files/modules need to change
-- Recommended migration sequence
+- Auth migration change brief
+
+**Clarifying Question:**
+What does the current auth system use now: session cookies, a third-party identity provider, API keys, or something else?
+
+**Constraints:**
+- Scope: authentication-related behavior only
+- Risk: do not assume a stateless-token migration path if the current system is session-based or third-party managed
+
+**Assumptions:**
+- JWT means standard stateless tokens rather than JWE.
+
+**Needs Design:** yes
 ```
 
-**Clarifying question:**
-> What does the current auth system use — session-based cookies, a third-party provider, or something else? The answer determines how much of the token issuance and validation logic needs to be rewritten.
-
----
-
-### Example 3 — Tier 3 (Decompose)
+### Example 3 - Structured
 
 **User input:**
 > "Build me a dashboard that shows real-time sales data pulled from our Postgres DB, with a chart for daily revenue and a table for top 10 products. It should update every 30 seconds and be shareable via a link."
@@ -254,88 +258,71 @@ Identify what changes are required to replace the current authentication system 
 ```
 ## Task Brief
 
-**Task Type:** generation (orchestration)
+**Task Type:** generation
 
 **User Goal:**
-Build a web dashboard that displays live sales data from a Postgres database, refreshing every 30 seconds, with a revenue chart and a top-products table, shareable via URL.
-
-**Core Questions:**
-- Is there a preferred frontend framework, or is a lightweight stack (e.g., plain HTML + Chart.js) acceptable?
-- Does "shareable via a link" mean public (no auth) or authenticated sharing?
+Build a shareable dashboard that displays live sales data from Postgres, including a daily revenue chart and a top-products table that refresh every 30 seconds.
 
 **Success Criteria:**
-- A running web app accessible via browser
-- Revenue chart and top-10-products table refresh every 30 seconds with live DB data
-- A stable URL that can be shared
-
-**Constraints:**
-- Data source: existing Postgres DB (read-only queries assumed)
-- Refresh interval: 30 seconds
-- Risk: no writes to the DB; no exposure of credentials in client-side code
-
-**Assumptions:**
-- Deployment environment is local or a simple server (not a managed cloud service)
-- The Postgres schema has a table with at least: product name, sale amount, timestamp
-
-**Execution Mode:** decompose
-
-**Sub-Tasks:**
-1. **Data layer** — Write the API endpoint(s) that query Postgres for daily revenue aggregates and top-10 products. Deliverable: a working server endpoint returning JSON.
-2. **Frontend** — Build the dashboard page with a chart and table that poll the API every 30 seconds. Deliverable: a working HTML/JS page.
-3. **Sharing** — Make the dashboard accessible at a stable URL. Deliverable: deployment instructions or a running dev server with a shareable link.
+- The dashboard shows daily revenue and top products from live data.
+- The dashboard refreshes every 30 seconds.
+- The dashboard can be accessed through a stable shareable URL.
 
 **Deliverables:**
-- Backend API endpoint(s)
-- Frontend dashboard page
-- Working shareable URL
+- Live sales dashboard
+
+**Clarifying Question:**
+Does "shareable via a link" mean publicly accessible without auth, or accessible only to authenticated users?
+
+**Constraints:**
+- Scope: dashboard behavior only
+- Format: browser-based UI
+- Risk: no database writes and no credential exposure in client-side code
+
+**Assumptions:**
+- The data source is an existing Postgres database with fields needed for revenue and top-product aggregation.
+
+**Needs Design:** yes
 ```
 
-### Example 4 — Tier 2 (Ambiguous Intent)
+### Example 4 - Ambiguous Intent
 
 **User input:**
-> "Our API docs are a mess — can you help fix them?"
+> "Our API docs are a mess - can you help fix them?"
 
 **Task Brief:**
 
 ```
 ## Task Brief
 
-**Task Type:** unclear — pending intent confirmation
+**Task Type:** analysis
 
 **User Goal:**
-Improve the API documentation, but the target outcome is ambiguous between two substantially different directions:
+Improve the API documentation, but the target is ambiguous between two materially different outcomes:
 
-- **Interpretation A — Content**: the docs exist but are inaccurate, incomplete, or hard to follow. Goal: audit and rewrite the documentation content itself (endpoints, parameters, examples, error codes).
-- **Interpretation B — Tooling/Presentation**: the docs are technically present but poorly organized or served via an outdated tool. Goal: migrate to a better doc platform (e.g., Swagger UI, Redoc, Mintlify) or restructure the site layout.
-
-These require different executors, different files touched, and different success criteria.
-
-**Core Questions:**
-- Which direction: fix the content, or fix the tooling/presentation?
+- Interpretation A: audit and rewrite the documentation content itself
+- Interpretation B: change the documentation tooling or site structure
 
 **Success Criteria:**
-- Deferred until intent is confirmed.
-
-**Constraints:**
-- Scope: API documentation only (not internal wikis, READMEs, or code comments unless specified)
-- Risk: changes to public-facing docs may affect external developer experience
-
-**Assumptions:**
-- "API docs" means developer-facing HTTP API reference, not internal design docs.
-- There is an existing doc artifact to work from (not a greenfield write from scratch).
-
-**Execution Mode:** clarify-first
+- The intended direction is confirmed before work starts.
 
 **Deliverables:**
-- Deferred until intent is confirmed.
+- Deferred until the direction is confirmed
+
+**Clarifying Question:**
+Is the real problem the documentation content, or the tooling and presentation layer?
+
+**Constraints:**
+- Scope: public API documentation only
+- Risk: external developer experience may be affected by public doc changes
+
+**Assumptions:**
+- "API docs" refers to developer-facing HTTP API documentation rather than internal notes.
+
+**Needs Design:** yes
 ```
 
-**Clarifying question:**
-> Is the core problem the **content** (missing endpoint descriptions, inaccurate examples, undocumented error codes) or the **presentation** (outdated tooling, poor structure, hard to navigate)? The answer determines whether we start by auditing existing docs or by evaluating tooling options.
-
----
-
-### Example 5 — Tier 2 (Inaccurate Goal)
+### Example 5 - Inaccurate Goal
 
 **User input:**
 > "Add Redis caching to our API endpoints."
@@ -345,32 +332,30 @@ These require different executors, different files touched, and different succes
 ```
 ## Task Brief
 
-**Task Type:** investigation + transformation
+**Task Type:** investigation
 
 **User Goal:**
-Reduce API response latency (assumed — user stated a specific caching technique rather than the problem it solves).
-
-**Core Questions:**
-- What performance problem is prompting this — high latency on specific endpoints, high DB load, or slow responses under heavy traffic?
+Reduce API latency or backend load, assuming Redis was proposed as a technique rather than as the confirmed goal.
 
 **Success Criteria:**
-- Identified performance bottleneck and an appropriate mitigation strategy (which may or may not be Redis).
-
-**Constraints:**
-- Scope: API layer
-- Risk: no data consistency issues introduced by caching
-
-**Assumptions:**
-- The user wants faster API responses and believes Redis is the solution. The actual bottleneck has not been confirmed.
-
-**Execution Mode:** clarify-first
+- The real performance problem is identified.
+- The task target is reframed around the actual bottleneck instead of a preselected technique.
 
 **Deliverables:**
-- Deferred until the performance problem is confirmed.
-```
+- Performance-problem brief
 
-**Clarifying question:**
-> What performance problem are you seeing — slow endpoints under load, high database query times, or something else? Redis caching is one option, but the right fix depends on where the bottleneck actually is.
+**Clarifying Question:**
+What performance problem are you seeing right now: slow endpoints, high database load, or something else?
+
+**Constraints:**
+- Scope: API behavior only
+- Risk: do not assume caching is appropriate before the bottleneck is known
+
+**Assumptions:**
+- The user wants better performance but has not yet confirmed where the bottleneck is.
+
+**Needs Design:** no
+```
 
 ---
 
@@ -378,15 +363,18 @@ Reduce API response latency (assumed — user stated a specific caching techniqu
 
 A good task brief passes these checks:
 
-1. **Standalone**: An executor reading only the brief — not the original message — can start work without asking follow-up questions (or knows exactly what one question to ask).
-2. **Intent-preserving**: The User Goal captures what the user actually wants, not just what they said.
-3. **Constraint-complete**: Any constraint whose absence would cause a wrong-path execution is present.
-4. **Non-padded**: Fields that add no information are omitted or marked minimal. A 3-field brief for a simple task is correct; a 8-field brief for the same task is over-engineering.
-5. **Actionable deliverables**: Each deliverable is a concrete artifact, not a vague outcome ("a working script" not "something that helps with the problem").
-6. **Goal-honest**: The User Goal reflects the underlying problem, not just the stated technique or observed symptom. If the stated goal appears to be a solution or error description, the brief surfaces this and asks to confirm.
+1. **Standalone**: an executor can start correctly from the brief alone, or knows the one question that must be answered first.
+2. **Intent-preserving**: the `User Goal` captures what the user actually wants, not just what they said.
+3. **Constraint-complete**: missing any included constraint would materially risk wrong-path execution.
+4. **Non-padded**: the brief stays short when the task is simple.
+5. **Actionable deliverables**: each deliverable is a concrete artifact or outcome.
+6. **Goal-honest**: the brief reframes solution-as-goal and symptom-as-goal requests honestly.
+7. **Scope-clean**: the brief does not drift into design routing, decomposition, or implementation planning.
+8. **Single-question discipline**: when clarification is needed, the brief asks one focused question, not a questionnaire.
 
 A brief is **not useful** if:
-- It restates the user's message verbatim in different words
-- It introduces goals or constraints the user didn't imply
-- It generates a 6-question clarification session for a simple request
-- It is so generic it could apply to any task ("deliverable: results")
+
+- it restates the user's message in different words without adding clarity
+- it introduces goals or constraints the user did not imply
+- it turns a simple request into a long clarification session
+- it drifts into design trees, sub-task decomposition, or implementation plans

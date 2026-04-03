@@ -220,7 +220,7 @@ Cost-at-scale:  Auth0 ★★★☆☆  Keycloak ★★★★☆  Self ★★★�
 
 ## 8. DAG / Dependency Diagrams
 
-**Used by:** design-orchestrator, task-brief (decompose mode)
+**Used by:** design-orchestrator
 
 ```
           [task-brief]

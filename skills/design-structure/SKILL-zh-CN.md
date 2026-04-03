@@ -13,7 +13,7 @@ description: "把一个模糊或部分成形的想法整理成初始设计结构
 2. **设计树生成（Design tree generation）**：基于已确认输入产出设计树
 
 它的首要产物是 `design_state`。
-当初始设计树的主体完成后，必须先把它落盘为权威设计工件（authoritative design artifact），再交给下一步设计阶段。
+当初始设计树首次达到“可稳定引用（stable-to-reference）”门槛后，必须先把它落盘为权威设计工件（authoritative design artifact），并保存到指定目录 `docs/design-tree/`，再交给下一步设计阶段。
 
 ## 何时使用 (When to Use)
 
@@ -193,13 +193,14 @@ Expected daily request volume?
 
 - 一条消息只用一种问题类型
 - 每个问题都以 `↑` 结尾，表示“轮到你了”
-- 用户确认后，不要重复已确认内容（它已经进入 `design_state`，并会在主体完成时落盘）
+- 用户确认后，不要重复已确认内容（它已经进入 `design_state`，并会在设计树达到可稳定引用门槛时落盘）
 
 ## 持久化 (Persistence)
 
-本地保存契约看 `REFERENCE.md`。
+repo-local 保存与命名契约看 `REFERENCE.md`。
+这套持久化行为是当前仓库的 repo-local 规则，不是 design-tree family 的共享默认规则。
 
-当设计树主体完成后，立即保存到 `docs/design-tree/<feature-name>.md`。
+当设计树首次达到“可稳定引用（stable-to-reference）”门槛后，必须保存到指定目录 `docs/design-tree/`，默认路径为 `docs/design-tree/<feature-slug>.md`。
 把已保存文档状态标记为 `draft`。
 必须先完成落盘，再交给 `design-refinement` 或其他下游设计步骤。
 
@@ -212,7 +213,7 @@ Expected daily request volume?
 - 识别开放分支（open branches）
 - 识别显式决策节点（explicit decision nodes）
 - 记录假设（assumptions），而不是静默依赖它们
-- 在交接前达到稳定的“主体完成（main body complete）”门槛
+- 在交接前达到“可稳定引用（stable-to-reference）”门槛
 - 保持“`design_state` 优先，已落盘工件作为权威持久化记录”的输出顺序
 
 如果某个分支不相关，要显式说明，而不是静默省略。
@@ -229,7 +230,7 @@ Expected daily request volume?
 6. 识别应在后续交给 `decision-evaluation` 的显式决策节点。
 7. 记录假设（assumptions），而不是静默依赖它们。
 8. 标记依赖未验证外部工具、API、库或服务的节点。在标记时做一次轻量可行性检查（feasibility check，例如 web search 或 doc lookup）。如果依赖明显不可行，立刻标 `✗`；如果确认大体可行但仍有未决问题，标 `[RESEARCH]` 并记录初步发现；如果已完全确认，则标 `✓`。
-9. 一旦主体完成，就立即持久化设计，并把已保存文档标记为 `draft`。
+9. 一旦首次达到“可稳定引用（stable-to-reference）”门槛，就立即把设计持久化到指定目录 `docs/design-tree/`，并把已保存文档标记为 `draft`。
 10. 如果是在执行父树交接（handoff），就创建一个边界明确的派生树，而不是把父树原样内联重复。
 
 ## 预期输出 (Expected Outputs)
@@ -316,11 +317,11 @@ design_tree
 
 ## 交接规则 (Handoff Rules)
 
-- 当主体完成后，在任何下游设计交接前都必须先落盘
+- 当设计树首次达到“可稳定引用（stable-to-reference）”门槛后，在任何下游设计交接前都必须先落盘
 - 首次落盘的版本必须标记为 `draft`
 - 当主体已经存在、但分支仍然过浅时，默认下一步交给 `design-refinement`
 - 当出现一个带真实选项的具体决策节点时，交给 `decision-evaluation`
 - 如果 `design_state` 变化足够大，需要重新评估路由，交回 `design-orchestrator`
 - 如果 `design_target_type` 仍未解决，不要继续第一阶段之后的工作
 - 不要在设计树尚未成形前强行把对话推进到方案比较
-- 一旦达到主体完成门槛，不要拖延落盘
+- 一旦达到“可稳定引用（stable-to-reference）”门槛，不要拖延落盘

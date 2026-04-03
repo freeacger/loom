@@ -4,21 +4,21 @@
     {
       "id": 1,
       "prompt": "I need to rename the function `getUserData` to `fetchUserProfile` everywhere in the codebase. It's used in about 15 files.",
-      "expected_output": "A concise task brief that sets Execution Mode to 'direct', correctly identifies this as a straightforward transformation task, lists minimal constraints (scope: all files using getUserData), and keeps the brief short (3-5 fields). Should NOT pad with unnecessary clarifying questions or over-engineer a simple rename.",
+      "expected_output": "A concise task brief that correctly identifies this as a straightforward transformation task, lists minimal constraints (scope: all files using getUserData), omits a clarifying question, and sets Needs Design to 'no'. The brief should stay short instead of padding fields for a simple rename.",
       "assertions": [
         {
-          "name": "execution_mode_is_direct",
-          "description": "The brief sets Execution Mode to 'direct' since this is a clear, unambiguous rename task",
+          "name": "needs_design_is_no",
+          "description": "Needs Design is 'no' since this is a clear rename request with an obvious execution path",
           "type": "qualitative"
         },
         {
           "name": "brief_is_concise",
-          "description": "The brief does not ask unnecessary clarifying questions and does not pad with fields that add no information",
+          "description": "The brief does not pad with unnecessary fields or questions",
           "type": "qualitative"
         },
         {
           "name": "goal_is_actionable",
-          "description": "User Goal is stated as a verb-led actionable sentence, not a restatement of the original request",
+          "description": "User Goal is stated as a verb-led actionable sentence, not a restatement of the prompt",
           "type": "qualitative"
         }
       ]
@@ -26,26 +26,26 @@
     {
       "id": 2,
       "prompt": "我们的 API 响应时间最近变慢了，P99 从 200ms 涨到了 800ms，大概是上周部署之后开始的。能帮我找出原因吗？",
-      "expected_output": "A task brief that correctly classifies this as 'investigation' type, sets Execution Mode to 'clarify-first' (because key info is missing: which endpoints, what changed in the deployment, is there monitoring data?), identifies ONE most critical clarifying question, and fills in reasonable assumptions for the rest. The brief should identify that the executor needs to correlate deployment changes with performance data.",
+      "expected_output": "A task brief that correctly classifies this as 'investigation', asks exactly one clarifying question, captures the recent deployment as context, and sets Needs Design to 'no'. The brief should make it clear that the executor needs to investigate the slowdown rather than jump into solution design.",
       "assertions": [
         {
           "name": "task_type_is_investigation",
-          "description": "Task Type is correctly identified as 'investigation' (not generation or transformation)",
+          "description": "Task Type is correctly identified as 'investigation'",
           "type": "qualitative"
         },
         {
-          "name": "execution_mode_is_clarify_first",
-          "description": "Execution Mode is 'clarify-first' since key context is missing for root cause analysis",
+          "name": "needs_design_is_no",
+          "description": "Needs Design is 'no' because this is a root-cause investigation, not design work",
           "type": "qualitative"
         },
         {
           "name": "one_focused_question",
-          "description": "The brief asks exactly ONE focused clarifying question, not a list of 3+ questions",
+          "description": "The brief asks exactly one focused clarifying question, not a list of questions",
           "type": "qualitative"
         },
         {
           "name": "deployment_context_captured",
-          "description": "The brief references the recent deployment as a key constraint/assumption to investigate",
+          "description": "The brief captures the recent deployment as a key constraint or assumption",
           "type": "qualitative"
         }
       ]
@@ -53,26 +53,26 @@
     {
       "id": 3,
       "prompt": "I want to build a SaaS tool for small law firms to manage client intake: a web form for new clients, auto-send a welcome email, save their info to a database, and let lawyers review and approve clients from a dashboard. Should be easy to use, mobile-friendly, and need to keep the data secure since it includes PII.",
-      "expected_output": "A task brief that sets Execution Mode to 'decompose', correctly identifies this as an orchestration task with at least 3 independent sub-tasks (intake form, email automation, dashboard/approval flow), surfaces the PII/security constraint prominently, and produces sub-task mini-briefs with clear deliverables. Should NOT try to compress everything into a single execution path.",
+      "expected_output": "A task brief that treats this as a complex product/system request, surfaces the PII/security constraint prominently, keeps the output as a single brief rather than sub-task decomposition, and sets Needs Design to 'yes'. It should not try to decompose the work into multiple mini-briefs.",
       "assertions": [
         {
-          "name": "execution_mode_is_decompose",
-          "description": "Execution Mode is 'decompose' since this is a multi-component system with independent workstreams",
+          "name": "needs_design_is_yes",
+          "description": "Needs Design is 'yes' because this is a substantial product/system request",
           "type": "qualitative"
         },
         {
-          "name": "subtasks_are_independent",
-          "description": "At least 3 sub-tasks are identified, each with its own goal and deliverable",
+          "name": "no_subtasks_generated",
+          "description": "The brief stays as one brief and does not generate Sub-Tasks or decomposition output",
           "type": "qualitative"
         },
         {
           "name": "pii_constraint_surfaced",
-          "description": "PII/data security constraint is listed under Constraints with a note about what it prohibits (e.g., no plaintext storage, no unauthenticated access)",
+          "description": "PII/data security is surfaced prominently under Constraints",
           "type": "qualitative"
         },
         {
           "name": "deliverables_are_concrete",
-          "description": "Each sub-task deliverable is a concrete artifact, not a vague outcome",
+          "description": "Deliverables are concrete and not vague placeholders",
           "type": "qualitative"
         }
       ]
@@ -80,21 +80,21 @@
     {
       "id": 4,
       "prompt": "Add retry logic with exponential backoff to the payment processing endpoint.",
-      "expected_output": "A task brief that detects the solution-as-goal signal (retry with exponential backoff is a specific technique, not a problem statement), reframes the User Goal around the underlying reliability problem, sets Execution Mode to 'clarify-first', and asks one question about what failure mode is being observed (timeouts, dropped connections, 5xx errors, etc.). Should NOT just proceed with implementing retry logic without validating the goal.",
+      "expected_output": "A task brief that detects the solution-as-goal signal, reframes the User Goal around the underlying reliability problem, asks one question about the actual failure mode, and sets Needs Design to 'no'. It should not proceed as if retry logic were already the confirmed task target.",
       "assertions": [
         {
           "name": "solution_as_goal_detected",
-          "description": "The brief recognizes that 'add retry logic' is a solution, not a goal, and reframes the User Goal around the underlying problem (e.g., reliability, transient failures)",
+          "description": "The brief recognizes that retry logic is a proposed solution rather than the real goal",
           "type": "qualitative"
         },
         {
-          "name": "execution_mode_is_clarify_first",
-          "description": "Execution Mode is 'clarify-first' since the real problem has not been stated",
+          "name": "needs_design_is_no",
+          "description": "Needs Design remains 'no' until the actual problem is clarified",
           "type": "qualitative"
         },
         {
           "name": "asks_about_failure_mode",
-          "description": "The clarifying question asks about the actual failure behavior being observed, not about implementation preferences",
+          "description": "The clarifying question asks about observed failure behavior, not implementation preference",
           "type": "qualitative"
         }
       ]
@@ -102,21 +102,21 @@
     {
       "id": 5,
       "prompt": "Fix the 502 errors showing up in the checkout flow.",
-      "expected_output": "A task brief that detects the symptom-as-goal signal (502 errors are a symptom, not a desired outcome), reframes the User Goal as 'restore reliable checkout processing' or similar, sets Execution Mode to 'clarify-first', and asks about the expected behavior or root cause context. Should NOT simply state the goal as 'fix 502 errors' without reframing.",
+      "expected_output": "A task brief that detects the symptom-as-goal signal, reframes the User Goal as restoring reliable checkout behavior, asks about expected behavior or root-cause context, and sets Needs Design to 'no'. It should not simply restate the goal as 'fix 502 errors'.",
       "assertions": [
         {
           "name": "symptom_as_goal_detected",
-          "description": "The brief reframes 'fix 502 errors' into a goal about reliable checkout behavior, not just error elimination",
+          "description": "The brief reframes the symptom into an outcome-focused goal",
           "type": "qualitative"
         },
         {
-          "name": "execution_mode_is_clarify_first",
-          "description": "Execution Mode is 'clarify-first' since the root cause is unknown",
+          "name": "needs_design_is_no",
+          "description": "Needs Design is 'no' because this remains a debugging/problem-framing request",
           "type": "qualitative"
         },
         {
           "name": "reframes_to_outcome",
-          "description": "The clarifying question or assumptions reframe from the error symptom toward expected behavior or root cause",
+          "description": "The brief or clarifying question reframes from symptom to expected behavior",
           "type": "qualitative"
         }
       ]
@@ -124,16 +124,16 @@
     {
       "id": 6,
       "prompt": "I have a half-formed request: we need to redesign onboarding, clean up analytics events, and maybe also update the welcome email. Help me figure out what the actual task should be before anyone starts implementing.",
-      "expected_output": "This should trigger task-brief because the request has multiple sub-goals, unclear priority order, and explicitly asks for help clarifying the real task before execution. The response should normalize the request into a brief instead of jumping into design or implementation.",
+      "expected_output": "This should trigger task-brief because the request has multiple sub-goals, unclear priority order, and explicitly asks for clarification before implementation. The response should normalize the request into one brief, stay within task-brief scope, and set Needs Design to 'yes' rather than jumping into decomposition.",
       "assertions": [
         {
           "name": "routing_should_trigger_true",
-          "description": "This prompt should trigger task-brief because it is a raw, multi-goal request that needs normalization before execution",
+          "description": "This prompt should trigger task-brief because it is ambiguous and multi-part",
           "type": "qualitative"
         },
         {
-          "name": "routing_reason_matches_boundary",
-          "description": "The response explains that task-brief applies because the request is ambiguous, multi-part, and asks for clarification before work starts",
+          "name": "needs_design_is_yes",
+          "description": "Needs Design is 'yes' because the clarified task likely requires design work before implementation",
           "type": "qualitative"
         },
         {
@@ -146,16 +146,16 @@
     {
       "id": 7,
       "prompt": "I'm not sure how to ask this. We migrated vendors and now invoicing, dashboard totals, and exports all seem related. Can you turn this into a brief another engineer can execute?",
-      "expected_output": "This should trigger task-brief because the user explicitly asks to turn a messy cross-domain problem into a brief for handoff. The response should produce a structured brief and clarify the likely execution mode rather than debugging or planning implementation details directly.",
+      "expected_output": "This should trigger task-brief because the user explicitly asks for a handoff-friendly brief for a messy cross-domain problem. The response should produce one structured brief, not introduce an Execution Mode or implementation plan, and should treat the task as problem framing or investigation rather than design by default.",
       "assertions": [
         {
           "name": "routing_should_trigger_true",
-          "description": "This prompt should trigger task-brief because it requests a model-agnostic handoff brief for a cross-domain problem",
+          "description": "This prompt should trigger task-brief because it asks for task normalization and handoff preparation",
           "type": "qualitative"
         },
         {
-          "name": "routing_reason_matches_boundary",
-          "description": "The response identifies cross-domain ambiguity and handoff preparation as the reason task-brief is the right fit",
+          "name": "no_execution_mode_or_subtasks",
+          "description": "The output does not rely on Execution Mode, structured-handoff, decompose, or Sub-Tasks",
           "type": "qualitative"
         },
         {
@@ -168,21 +168,21 @@
     {
       "id": 8,
       "prompt": "We need to add retry logic to webhooks, maybe queueing too, or maybe the real issue is duplicate deliveries. Help me make this request clearer before we start.",
-      "expected_output": "This should trigger task-brief because the request is still at the problem-framing stage and mixes multiple possible solutions with an unclear underlying goal. The response should reframe the request and clarify the execution target before implementation begins.",
+      "expected_output": "This should trigger task-brief because the request is still at the problem-framing stage and mixes multiple possible solutions with an unclear underlying goal. The response should reframe the request, ask one clarifying question, and avoid jumping into retry implementation or queue design.",
       "assertions": [
         {
           "name": "routing_should_trigger_true",
-          "description": "This prompt should trigger task-brief because it mixes solution ideas with an unclear problem statement and explicitly asks to clarify the request",
+          "description": "This prompt should trigger task-brief because it mixes solution ideas with an unclear problem statement",
           "type": "qualitative"
         },
         {
-          "name": "routing_reason_matches_boundary",
-          "description": "The response explains that task-brief is needed to normalize the request before any implementation skill is used",
+          "name": "one_focused_question",
+          "description": "The response asks one clarifying question rather than opening a broader discovery workflow",
           "type": "qualitative"
         },
         {
           "name": "routing_output_stays_in_scope",
-          "description": "The output does not jump directly into retry implementation or debugging workflow details",
+          "description": "The output does not jump directly into retry implementation, queue design, or debugging workflow details",
           "type": "qualitative"
         }
       ]
@@ -190,7 +190,7 @@
     {
       "id": 9,
       "prompt": "Rename `AuthSvc` to `AuthService` in `src/auth.ts` and update the imports.",
-      "expected_output": "This should NOT trigger task-brief because the request is a single, unambiguous code change with an obvious execution path. The response should either execute directly or keep the routing untriggered rather than creating an unnecessary brief.",
+      "expected_output": "This should NOT trigger task-brief because the request is a single, unambiguous code change with an obvious execution path. The response should either execute directly or keep routing untriggered rather than manufacturing a brief.",
       "assertions": [
         {
           "name": "routing_should_trigger_false",

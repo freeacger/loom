@@ -68,6 +68,40 @@
           "type": "qualitative"
         }
       ]
+    },
+    {
+      "id": 5,
+      "category": "positive",
+      "tags": [
+        "derivation-gates"
+      ],
+      "design_state_input": false,
+      "prompt": "请把 design-tree-core 的派生判断改成正式标准：使用 4 个硬门槛加 3 个辅助信号，而不是只靠 5 个启发式问题。",
+      "expected_output": "The skill should accept a gate-based derivation standard that requires all hard gates and a minimum number of supporting signals before deriving.",
+      "assertions": [
+        {
+          "name": "accepts_gate_based_derivation_standard",
+          "description": "Output accepts hard gates plus supporting signals as shared derivation governance",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "category": "negative",
+      "tags": [
+        "weighted-score-negative"
+      ],
+      "design_state_input": false,
+      "prompt": "为了让派生判断更灵活，请给 design-tree-core 增加一个加权打分模型：边界清晰 3 分、重复出现 2 分、父树变小 1 分，总分超过 5 就派生。",
+      "expected_output": "The skill should reject weighted scoring for derivation because missing hard boundary conditions must not be overridden by additive totals.",
+      "assertions": [
+        {
+          "name": "rejects_weighted_derivation_score",
+          "description": "Output rejects additive or weighted scoring as the shared derivation decision model",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

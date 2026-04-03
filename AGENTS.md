@@ -5,6 +5,7 @@
 - **Publish before pull**: Push to GitHub first (skills.sh auto-discovers), then run `mise run pull` to update install paths.
 - **Never run `npx skills add` directly in this repo** — the CLI replaces `skills/` directories with symlinks. Always use `mise run pull`.
 - **Commit before publishing**: Never publish uncommitted changes.
+- **Separate protocol from presentation**: Keep `skills/<name>/SKILL.md` field names and enum literals canonical for protocol stability. Do not hardcode bilingual headings into the canonical English template. If bilingual labels improve Chinese responses, treat them as a rendering rule for Chinese output and preserve the English literals as protocol anchors.
 
 ## Docs Conventions
 

@@ -9,7 +9,7 @@
       ],
       "design_state_input": false,
       "prompt": "我想做一个 API 网关服务，供公司内部各个微服务使用。大概需要路由转发、认证鉴权、限流、日志。",
-      "expected_output": "The skill should first confirm design_target_type=system, then confirm problem, scope, and assumptions, and produce a design_state-first tree using the system skeleton. It should not require file persistence by default.",
+      "expected_output": "The skill should first confirm design_target_type=system, then confirm problem, scope, and assumptions, and produce a design_state-first tree using the system skeleton. It should treat persistence to docs/design-tree as a repo-local default once the tree becomes stable enough to reference safely, not as an opt-in behavior.",
       "assertions": [
         {
           "name": "target_type_confirmed_first",
@@ -19,6 +19,11 @@
         {
           "name": "system_skeleton_used",
           "description": "The resulting tree uses system-oriented branches such as core objects, core flows, and interfaces/data",
+          "type": "qualitative"
+        },
+        {
+          "name": "repo_local_persistence_default_used",
+          "description": "The output treats docs/design-tree persistence as the repo-local default after the stable-to-reference threshold rather than a user-request-only behavior",
           "type": "qualitative"
         }
       ]
@@ -144,20 +149,64 @@
       "id": 8,
       "category": "positive",
       "tags": [
-        "explicit-save-request"
+        "repo-local-persistence"
       ],
       "design_state_input": false,
-      "prompt": "帮我设计一个消息推送系统，支持 App 推送、短信、邮件三种渠道。请把设计结果保存到 docs/design-tree 目录里。",
-      "expected_output": "The skill should still confirm design_target_type first, build design_state, and persist to docs/design-tree only because the user explicitly requested saving.",
+      "prompt": "帮我设计一个消息推送系统，支持 App 推送、短信、邮件三种渠道。",
+      "expected_output": "The skill should still confirm design_target_type first, build design_state, and treat persistence to docs/design-tree as the repo-local default once the design reaches the stable-to-reference threshold. It should not describe saving as something that happens only because the user asked for it.",
       "assertions": [
         {
-          "name": "persistence_only_when_requested",
-          "description": "The output saves a file only because the prompt explicitly asked for persistence",
+          "name": "persistence_not_request_only",
+          "description": "The output does not frame persistence as user-request-only behavior",
           "type": "qualitative"
         },
         {
           "name": "design_state_still_primary",
           "description": "The skill still frames the result as design_state-first rather than file-first",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "category": "positive",
+      "tags": [
+        "derived-tree-naming"
+      ],
+      "design_state_input": false,
+      "prompt": "父设计树 docs/design-tree/api-gateway.md 已经确认需要把限流策略单独展开。请为这个子问题创建派生设计树，并按仓库规则命名保存文件。",
+      "expected_output": "The skill should create a derived tree with explicit parent/child boundaries and use a repo-local derived filename like docs/design-tree/api-gateway--rate-limiting.md rather than a generic part-2, refinement, or v2 suffix.",
+      "assertions": [
+        {
+          "name": "derived_tree_parent_child_boundary_explicit",
+          "description": "The output makes parent/child ownership and the derivation reason explicit",
+          "type": "qualitative"
+        },
+        {
+          "name": "derived_tree_repo_local_naming_rule_used",
+          "description": "The output uses a parent--child filename pattern for the derived tree instead of a generic continuation suffix",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "category": "positive",
+      "tags": [
+        "same-lineage-iteration"
+      ],
+      "design_state_input": false,
+      "prompt": "继续细化消息推送系统设计树，还是同一个问题域，只是补充失败重试和回退策略。按仓库规则处理文件命名，别新开一个 v2 文件。",
+      "expected_output": "The skill should keep the same authoritative file path for ordinary refinement of the same design lineage rather than inventing a new v2/final/new filename. If it mentions a save path, it should reuse the existing root path for that lineage.",
+      "assertions": [
+        {
+          "name": "same_lineage_reuses_same_path",
+          "description": "The output reuses the same authoritative file path for ordinary refinement of the same design lineage",
+          "type": "qualitative"
+        },
+        {
+          "name": "avoids_v2_suffix_for_normal_refinement",
+          "description": "The output avoids naming normal same-lineage refinement as v2, final, new, or similar suffixes",
           "type": "qualitative"
         }
       ]

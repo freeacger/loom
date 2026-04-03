@@ -228,17 +228,36 @@ A branch is implementation-ready only when its leaf nodes can answer:
 
 ### 4.1 When to Derive a New Tree
 
-Derive a new tree only if all conditions below are true:
+Derive a new tree only if all hard gates below are true:
 
-1. The parent tree is starting to answer a second distinct core question.
-2. The new question appears repeatedly, not as a one-off exception.
-3. The branch now behaves like a stable decision system.
-4. The new tree can define its own scope and done criteria.
-5. Deriving it will make the parent tree smaller and clearer.
+1. The branch is now answering a distinct core question rather than the parent tree's original core question at greater depth.
+2. The candidate derived tree can define its own explicit scope and explicit non-scope.
+3. The candidate derived tree can define its own done criteria or completion check.
+4. The parent/child handoff can be expressed as an explicit transfer contract with clear inputs and expected return form.
 
-If any condition fails, do not derive.
+If any hard gate fails, do not derive.
 
-### 4.2 When Not to Derive
+### 4.2 Supporting Signals
+
+After all hard gates pass, evaluate these supporting signals:
+
+1. The new question appears repeatedly, not as a one-off exception.
+2. The branch now behaves like a stable decision system with its own inputs, outputs, routing logic, or decision cadence.
+3. Deriving it will make the parent tree materially smaller and clearer.
+
+At least 2 of the 3 supporting signals should be true before deriving.
+
+### 4.3 Decision Standard
+
+Use derivation as a gate-based decision, not a weighted score.
+
+- If any hard gate fails, refine inside the parent tree.
+- If all hard gates pass and at least 2 supporting signals pass, derive a new tree.
+- If all hard gates pass but fewer than 2 supporting signals pass, keep refining in the parent tree and re-evaluate later.
+
+Do not use additive scoring or weighted totals to override missing hard gates.
+
+### 4.4 When Not to Derive
 
 Do not derive a new tree when:
 
@@ -249,7 +268,7 @@ Do not derive a new tree when:
 - the content belongs in a checklist, report, template, or script
 - the problem is still clearly part of the parent tree's original core question
 
-### 4.3 Derivation Test
+### 4.5 Derivation Test
 
 Before deriving, ask:
 
