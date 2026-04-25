@@ -1,8 +1,12 @@
 # 设计审查闭环与任务状态集成设计决策草案 (Design Review Closure and Task State Integration Decision Draft)
 
-> **状态 (Status):** 草案（draft）。
+> **状态 (Status):** 已被取代 (superseded)，2026-04-26。
 >
-> 本文档记录的是目标架构（target architecture）与设计决策（design decisions），不是已经全面生效的实现规范（implementation standard）。
+> **Superseded by:** [`2026-04-26-task-journal-replaces-task-state-management.md`](./2026-04-26-task-journal-replaces-task-state-management.md)
+>
+> 本文围绕的"`task-state-management` 作为状态真相"前提已废弃；任务状态改用 `skills/task-journal` 提供的 append-only 约定承载。文中提到的 `docs/tasks/<task-id>/`、`design-state.json`、`status.md` 等工件不再适用。
+>
+> 本文保留作为历史记录（historical record），便于追溯当时的设计动机与被否决路径。
 
 ## 背景与问题 (Background and Problem)
 

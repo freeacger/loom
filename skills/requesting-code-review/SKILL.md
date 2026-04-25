@@ -103,3 +103,22 @@ You: [Fix progress indicators]
 - Request clarification
 
 See template at: requesting-code-review/code-reviewer.md
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after a review is requested or completed
+- **Reserved key(s):** `note`
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — requesting-code-review
+  note: review requested; reviewer = <name>
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

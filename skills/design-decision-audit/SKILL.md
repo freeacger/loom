@@ -517,3 +517,22 @@ Before finishing, check these points:
 - Suggested additions are copy-ready
 - Explicit user overrides beat ambient repo conventions
 - If the task requires saving, a report path was either written or explicitly confirmed by the user
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after the audit completes and findings are returned
+- **Reserved key(s):** `note` for clean audits; `blocker` if findings are blocking
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — design-decision-audit
+  note: audit complete; <N> findings, <M> blocking
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

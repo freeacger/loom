@@ -198,3 +198,22 @@ git worktree remove <worktree-path>
 
 **Pairs with:**
 - **using-git-worktrees** - Cleans up worktree created by that skill
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after the branch is merged or shipped
+- **Reserved key(s):** `done` (value: `merged`, `shipped`, `cancelled`, …)
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — finishing-a-development-branch
+  done: merged
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

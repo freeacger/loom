@@ -173,3 +173,22 @@ Exit when:
 - Hand off to `design-orchestrator` when the real blocker is tree ownership or routing drift rather than branch weakness.
 - Treat missing `design_target_type` as an immediate blocker, not as a soft warning.
 - Never give a "probably ready" answer. The result must be explicit.
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after readiness verdict is produced
+- **Reserved key(s):** `readiness` (value must be `ready` or `not-ready`)
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — design-readiness-check
+  readiness: ready
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

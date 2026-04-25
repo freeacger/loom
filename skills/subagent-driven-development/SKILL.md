@@ -240,3 +240,22 @@ Done!
 
 **Alternative workflow:**
 - **loom:executing-plans** - Use for parallel session instead of same-session execution
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after the orchestration finishes and sub-results are merged back
+- **Reserved key(s):** `saved` for the merged artifact; `blocker` if a sub-task fails irrecoverably
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — subagent-driven-development
+  saved: <merged-artifact-path>
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

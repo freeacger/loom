@@ -1,6 +1,6 @@
 ---
 name: task-brief
-description: "Use this skill to turn a raw user request into a structured, model-agnostic task brief before execution. Invoke whenever the request is complex, multi-step, cross-domain, ambiguous, or will be handed off to another model or agent. Also trigger when the user says things like 'help me figure out what I need', 'I'm not sure how to ask this', 'I want to do X but I don't know where to start', 'take this and make it clearer', or when the task mixes multiple goals or domains. Do NOT trigger for simple one-line requests with clear intent (e.g., 'fix the typo on line 42', 'rename this variable')."
+description: "Use this skill to turn a raw user request into a structured, model-agnostic task brief before execution, and — when the brief survives confirmation — to be the sole entry point that creates a task directory at `.agents/tasks/<task-id>/`. Invoke whenever the request is complex, multi-step, cross-domain, ambiguous, or will be handed off to another model or agent. Also trigger when the user says things like 'help me figure out what I need', 'I'm not sure how to ask this', 'I want to do X but I don't know where to start', 'take this and make it clearer', or when the task mixes multiple goals or domains. Do NOT trigger for simple one-line requests with clear intent (e.g., 'fix the typo on line 42', 'rename this variable')."
 ---
 
 # Task Brief
@@ -12,6 +12,8 @@ Turn a raw natural-language request into a structured task brief that another ex
 **This skill is a task specification normalizer.** Its job is to surface the real goal, capture the completion standard, and make critical constraints explicit. It does not do design-stage routing, task decomposition, implementation planning, or execution.
 
 The value is straightforward: a good brief reduces misunderstanding, prevents wasted work on the wrong problem, and makes handoff cleaner for another model, agent, or human.
+
+`task-brief` is also the **sole creation entry point** for `.agents/tasks/<task-id>/`. Once a brief is confirmed and the task is non-trivial enough to warrant persistence, this skill creates the task directory and writes the first journal entry. See "Creating a Task Directory" below.
 
 ---
 
@@ -26,6 +28,7 @@ The value is straightforward: a good brief reduces misunderstanding, prevents wa
 5. Record short assumptions when the user has left gaps.
 6. Ask at most one clarifying question when one critical unknown remains.
 7. Make one lightweight judgment about whether the task needs design work.
+8. After user confirmation, when persistence is warranted, create `.agents/tasks/<task-id>/` with a frozen `brief.md` and the first `task_created` journal entry.
 
 `task-brief` should not:
 
@@ -68,7 +71,7 @@ Classify the request into one of these tiers before writing the brief.
 
 | Tier | Signal | Response |
 |------|--------|----------|
-| **Direct** | Single goal, clear scope, no critical missing information | Write a concise brief. Usually `Needs Design` is `no`. |
+| **Direct** | Single goal, clear scope, no critical missing information | Write a concise brief. Usually no design stage needed. |
 | **Clarify** | One critical unknown remains, or the stated goal may be inaccurate | Write the brief first, ask exactly one clarifying question, and keep the rest minimal. |
 | **Structured** | Multiple goals, cross-domain context, or a handoff-friendly brief is needed | Write the full brief, but stop at the brief. Do not decompose or route inside this skill. |
 
@@ -96,48 +99,54 @@ Do not default to codebase search just to sharpen the question. If the task is a
 
 ## Output: Task Brief
 
-Always output the brief in this format. Omit `Clarifying Question` if none is needed. Omit fields only when they add no value.
+The task brief uses a **two-tier visual structure** when rendered to the user. The protocol field names (`User Goal`, `Success Criteria`, `Clarifying Question`, `Deliverables`, `Constraints`, `Assumptions`) are stable anchors — keep their wording exactly. Visual layout is render-only.
+
+### Render Rules
+
+- **No outer code block.** Render the brief as plain markdown so headings, bold, and quote blocks display naturally.
+- **Upper tier (the TL;DR)** — what the executor needs to grasp in five seconds:
+  - `User Goal` rendered as a quote block with the verb-led sentence(s) bolded:
+    > **State the real intent in 1-2 sentences. Start with a verb.**
+  - `Deliverables` as a short bulleted list.
+  - `Clarifying Question` (only when one is needed) prefixed with `❓` for visual salience.
+- **Divider** (`---`) separates the upper tier from the lower tier.
+- **Lower tier (the rest)** — context an executor consults as they work:
+  - `Success Criteria` as bulleted observable checks.
+  - `Constraints` as a flat bulleted list. Do not force `Scope` / `Format` / `Risk` / `Other` sub-categories; only break out a sub-label when the constraint is heterogeneous enough to need it.
+  - `Assumptions` as a short bulleted list when the user left gaps.
+  - **Recommended next** as one natural-language sentence stating whether to proceed directly, enter the design stage (with a brief reason), or pause for clarification.
+- **Skip empty fields entirely.** Do not render `Assumptions:` with "(none)" — omit the heading.
+- **Do not render `Task Type` by default.** It exists in the protocol as an anchor but adds little to the user view; surface it only when the executor genuinely needs to disambiguate.
+
+### Bilingual rendering
+
+Keep the field names canonical. In Chinese responses, render bilingual labels with Chinese first and the English literal in parentheses, e.g., `**完成标准 (Success Criteria):**`. In English responses, render English only. Do not hardcode bilingual headings into examples below — they are reference templates, not the rendered output.
+
+### Reference template (canonical anchors)
 
 ```
-## Task Brief
-
-**Task Type:** [analysis | transformation | generation | investigation | other]
-
-**User Goal:**
-[1-2 sentences. State the real intent, not the surface request. Start with a verb.]
-
-**Success Criteria:**
-- [Observable completion signal 1]
-- [Observable completion signal 2]
+> **<User Goal — verb-led, 1–2 sentences>**
 
 **Deliverables:**
-- [Concrete artifact 1]
-- [Concrete artifact 2]
+- <concrete artifact 1>
+- <concrete artifact 2>
 
-**Clarifying Question:**
-[Exactly one question when one critical unknown remains. Omit this field if no question is needed.]
-
-**Constraints:**
-- Scope: [data source, file range, system boundary, etc.]
-- Format: [output language, file type, response length, etc.]
-- Risk: [what must not be broken, changed, or leaked]
-- Other: [time range, locale, performance budget, etc.]
-
-**Assumptions:**
-- [Short inference made because the user did not specify it]
-
-**Needs Design:** [yes | no]
-```
+**❓ Clarifying Question:** <one question, only when one critical unknown remains>
 
 ---
 
-## Output Rendering
+**Success Criteria:**
+- <observable signal 1>
+- <observable signal 2>
 
-Keep the English field names and enum literals canonical for protocol stability.
+**Constraints:**
+- <constraint that materially changes execution>
 
-- English responses should render the headings in English only.
-- Chinese responses may render bilingual headings with Chinese first and English in parentheses.
-- Do not hardcode bilingual headings into this canonical English template.
+**Assumptions:**
+- <inference filling a user-left gap>
+
+**Recommended next:** <one sentence — proceed directly | enter design stage (reason) | pause for clarification>
+```
 
 ---
 
@@ -179,183 +188,208 @@ These rules govern how to convert a raw message into the brief.
 
 ---
 
+## Creating a Task Directory
+
+After the brief stabilizes, decide whether to create a task directory at `.agents/tasks/<task-id>/`. This is the **sole creation entry point** for the task tree — other skills append journal entries but do not create the directory.
+
+### When to propose creation
+
+Propose creation when **any** of the following holds:
+
+- the task is multi-step (more than one major action)
+- the task will produce a persistent artifact (design tree, plan, code branch, report)
+- the brief recommends entering the design stage
+- the user signals follow-up will continue across sessions
+
+Do **not** propose creation when:
+
+- the task is a single trivial action (rename, typo fix, run a known command)
+- the user explicitly says they don't want a task record
+- the work is already attached to an existing task — append to that task's journal instead
+
+### Confirmation gate
+
+After writing the brief, ask the user explicitly: "Should I create a task record at `.agents/tasks/<task-id>/`? Suggested slug: `<slug>`." Do not create silently.
+
+### Slug strategy (Hybrid)
+
+- Propose a slug derived from the `User Goal`: ASCII kebab-case, ≤ 6 words, ≤ 60 characters.
+- If the user supplies their own slug, use the user's slug verbatim.
+- The user's slug always wins over the proposal — do not auto-edit it for "kebab-case correctness" if it's already legible.
+
+### Task ID format
+
+`YYYY-MM-DD-<slug>-<rand>` where `<rand>` is two lowercase hex characters from `random.randint(0, 255)`. Re-roll on directory collision. Never reuse a deleted id's rand.
+
+### Atomic creation steps
+
+When the user confirms:
+
+1. Create directory `.agents/tasks/<task-id>/` plus `artifacts/` subdirectory.
+2. Write `brief.md` with the brief content (the canonical anchored fields, no rendering decoration).
+3. Write the first journal entry to `journal.md`:
+   ```
+   ## <ISO8601> — task-brief
+   task_created: brief.md
+   slug derived from "<short reason>"
+   ```
+4. Update `.agents/tasks/.current` to point at the new task id.
+
+These four steps are a single conceptual unit — if any fails, undo the partial state before reporting back.
+
+After creation, `brief.md` is **frozen**. Goal drift goes into journal entries with a `refined:` key. Do not edit `brief.md` again.
+
+See `task-journal` for the convention these entries follow.
+
+---
+
 ## Examples
 
-### Example 1 - Direct
+### Example 1 — Direct
 
 **User input:**
 > "Extract all TODO comments from the codebase and output them as a markdown list grouped by file."
 
-**Task Brief:**
+**Rendered brief:**
 
-```
-## Task Brief
-
-**Task Type:** transformation
-
-**User Goal:**
-Collect all TODO comments across the codebase and organize them into a readable markdown list grouped by file.
-
-**Success Criteria:**
-- The output lists TODO comments grouped by file.
-- Each TODO entry includes a line number.
+> **Collect every TODO comment across the codebase and produce a readable markdown list grouped by file.**
 
 **Deliverables:**
-- Markdown list of TODO comments grouped by file
+- Markdown list of TODO comments grouped by file, each entry with file path and line number
+
+---
+
+**Success Criteria:**
+- Output groups TODO entries by file
+- Each entry includes a line number
+- Output covers the entire repository
 
 **Constraints:**
+- Output format: markdown
 - Scope: entire repository
-- Format: markdown output
 
 **Assumptions:**
-- "TODO" means the literal string `TODO` or `TODO:`.
+- "TODO" matches the literal strings `TODO` or `TODO:`
 
-**Needs Design:** no
-```
+**Recommended next:** Proceed directly with execution.
 
-### Example 2 - Clarify
+### Example 2 — Clarify
 
 **User input:**
 > "I need to migrate our auth system to JWT. Can you help me figure out what needs to change?"
 
-**Task Brief:**
+**Rendered brief:**
 
-```
-## Task Brief
-
-**Task Type:** investigation
-
-**User Goal:**
-Identify what needs to change to migrate the current authentication system to JWT-based auth without mis-scoping the migration.
-
-**Success Criteria:**
-- The affected auth components are identified.
-- The migration target is clear enough to begin design or impact analysis.
+> **Identify what needs to change to migrate the current authentication system to JWT-based auth, before scoping the migration itself.**
 
 **Deliverables:**
-- Auth migration change brief
+- Auth migration change brief covering affected components and migration target
 
-**Clarifying Question:**
-What does the current auth system use now: session cookies, a third-party identity provider, API keys, or something else?
+**❓ Clarifying Question:** What does the current auth system use now — session cookies, a third-party identity provider, API keys, or something else?
+
+---
+
+**Success Criteria:**
+- Affected auth components are identified
+- Migration target is concrete enough to begin design or impact analysis
 
 **Constraints:**
-- Scope: authentication-related behavior only
-- Risk: do not assume a stateless-token migration path if the current system is session-based or third-party managed
+- Scope is limited to authentication-related behavior
+- Do not assume a stateless-token migration path if the current system is session-based or third-party managed
 
 **Assumptions:**
-- JWT means standard stateless tokens rather than JWE.
+- "JWT" means standard stateless tokens rather than JWE
 
-**Needs Design:** yes
-```
+**Recommended next:** Enter design stage. Reason: migration target depends on the current auth model and cross-cuts session handling and identity providers.
 
-### Example 3 - Structured
+### Example 3 — Structured
 
 **User input:**
 > "Build me a dashboard that shows real-time sales data pulled from our Postgres DB, with a chart for daily revenue and a table for top 10 products. It should update every 30 seconds and be shareable via a link."
 
-**Task Brief:**
+**Rendered brief:**
 
-```
-## Task Brief
-
-**Task Type:** generation
-
-**User Goal:**
-Build a shareable dashboard that displays live sales data from Postgres, including a daily revenue chart and a top-products table that refresh every 30 seconds.
-
-**Success Criteria:**
-- The dashboard shows daily revenue and top products from live data.
-- The dashboard refreshes every 30 seconds.
-- The dashboard can be accessed through a stable shareable URL.
+> **Build a shareable dashboard that displays live sales data from Postgres, including a daily revenue chart and a top-products table that refresh every 30 seconds.**
 
 **Deliverables:**
-- Live sales dashboard
+- Live sales dashboard with daily revenue chart and top-10 products table
+- Shareable URL for accessing the dashboard
 
-**Clarifying Question:**
-Does "shareable via a link" mean publicly accessible without auth, or accessible only to authenticated users?
+**❓ Clarifying Question:** Does "shareable via a link" mean publicly accessible without auth, or accessible only to authenticated users?
+
+---
+
+**Success Criteria:**
+- Dashboard shows daily revenue and top-10 products from live data
+- Dashboard refreshes every 30 seconds
+- Dashboard is reachable through a stable URL
 
 **Constraints:**
-- Scope: dashboard behavior only
-- Format: browser-based UI
-- Risk: no database writes and no credential exposure in client-side code
+- Browser-based UI only
+- No database writes from the dashboard
+- No credential exposure in client-side code
 
 **Assumptions:**
-- The data source is an existing Postgres database with fields needed for revenue and top-product aggregation.
+- Postgres already exposes the fields needed for revenue aggregation and top-product ranking
 
-**Needs Design:** yes
-```
+**Recommended next:** Enter design stage. Reason: cross-domain scope (data layer, refresh strategy, access model) and unresolved access-control question.
 
-### Example 4 - Ambiguous Intent
+### Example 4 — Ambiguous Intent
 
 **User input:**
 > "Our API docs are a mess - can you help fix them?"
 
-**Task Brief:**
+**Rendered brief:**
 
-```
-## Task Brief
-
-**Task Type:** analysis
-
-**User Goal:**
-Improve the API documentation, but the target is ambiguous between two materially different outcomes:
-
-- Interpretation A: audit and rewrite the documentation content itself
-- Interpretation B: change the documentation tooling or site structure
-
-**Success Criteria:**
-- The intended direction is confirmed before work starts.
+> **Improve the API documentation, but disambiguate between two materially different outcomes before any work begins: rewriting the documentation content vs. changing the documentation tooling or site structure.**
 
 **Deliverables:**
 - Deferred until the direction is confirmed
 
-**Clarifying Question:**
-Is the real problem the documentation content, or the tooling and presentation layer?
+**❓ Clarifying Question:** Is the real problem the documentation content, or the tooling and presentation layer?
+
+---
+
+**Success Criteria:**
+- Intended direction is confirmed before work starts
 
 **Constraints:**
-- Scope: public API documentation only
-- Risk: external developer experience may be affected by public doc changes
+- Scope is limited to public API documentation
+- External developer experience may be affected by public doc changes
 
 **Assumptions:**
-- "API docs" refers to developer-facing HTTP API documentation rather than internal notes.
+- "API docs" refers to developer-facing HTTP API documentation rather than internal notes
 
-**Needs Design:** yes
-```
+**Recommended next:** Pause for clarification. Reason: the two interpretations would lead to very different scopes and skill paths.
 
-### Example 5 - Inaccurate Goal
+### Example 5 — Inaccurate Goal
 
 **User input:**
 > "Add Redis caching to our API endpoints."
 
-**Task Brief:**
+**Rendered brief:**
 
-```
-## Task Brief
-
-**Task Type:** investigation
-
-**User Goal:**
-Reduce API latency or backend load, assuming Redis was proposed as a technique rather than as the confirmed goal.
-
-**Success Criteria:**
-- The real performance problem is identified.
-- The task target is reframed around the actual bottleneck instead of a preselected technique.
+> **Reduce API latency or backend load. Redis caching is the user's proposed technique, but the underlying goal is performance — the actual bottleneck has not been confirmed.**
 
 **Deliverables:**
-- Performance-problem brief
+- Performance-problem brief that names the actual bottleneck
 
-**Clarifying Question:**
-What performance problem are you seeing right now: slow endpoints, high database load, or something else?
+**❓ Clarifying Question:** What performance problem are you seeing right now — slow endpoints, high database load, or something else?
+
+---
+
+**Success Criteria:**
+- Real performance problem is identified
+- Task target is reframed around the actual bottleneck rather than a preselected technique
 
 **Constraints:**
-- Scope: API behavior only
-- Risk: do not assume caching is appropriate before the bottleneck is known
+- Scope is limited to API behavior
+- Do not assume caching is appropriate before the bottleneck is known
 
 **Assumptions:**
-- The user wants better performance but has not yet confirmed where the bottleneck is.
+- The user wants better performance but has not confirmed where the bottleneck is
 
-**Needs Design:** no
-```
+**Recommended next:** Pause for clarification. Reason: solution-as-goal — committing to Redis without the bottleneck is high-risk.
 
 ---
 
@@ -366,11 +400,12 @@ A good task brief passes these checks:
 1. **Standalone**: an executor can start correctly from the brief alone, or knows the one question that must be answered first.
 2. **Intent-preserving**: the `User Goal` captures what the user actually wants, not just what they said.
 3. **Constraint-complete**: missing any included constraint would materially risk wrong-path execution.
-4. **Non-padded**: the brief stays short when the task is simple.
+4. **Non-padded**: the brief stays short when the task is simple. Empty fields are omitted entirely.
 5. **Actionable deliverables**: each deliverable is a concrete artifact or outcome.
 6. **Goal-honest**: the brief reframes solution-as-goal and symptom-as-goal requests honestly.
 7. **Scope-clean**: the brief does not drift into design routing, decomposition, or implementation planning.
 8. **Single-question discipline**: when clarification is needed, the brief asks one focused question, not a questionnaire.
+9. **Creation discipline**: a task directory is created only after the user confirms, with a slug they accepted or supplied.
 
 A brief is **not useful** if:
 
@@ -378,3 +413,4 @@ A brief is **not useful** if:
 - it introduces goals or constraints the user did not imply
 - it turns a simple request into a long clarification session
 - it drifts into design trees, sub-task decomposition, or implementation plans
+- it creates a task directory silently or against the user's wishes

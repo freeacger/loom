@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.0 — Two-Tier Rendering and Task Directory Creation
+
+- Replaces the `Output: Task Brief` section with explicit render rules: no outer code block, two-tier visual layout (TL;DR upper / context lower) separated by a `---` divider, `User Goal` as a quote-block bolded sentence, `❓` prefix on `Clarifying Question`
+- Drops default rendering of `Task Type` (kept in protocol as a stable anchor)
+- Replaces literal `Needs Design: yes/no` with a natural-language `Recommended next:` sentence (proceed / enter design stage with reason / pause for clarification)
+- Flattens `Constraints` to a flat bulleted list; `Scope` / `Format` / `Risk` / `Other` sub-categories are no longer required
+- Empty fields are omitted entirely rather than rendered with placeholders
+- Adopts the role of **sole creation entry point** for `.agents/tasks/<task-id>/`: defines when to propose creation, the confirmation gate, the Hybrid slug strategy (proposed-from-goal, user override wins), and the atomic creation steps that pair `brief.md` with the first `task_created:` journal entry
+- Updates all five examples to the new rendering
+- Adds 4 new behavior cases (12–15) covering rendering, confirmation gate, slug hybrid, and atomic creation; existing trigger / anti-trigger cases preserved as regression coverage
+
 ## v0.4.0 - Scope Contraction
 
 - Removes `Execution Mode`, including `structured-handoff` and `decompose`

@@ -294,3 +294,22 @@ From debugging sessions:
 - Random fixes approach: 2-3 hours of thrashing
 - First-time fix rate: 95% vs 40%
 - New bugs introduced: Near zero vs common
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after the root cause is identified or the investigation is paused
+- **Reserved key(s):** `note` for findings; `blocker` if a fix can't proceed
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — systematic-debugging
+  note: root cause identified — <one-line summary>
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

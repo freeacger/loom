@@ -137,3 +137,22 @@ From 24 failure memories:
 Run the command. Read the output. THEN claim the result.
 
 This is non-negotiable.
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after verification commands run and results are observed
+- **Reserved key(s):** `note` if verification passed; `blocker` if verification failed
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — verification-before-completion
+  note: verified; tests <N> passed, <M> failed
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

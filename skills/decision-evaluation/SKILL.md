@@ -180,3 +180,22 @@ Exit when:
 - Hand back to `design-orchestrator` if routing should be reconsidered after the decision lands.
 - Do not force broad design discovery into a bounded decision just to make progress.
 - Do not take over general design clarification work.
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after a bounded decision is recommended and recorded
+- **Reserved key(s):** `decision`
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — decision-evaluation
+  decision: <decision-node-name>
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

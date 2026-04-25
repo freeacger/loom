@@ -114,3 +114,22 @@ After saving the plan, offer execution choice:
 **If Parallel Session chosen:**
 - Guide them to open new session in worktree
 - **REQUIRED SUB-SKILL:** New session uses loom:executing-plans
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after a plan file is persisted to docs/exec-plans/active/
+- **Reserved key(s):** `saved`
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — writing-plans
+  saved: docs/exec-plans/active/<file>.md
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

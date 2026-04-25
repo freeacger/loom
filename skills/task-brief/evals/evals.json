@@ -267,6 +267,127 @@
           "type": "qualitative"
         }
       ]
+    },
+    {
+      "id": 12,
+      "category": "behavior",
+      "tags": ["rendering"],
+      "prompt": "I'm planning a content moderation pipeline for our forum: incoming posts go through a profanity filter, an external toxicity API, and a human review queue when scores are borderline. Need to decide where each step lives, what the SLA targets are, and whether we keep an audit log. Help me get a clear brief.",
+      "expected_output": "A rendered task brief that follows the new two-tier visual structure: User Goal as a quote-block bolded sentence, Deliverables and (if any) Clarifying Question marked with ❓ in the upper tier, then a `---` divider, then Success Criteria / Constraints / Assumptions / Recommended next in the lower tier. No outer code block, no `Task Type` heading, no `Needs Design: yes/no` literal, and no empty fields rendered. `Constraints` is a flat list rather than forced into Scope/Format/Risk sub-categories.",
+      "assertions": [
+        {
+          "name": "no_outer_code_block",
+          "description": "Brief is rendered as plain markdown without wrapping the whole brief in a triple-backtick code block",
+          "type": "qualitative"
+        },
+        {
+          "name": "user_goal_as_quote_bold",
+          "description": "User Goal appears as a `> **...**` quote+bold one or two sentences at the top",
+          "type": "qualitative"
+        },
+        {
+          "name": "two_tier_divider",
+          "description": "A `---` divider separates the upper tier (User Goal, Deliverables, Clarifying Question) from the lower tier (Success Criteria, Constraints, Assumptions, Recommended next)",
+          "type": "qualitative"
+        },
+        {
+          "name": "no_task_type_heading",
+          "description": "No `Task Type:` line is rendered in the brief",
+          "type": "qualitative"
+        },
+        {
+          "name": "needs_design_naturalized",
+          "description": "Instead of `Needs Design: yes/no`, the brief carries a `Recommended next:` natural-language sentence stating proceed/design/clarify with a brief reason",
+          "type": "qualitative"
+        },
+        {
+          "name": "constraints_flat",
+          "description": "Constraints are a flat bulleted list, not forced into Scope/Format/Risk/Other sub-categories",
+          "type": "qualitative"
+        },
+        {
+          "name": "empty_fields_omitted",
+          "description": "Sections with no content are omitted entirely rather than rendered with `(none)` placeholders",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "category": "behavior",
+      "tags": ["task-creation", "confirmation-gate"],
+      "prompt": "我想为我们的运营团队搭一个每周自动汇总的报表系统：周一早上从 BigQuery 拉数据，按部门聚合，渲染成飞书文档发到运营群。能帮我把这个想法整理清楚吗？",
+      "expected_output": "Writes the brief in the new two-tier format. Because the task is multi-step and produces persistent artifacts (BigQuery query, render template, automated job), the response proposes creating a task directory at `.agents/tasks/<task-id>/` and **explicitly waits for user confirmation** before creating anything. Includes a suggested kebab-case slug (≤ 6 words, ≤ 60 chars) derived from the User Goal. Does NOT silently create the directory.",
+      "assertions": [
+        {
+          "name": "proposes_task_creation",
+          "description": "Response proposes creating `.agents/tasks/<task-id>/` after the brief, given the multi-step persistent-artifact nature of the task",
+          "type": "qualitative"
+        },
+        {
+          "name": "waits_for_confirmation",
+          "description": "Response asks the user explicitly before creating the directory; does not create silently",
+          "type": "qualitative"
+        },
+        {
+          "name": "suggests_slug",
+          "description": "Response includes a suggested slug derived from the User Goal in kebab-case (≤ 6 words, ≤ 60 chars)",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "category": "behavior",
+      "tags": ["task-creation", "slug-hybrid"],
+      "prompt": "好的请创建任务，slug 用 `weekly-ops-report` 别用你提议的那个。",
+      "expected_output": "Creates the task directory at `.agents/tasks/<YYYY-MM-DD>-weekly-ops-report-<rand>/` using the user-supplied slug verbatim, not the previously proposed slug. The user's slug wins (Hybrid policy). Random suffix is two lowercase hex characters. Date prefix is the current date.",
+      "assertions": [
+        {
+          "name": "uses_user_supplied_slug",
+          "description": "The created task id uses `weekly-ops-report` exactly as the user supplied, not a regenerated proposal",
+          "type": "qualitative"
+        },
+        {
+          "name": "valid_task_id_format",
+          "description": "Task id matches `YYYY-MM-DD-<slug>-<rand>` with two lowercase hex characters as the random suffix",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "category": "behavior",
+      "tags": ["task-creation", "atomic-write"],
+      "prompt": "[continuation of id=14] now actually create the task directory and confirm what you wrote.",
+      "expected_output": "Creates `.agents/tasks/<task-id>/` with `artifacts/` subdirectory, writes `brief.md` containing the canonical anchored fields from the brief (no rendering decoration), writes the first journal entry to `journal.md` with heading `## <ISO8601> — task-brief` and a `task_created: brief.md` line plus a short slug-rationale body, and updates `.agents/tasks/.current` to point at the new task id. brief.md is treated as immutable from this point forward; subsequent goal drift would be recorded as journal entries with a `refined:` key.",
+      "assertions": [
+        {
+          "name": "creates_directory_and_artifacts",
+          "description": "Task directory plus `artifacts/` subdirectory are created on disk",
+          "type": "qualitative"
+        },
+        {
+          "name": "brief_md_canonical_fields",
+          "description": "`brief.md` contains canonical anchored fields (User Goal, Success Criteria, Deliverables, Constraints, Assumptions, etc.) in their unrendered protocol form",
+          "type": "qualitative"
+        },
+        {
+          "name": "first_journal_entry_present",
+          "description": "`journal.md` has a single first entry with heading `## <ISO8601> — task-brief` and a `task_created:` key:value line",
+          "type": "qualitative"
+        },
+        {
+          "name": "current_pointer_updated",
+          "description": "`.agents/tasks/.current` is updated to the new task id",
+          "type": "qualitative"
+        },
+        {
+          "name": "brief_marked_immutable",
+          "description": "Response signals brief.md is now frozen and future goal drift goes into journal entries with a `refined:` key",
+          "type": "qualitative"
+        }
+      ]
     }
   ]
 }

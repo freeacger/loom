@@ -91,3 +91,22 @@ Then report which plan file was moved so the reviewer can verify archival state.
 - **loom:using-git-worktrees** - REQUIRED: Set up isolated workspace before starting
 - **loom:writing-plans** - Creates the plan this skill executes
 - **loom:finishing-a-development-branch** - Complete development after all tasks
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after each major checkpoint completes; final `done` after the plan finishes
+- **Reserved key(s):** `saved` for checkpoints; `done` for plan completion; `blocker` if execution stalls
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — executing-plans
+  saved: <checkpoint-artifact>
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

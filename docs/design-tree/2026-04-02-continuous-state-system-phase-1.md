@@ -1,5 +1,13 @@
 # 连续状态系统 Phase 1 设计树 (Continuous State System Phase 1 Design Tree)
 
+> **状态 (Status):** 已被取代 (superseded)，2026-04-26。
+>
+> **Superseded by:** [`docs/design-decisions/2026-04-26-task-journal-replaces-task-state-management.md`](../design-decisions/2026-04-26-task-journal-replaces-task-state-management.md)
+>
+> 本设计树围绕的连续状态系统（continuous state system）前提已废弃。`docs/tasks/<task-id>/` 路径、`design-state.json` / `plan-state.json` / `execution-state.json` 三层状态、`events.jsonl`、ownership lease 等工件均不再适用；任务状态改由 `skills/task-journal` 的 append-only 约定承载。
+>
+> 本文保留作为历史记录（historical record），便于追溯设计动机与被否决路径。
+
 ## 问题 (Problem)
 
 当前设计树系列技能已经在“概念路由（concept routing）”上形成较清楚的能力边界，但对技能使用方而言，仍缺少一套跨 `design -> planning -> execution` 连续推进的显式状态系统。缺口不在单一 `writing-plans` 技能，而在于：

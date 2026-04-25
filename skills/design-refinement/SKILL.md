@@ -188,3 +188,22 @@ Exit when:
 - Do not invent fake option comparisons just to make progress.
 - Do not use refinement to absorb a branch that should become a derived tree.
 - Do not force workflow, methodology, or framework branches into system-shaped leaves.
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after a refinement pass updates the persisted design tree
+- **Reserved key(s):** `saved` (re-save) and optionally `note` for what was refined
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — design-refinement
+  saved: docs/design-tree/<file>.md
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.

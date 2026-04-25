@@ -321,3 +321,22 @@ Exit when:
 - Do not continue past Phase 1 if `design_target_type` is still unresolved.
 - Do not force the conversation into option comparison before the design tree is formed.
 - Do not delay persistence after the stable-to-reference threshold has been reached.
+
+---
+
+## Journal Integration
+
+When operating on a task tracked under `.agents/tasks/<task-id>/`, append a journal entry at this skill's milestone.
+
+- **Trigger:** after the design tree reaches the stable-to-reference threshold and is persisted to docs/design-tree/
+- **Reserved key(s):** `saved`
+- **Entry shape:**
+  ```
+  ## <ISO8601-timestamp> — design-structure
+  saved: docs/design-tree/<file>.md
+  [optional ≤ 15-line body; longer content goes to artifacts/]
+  ```
+
+Resolve the task id from the explicit caller argument or `.agents/tasks/.current`. If neither resolves, skip the append; do not guess.
+
+See `task-journal` for the full convention.
