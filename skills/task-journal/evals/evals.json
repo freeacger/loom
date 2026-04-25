@@ -1,0 +1,290 @@
+{
+  "skill_name": "task-journal",
+  "evals": [
+    {
+      "id": 1,
+      "category": "positive",
+      "tags": ["trigger", "read-journal"],
+      "prompt": "看下 task `2026-04-26-task-journal-redesign-a3` 现在到哪了",
+      "expected_output": "Reads `.agents/tasks/2026-04-26-task-journal-redesign-a3/journal.md` (or uses the journal.py read helper) and summarizes the latest entries. The path convention `.agents/tasks/<task-id>/journal.md` is followed and `brief.md` is treated as immutable context, not a place to look for current status.",
+      "assertions": [
+        {
+          "name": "uses_journal_path_convention",
+          "description": "Output reads the journal at `.agents/tasks/<task-id>/journal.md`, not docs/tasks/ or any task-state-management path",
+          "type": "qualitative"
+        },
+        {
+          "name": "treats_journal_as_status_source",
+          "description": "Output derives current status from journal entries rather than from brief.md or memory",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "category": "positive",
+      "tags": ["trigger", "list-active"],
+      "prompt": "我现在还有哪些任务在跑？看下 .agents/tasks/ 下面有什么",
+      "expected_output": "Lists subdirectories under `.agents/tasks/`, filters by activity using either the last journal entry timestamp or directory mtime, and treats the absence of a `done:` entry (or a recent non-done entry) as the activity signal. Does not assume `active/` vs `completed/` partitioning.",
+      "assertions": [
+        {
+          "name": "uses_flat_layout",
+          "description": "Output respects the flat layout under `.agents/tasks/` and does not look for active/completed subdirs",
+          "type": "qualitative"
+        },
+        {
+          "name": "uses_journal_for_activity_signal",
+          "description": "Output uses last journal entry or `done:` presence to judge activity, not a state-machine status field",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "category": "positive",
+      "tags": ["trigger", "lint"],
+      "prompt": "帮我看看任务记录有没有漂移",
+      "expected_output": "Invokes `python3 ${SKILL_DIR}/scripts/lint_tasks.py --tasks-dir .agents/tasks` (or an equivalent absolute path to the installed skill) and reports the error/warn output. Does not invent a `mise run lint-tasks` or other wrapper command, and does not try to write its own checker.",
+      "assertions": [
+        {
+          "name": "invokes_lint_script_directly",
+          "description": "Output calls `python3 .../scripts/lint_tasks.py` directly with `--tasks-dir`, not via mise or a custom wrapper",
+          "type": "qualitative"
+        },
+        {
+          "name": "reports_severity_levels",
+          "description": "Output distinguishes error vs warn from the linter rather than collapsing to a single pass/fail",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "category": "positive",
+      "tags": ["trigger", "tier-b-append"],
+      "prompt": "我刚作为 design-structure 完成了一个设计树的初稿，文件保存在 docs/design-tree/2026-04-26-task-journal-redesign.md，对应 task id 是 2026-04-26-task-journal-redesign-a3。把这件事登记到 task journal。",
+      "expected_output": "Appends a single journal entry to `.agents/tasks/2026-04-26-task-journal-redesign-a3/journal.md` with heading `## <ISO8601> — design-structure`, a `saved:` line naming the design-tree file, and a short body. Uses the reserved key `saved` (not a synonym), keeps the body within 15 lines, and does not modify `brief.md`.",
+      "assertions": [
+        {
+          "name": "uses_reserved_saved_key",
+          "description": "Entry uses the reserved `saved:` key for a persistent artifact, not a custom synonym",
+          "type": "qualitative"
+        },
+        {
+          "name": "follows_entry_format",
+          "description": "Heading is `## <ISO8601> — <skill-name>` with the em dash, followed by at least one key:value line",
+          "type": "qualitative"
+        },
+        {
+          "name": "leaves_brief_untouched",
+          "description": "Output does not edit brief.md as part of this milestone log",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "category": "positive",
+      "tags": ["trigger", "completion"],
+      "prompt": "PR #142 合到 main 了，把 task `2026-04-26-task-journal-redesign-a3` 标完成",
+      "expected_output": "Appends a `done:` entry under the task's journal.md with a value such as `merged` and a short body referencing PR #142. Does NOT move or rename `.agents/tasks/2026-04-26-task-journal-redesign-a3/` (no migration to completed/, no archival rename).",
+      "assertions": [
+        {
+          "name": "appends_done_entry",
+          "description": "Output appends an entry with reserved key `done:` and a non-empty value",
+          "type": "qualitative"
+        },
+        {
+          "name": "does_not_move_directory",
+          "description": "Output does not propose moving, renaming, or archiving the task directory; it stays under `.agents/tasks/<id>/`",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "category": "negative",
+      "tags": ["anti-trigger", "historical"],
+      "prompt": "task-state-management 当时为什么用 ownership lease？这个设计动机是什么？",
+      "expected_output": "Treats this as a historical/design-rationale question about the retired skill. Does not read or write any `.agents/tasks/` records, does not invoke task-journal scripts, and does not propose journal entries. May reference the ADR or git history, but does not activate task-journal.",
+      "assertions": [
+        {
+          "name": "no_journal_io",
+          "description": "Output does not perform any read/write under `.agents/tasks/` for this question",
+          "type": "qualitative"
+        },
+        {
+          "name": "scoped_to_history",
+          "description": "Output stays scoped to the historical question and does not graft on a task-journal workflow",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "category": "negative",
+      "tags": ["anti-trigger", "docs-naming"],
+      "prompt": "docs/exec-plans/ 下面这些文件的命名应该改成什么？现在有点乱",
+      "expected_output": "Treats this as a docs convention / file-naming question. Does not invoke task-journal, does not propose creating a task directory, and does not append journal entries. May reference docs/README.md naming conventions but does not activate task-journal.",
+      "assertions": [
+        {
+          "name": "no_task_creation",
+          "description": "Output does not create a `.agents/tasks/<id>/` directory for this question",
+          "type": "qualitative"
+        },
+        {
+          "name": "no_journal_append",
+          "description": "Output does not write any journal entry for this docs-only question",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "category": "negative",
+      "tags": ["anti-trigger", "general-methodology"],
+      "prompt": "怎么写好的 git commit message？有什么通用规范吗？",
+      "expected_output": "Treats this as a general writing/methodology question. Does not invoke task-journal, does not reference `.agents/tasks/`, and does not propose creating or updating any task record.",
+      "assertions": [
+        {
+          "name": "no_task_journal_reference",
+          "description": "Output does not bring up task-journal or `.agents/tasks/` for a general best-practices question",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "category": "negative",
+      "tags": ["anti-trigger", "task-creation-belongs-to-task-brief"],
+      "prompt": "帮我把这个想法整理成一个任务：我想给我们的内部工具加一个聊天机器人，能查 PR 状态、回顾上周提交、提醒我有哪些 review 没回复",
+      "expected_output": "Recognizes this as a task-creation request and routes to `task-brief`. Does NOT directly create `.agents/tasks/<id>/` from task-journal — task-journal is not the creation entry point. May mention that once the brief is confirmed, task-brief will be the one to create the directory and write the first journal entry.",
+      "assertions": [
+        {
+          "name": "routes_to_task_brief",
+          "description": "Output recognizes task-brief as the creation entry point, not task-journal",
+          "type": "qualitative"
+        },
+        {
+          "name": "does_not_self_create_directory",
+          "description": "Output does not create `.agents/tasks/<id>/` from task-journal alone",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "category": "negative",
+      "tags": ["anti-trigger", "trivial-action"],
+      "prompt": "把 src/utils/format.ts 里的变量 `tmp` 重命名为 `buffer`",
+      "expected_output": "Performs the rename directly. Does not create a task directory, does not propose journal entries, and does not invoke task-journal at all. A trivial single-step action does not warrant task records.",
+      "assertions": [
+        {
+          "name": "no_task_creation_for_trivial_action",
+          "description": "Output does not propose creating `.agents/tasks/<id>/` for a one-step rename",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "category": "behavior",
+      "tags": ["behavior", "entry-format"],
+      "prompt": "你现在以 design-readiness-check 的身份，对 task `2026-04-26-task-journal-redesign-a3` 的当前设计做完了一次审查，结论是 ready。把这条结论登记到 journal。",
+      "expected_output": "Appends an entry with heading `## <ISO8601> — design-readiness-check`, the reserved key `readiness: ready`, and an optional short body (≤ 15 lines). The reserved key has a value from {ready, not-ready}, not a free-form synonym like 'good' or 'pass'.",
+      "assertions": [
+        {
+          "name": "readiness_uses_canonical_value",
+          "description": "Entry value for `readiness:` is exactly `ready` or `not-ready`, not a paraphrase",
+          "type": "qualitative"
+        },
+        {
+          "name": "format_compliance",
+          "description": "Heading uses the em dash separator, includes ISO 8601 timestamp, and is followed by at least one key:value line",
+          "type": "qualitative"
+        },
+        {
+          "name": "body_within_limit",
+          "description": "Body, if present, stays within 15 lines; long content is offloaded to artifacts/",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "category": "behavior",
+      "tags": ["behavior", "brief-immutability"],
+      "prompt": "task `2026-04-26-task-journal-redesign-a3` 已经有几条 journal entry 了。我现在想把 brief.md 的 User Goal 改一下，因为最初目标写得太宽。",
+      "expected_output": "Refuses to directly edit brief.md after the first journal entry has been written. Instead, guides the user to record the change as a new journal entry using a key like `refined:` (or `note:`) describing the goal narrowing. Cites the brief immutability rule from the SKILL.md.",
+      "assertions": [
+        {
+          "name": "refuses_direct_brief_edit",
+          "description": "Output does not edit brief.md; it explains why and routes the change to a journal entry instead",
+          "type": "qualitative"
+        },
+        {
+          "name": "proposes_refined_entry",
+          "description": "Output proposes a journal entry with a key such as `refined:` capturing the goal change",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "category": "behavior",
+      "tags": ["behavior", "linter-invocation"],
+      "prompt": "在我现在这个项目里跑一下 task journal 的 lint，看看有没有破损",
+      "expected_output": "Calls `python3 ${SKILL_DIR}/scripts/lint_tasks.py --tasks-dir .agents/tasks` (with the actual installed skill path resolved). Does NOT invoke `mise run check-task-journal` (that is the loom repo's internal test runner, not a per-project linter), does not invent a wrapper command, and does not write a one-off checker script.",
+      "assertions": [
+        {
+          "name": "calls_lint_script_with_python3",
+          "description": "Output uses `python3 .../scripts/lint_tasks.py`, not `mise run` or a synthesized command",
+          "type": "qualitative"
+        },
+        {
+          "name": "passes_tasks_dir_argument",
+          "description": "Output passes `--tasks-dir .agents/tasks` (or equivalent absolute path)",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "category": "behavior",
+      "tags": ["behavior", "no-rpc"],
+      "prompt": "task `2026-04-26-task-journal-redesign-a3` 的 journal 里 design-structure 已经写过了，那是不是可以直接进入 plan 阶段？你帮我从 journal 推断一下。",
+      "expected_output": "Refuses to use journal entries as a state machine to derive 'next phase'. Explains that journal is write-many, read-rarely, not an RPC mechanism between skills. Suggests either the user makes the call, or invokes `design-readiness-check` for a real readiness review.",
+      "assertions": [
+        {
+          "name": "refuses_journal_as_rpc",
+          "description": "Output does not infer next-phase eligibility purely from parsing journal entries",
+          "type": "qualitative"
+        },
+        {
+          "name": "routes_to_readiness_check",
+          "description": "Output suggests `design-readiness-check` (or equivalent) instead of journal-derived inference",
+          "type": "qualitative"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "category": "behavior",
+      "tags": ["behavior", "completion-no-migration"],
+      "prompt": "task `2026-04-26-task-journal-redesign-a3` 的开发分支已经合到 main 了，把它收尾。注意我们这套 task journal 是怎么处理完成态的。",
+      "expected_output": "Appends a `done:` entry to the task's journal.md (value such as `merged`, brief body referencing the merge). Explicitly does not move, rename, or archive the task directory. Does not create a `completed/` partition.",
+      "assertions": [
+        {
+          "name": "writes_done_entry",
+          "description": "A new entry with reserved key `done:` and non-empty value is appended",
+          "type": "qualitative"
+        },
+        {
+          "name": "directory_unchanged",
+          "description": "Task directory is not moved, renamed, or archived; it stays at `.agents/tasks/<id>/`",
+          "type": "qualitative"
+        }
+      ]
+    }
+  ]
+}

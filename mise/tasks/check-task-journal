@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+#MISE description="Run task-journal unit tests"
+set -euo pipefail
+
+bash tests/task-journal/test_journal.sh
+bash tests/task-journal/test_lint_tasks.sh
