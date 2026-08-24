@@ -1,0 +1,226 @@
+{
+  "skill_name": "minimum-sufficient-design",
+  "evals": [
+    {
+      "id": "T01",
+      "category": "trigger-positive",
+      "prompt": "We need near-real-time progress updates. Compare a durable message stream with a lossy invalidation hint followed by recalculation from the authoritative ledger. Recommend the minimum sufficient design and explain the operational trade-off.",
+      "expected_output": "The skill triggers because the request requires an architecture trade-off about authority, reliability, and operating cost.",
+      "assertions": [
+        {"name": "skill_loaded", "description": "The runtime trace shows that SKILL.md was read.", "type": "trace"},
+        {"name": "risk_reference_loaded", "description": "The runtime trace shows risk-and-evolution-tools.md was read because durable messaging is a long-lived operational commitment.", "type": "trace"},
+        {"name": "authority_tradeoff", "description": "The answer compares authority, repair behavior, guarantees, and operating burden without prescribing one answer in advance.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "T02",
+      "category": "trigger-positive",
+      "prompt": "Review this proposal: whenever a remote write fails, retry it. The draft does not define which failures qualify, how long retries continue, or what state remains afterward. Is it sufficient?",
+      "expected_output": "The skill triggers because retry convergence and underdesign require engineering judgment.",
+      "assertions": [
+        {"name": "skill_loaded", "description": "The runtime trace shows that SKILL.md was read.", "type": "trace"},
+        {"name": "risk_reference_loaded", "description": "The runtime trace shows risk-and-evolution-tools.md was read.", "type": "trace"},
+        {"name": "bounded_recovery", "description": "The answer identifies missing retry classification, stable identity, budget, stop condition, and terminal handling.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "T03",
+      "category": "trigger-positive",
+      "prompt": "We must replace a client-visible identifier. Compare a hard cut, a dual-write transition, and delaying the commitment until usage evidence is available. Which path is proportionate?",
+      "expected_output": "The skill triggers because compatibility, migration, and reversibility are active trade-offs.",
+      "assertions": [
+        {"name": "skill_loaded", "description": "The runtime trace shows that SKILL.md was read.", "type": "trace"},
+        {"name": "risk_reference_loaded", "description": "The runtime trace shows risk-and-evolution-tools.md was read.", "type": "trace"},
+        {"name": "migration_tradeoff", "description": "The answer compares cutover safety, coexistence cost, evidence, and reversibility.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "T04",
+      "category": "trigger-positive",
+      "prompt": "Our preferred architecture would move canonical ownership to a new component, but an accepted decision record assigns that ownership elsewhere. Review the proposal and tell us how to proceed.",
+      "expected_output": "The skill triggers because the proposal may override an accepted decision.",
+      "assertions": [
+        {"name": "skill_loaded", "description": "The runtime trace shows that SKILL.md was read.", "type": "trace"},
+        {"name": "alignment_reference_loaded", "description": "The runtime trace shows alignment-and-authority.md was read.", "type": "trace"},
+        {"name": "explicit_conflict", "description": "The answer pauses the affected branch and offers preserve, bounded exception, or explicit supersession.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "T05",
+      "category": "trigger-positive",
+      "prompt": "A financial obligation can be repaid in partial remote operations whose outcomes may be unknown. Compare one mutable summary record with separate obligation and repayment facts. Is two-record persistence overdesign?",
+      "expected_output": "The skill triggers because necessary persistence, auditability, recovery, and minimality must be judged together.",
+      "assertions": [
+        {"name": "skill_loaded", "description": "The runtime trace shows that SKILL.md was read.", "type": "trace"},
+        {"name": "risk_reference_loaded", "description": "The runtime trace shows risk-and-evolution-tools.md was read.", "type": "trace"},
+        {"name": "not_count_minimalism", "description": "The answer judges complexity by invariant, authority, audit, and recovery rather than record count.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "T06",
+      "category": "trigger-positive",
+      "prompt": "The team proposes a stronger device-integrity mechanism to prove that a user performed a physical activity. Evaluate whether the mechanism actually proves the target property and whether it belongs in the design.",
+      "expected_output": "The skill triggers because the proposal requires matching a mechanism to a credible threat and target property.",
+      "assertions": [
+        {"name": "skill_loaded", "description": "The runtime trace shows that SKILL.md was read.", "type": "trace"},
+        {"name": "property_match", "description": "The answer distinguishes what the mechanism proves from the target claim and requires evidence of risk reduction.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "N01",
+      "category": "trigger-negative",
+      "prompt": "Implement the frozen retry contract exactly as written: three attempts with the existing operation ID, then set the existing terminal status. Add the already-specified unit tests. Do not reopen the design.",
+      "expected_output": "The skill does not trigger because this is mechanical implementation of a frozen contract with no new trade-off.",
+      "assertions": [
+        {"name": "skill_not_loaded", "description": "The runtime trace shows that SKILL.md and its references were not read.", "type": "trace"},
+        {"name": "no_design_reopening", "description": "The answer does not reopen the frozen retry decision without new evidence.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "N02",
+      "category": "trigger-negative",
+      "prompt": "Run the repository's already-defined migration static check and report its exit code. Do not change files.",
+      "expected_output": "The skill does not trigger because the request only executes defined verification.",
+      "assertions": [
+        {"name": "skill_not_loaded", "description": "The runtime trace shows that SKILL.md and its references were not read.", "type": "trace"},
+        {"name": "verification_only", "description": "The answer performs or reports only the requested check.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "N03",
+      "category": "trigger-negative",
+      "prompt": "Rename the local variable retryCount to attempts and update its direct test reference. No behavior changes.",
+      "expected_output": "The skill does not trigger because this is an obvious local mechanical edit.",
+      "assertions": [
+        {"name": "skill_not_loaded", "description": "The runtime trace shows that SKILL.md and its references were not read.", "type": "trace"},
+        {"name": "local_scope", "description": "The answer keeps the task to the requested rename.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "N04",
+      "category": "trigger-negative",
+      "prompt": "Fix the heading levels and spelling errors in this accepted decision record without changing any decision text.",
+      "expected_output": "The skill does not trigger because formatting does not reopen the decision.",
+      "assertions": [
+        {"name": "skill_not_loaded", "description": "The runtime trace shows that SKILL.md and its references were not read.", "type": "trace"},
+        {"name": "format_only", "description": "The answer does not reinterpret or revise the decision.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "N05",
+      "category": "trigger-negative",
+      "prompt": "Summarize this accepted architecture decision faithfully. Do not review it, compare alternatives, or recommend changes.",
+      "expected_output": "The skill does not trigger because the task is faithful restatement rather than engineering judgment.",
+      "assertions": [
+        {"name": "skill_not_loaded", "description": "The runtime trace shows that SKILL.md and its references were not read.", "type": "trace"},
+        {"name": "summary_only", "description": "The answer summarizes without adding a design judgment.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "N06",
+      "category": "trigger-negative",
+      "prompt": "Execute the two test commands listed in the frozen implementation contract and return the observed results. The commands and pass criteria are already fixed.",
+      "expected_output": "The skill does not trigger because the request only runs frozen verification.",
+      "assertions": [
+        {"name": "skill_not_loaded", "description": "The runtime trace shows that SKILL.md and its references were not read.", "type": "trace"},
+        {"name": "no_new_design", "description": "The answer does not invent new design requirements.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B01",
+      "category": "behavior",
+      "prompt": "A remote debit may be split across several attempts and each response can be lost. We need source attribution, audit, and a recovery checkpoint. The team says two durable facts are overengineering and wants one mutable total. Judge the proposal.",
+      "expected_output": "Accept two evidence-backed facts as necessary complexity when they protect attribution and convergence; reject record-count minimalism.",
+      "assertions": [
+        {"name": "required_references", "description": "risk-and-evolution-tools.md is read; theory.md and output-examples.md are not read.", "type": "trace"},
+        {"name": "necessary_persistence", "description": "The answer accepts justified persistence for attribution, stable identity, audit, and recovery.", "type": "qualitative"},
+        {"name": "evidence_levels", "description": "Local persistence and remote convergence receive separate verification.", "type": "qualitative"},
+        {"name": "no_hard_failure", "description": "The answer does not collapse unknown outcomes or recommend unbounded effects.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B02",
+      "category": "behavior",
+      "prompt": "Progress can already be rebuilt from an authoritative read whenever the screen opens. For faster refresh, someone proposes an outbox, broker, consumer fleet, dead-letter processing, and replay console. Evaluate the minimum sufficient option.",
+      "expected_output": "Identify speculative durable delivery complexity and recommend a simpler hint plus authoritative repair unless a current requirement disproves it.",
+      "assertions": [
+        {"name": "required_references", "description": "risk-and-evolution-tools.md is read because the proposed delivery system is a long-lived operational commitment; other references are not read.", "type": "trace"},
+        {"name": "simpler_sufficient_path", "description": "The answer recommends the existing repair path plus only the minimum timely hint, subject to stated latency evidence.", "type": "qualitative"},
+        {"name": "decisive_tradeoff", "description": "The answer compares correctness, latency, delivery obligations, and operating burden.", "type": "qualitative"},
+        {"name": "stops", "description": "The answer does not add unrelated mechanisms or options once the judgment is supported.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B03",
+      "category": "behavior",
+      "prompt": "Design review: a remote write is retried on every error with a fresh request ID until it works. No error classification, time budget, stop condition, reconciliation read, or terminal state is defined. Assess sufficiency and repair the design boundary.",
+      "expected_output": "Judge the proposal underdesigned and require a complete bounded recovery contract.",
+      "assertions": [
+        {"name": "required_references", "description": "risk-and-evolution-tools.md is read; unrelated references are not read.", "type": "trace"},
+        {"name": "underdesign", "description": "The answer explicitly judges the retry design underdesigned.", "type": "qualitative"},
+        {"name": "bounded_contract", "description": "The answer requires stable identity, retryable classification, count or time budget, stop condition, reconciliation, and actionable terminal handling.", "type": "qualitative"},
+        {"name": "unknown_preserved", "description": "The answer preserves unknown separately from success and failure.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B04",
+      "category": "behavior",
+      "prompt": "A design note says the cache owns account status, the domain glossary says the ledger owns it, and current code appears to write both. All three artifacts are available in the fixture repository. Decide what should change.",
+      "expected_output": "Retrieve the artifacts, distinguish evidence and alignment gaps, expose the conflict, then recommend only what the evidence supports.",
+      "assertions": [
+        {"name": "required_references", "description": "alignment-and-authority.md is read; theory.md and output-examples.md are not read.", "type": "trace"},
+        {"name": "retrieval_before_judgment", "description": "The trace shows targeted reading of the supplied artifacts before the recommendation.", "type": "trace"},
+        {"name": "gap_classification", "description": "The answer distinguishes what is factually unknown from what requires shared terminology or scope alignment.", "type": "qualitative"},
+        {"name": "no_silent_authority", "description": "The answer does not silently choose code or one document as authority.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B05",
+      "category": "behavior",
+      "prompt": "The candidate design introduces a second canonical writer, while the accepted decision says exactly one component owns writes. We prefer the new design because it is faster to implement. Continue the design and mark it ready.",
+      "expected_output": "Pause the affected branch, expose the conflict, and require preserve, bounded exception, or explicit supersession before readiness.",
+      "assertions": [
+        {"name": "required_references", "description": "alignment-and-authority.md is read; unrelated references are not read.", "type": "trace"},
+        {"name": "branch_paused", "description": "The answer refuses to mark the conflicting branch ready.", "type": "qualitative"},
+        {"name": "conflict_paths", "description": "The answer presents preserve, bounded exception, or explicit supersession and names follow-up obligations.", "type": "qualitative"},
+        {"name": "authority_respected", "description": "The answer does not decide risk acceptance or silently override the accepted decision.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B06",
+      "category": "behavior",
+      "prompt": "We have two options for a timed-out remote charge: mark it failed and issue a new charge, or mark it successful and continue fulfillment. The invariant is that we must neither double-charge nor fulfill without confirmed payment. Pick one.",
+      "expected_output": "Reject the false binary and introduce an explicit unknown state with stable identity and authoritative reconciliation.",
+      "assertions": [
+        {"name": "required_references", "description": "risk-and-evolution-tools.md is read; theory.md and output-examples.md are not read.", "type": "trace"},
+        {"name": "third_path", "description": "The answer rejects both unsafe options and reframes the state model around unknown outcome.", "type": "qualitative"},
+        {"name": "invariant_protected", "description": "The answer protects against both duplicate charge and unconfirmed fulfillment.", "type": "qualitative"},
+        {"name": "bounded_recovery", "description": "The answer uses stable identity, read-only reconciliation, and an actionable stopping state.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B07",
+      "category": "behavior",
+      "prompt": "You initially recommended a lossy hint because an authoritative read could always repair state. New evidence now shows that the authoritative source is retained for only ten minutes, while offline clients may return after a day. Reassess the recommendation.",
+      "expected_output": "Explicitly revise or reverse the prior recommendation because its decisive repair assumption no longer holds.",
+      "assertions": [
+        {"name": "required_references", "description": "risk-and-evolution-tools.md is read because durability and delayed reconciliation now matter; unrelated references are not read.", "type": "trace"},
+        {"name": "recommendation_revised", "description": "The answer explicitly states that the earlier recommendation is no longer sufficient.", "type": "qualitative"},
+        {"name": "affected_scope_only", "description": "The answer reopens the durability and recovery branch without discarding unaffected constraints.", "type": "qualitative"},
+        {"name": "new_verification", "description": "The answer requires evidence for the replacement retention or persistence guarantee.", "type": "qualitative"}
+      ]
+    },
+    {
+      "id": "B08",
+      "category": "behavior",
+      "prompt": "A local deterministic transformation has one caller, no persistence, no side effects, no compatibility surface, and focused tests cover all current cases. The proposal is one small pure function. Should we add a plugin interface, strategy registry, and configuration layer for future algorithms?",
+      "expected_output": "Conclude that the simple function is sufficient now and stop without manufacturing alternatives or future mechanisms.",
+      "assertions": [
+        {"name": "required_references", "description": "No conditional reference is read.", "type": "trace"},
+        {"name": "simple_sufficient", "description": "The answer recommends the pure function and identifies the proposed extension machinery as unsupported.", "type": "qualitative"},
+        {"name": "timely_stop", "description": "The answer does not invent extra options, persistence, configuration, or process.", "type": "qualitative"},
+        {"name": "proportionate_verification", "description": "The answer keeps verification at focused deterministic tests rather than demanding higher layers without a claim that needs them.", "type": "qualitative"}
+      ]
+    }
+  ]
+}
