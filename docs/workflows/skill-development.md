@@ -60,7 +60,7 @@ mise run release <name> "<commit message>"
 This runs in sequence:
 1. `mise run check-publish`
 2. `git add skills/<name>` → `git commit` → `git push`
-3. `cd ~ && npx skills add freeacger/loom -y -g` (updates all skills globally)
+3. `cd ~ && npx skills add freeacger/loom -y -g -a codex -a claude-code` (updates all skills globally for Codex and Claude Code)
 
 If publish finds nothing to commit, it skips gracefully and proceeds to pull.
 
@@ -103,7 +103,7 @@ mise run check-skill-spec               # optional Agent Skills spec validation 
 mise run check-design-tree-evals        # validate design-tree eval metadata and design_target_type coverage
 mise run check-design-tree-canonical    # validate minimal canonical behavior matrix coverage
 mise run publish <name> "<message>"     # git add + commit + push only
-mise run pull                           # npx skills add freeacger/loom -g (all skills)
+mise run pull                           # install all skills globally for Codex and Claude Code
 mise run release-design-tree "<msg>"    # publish shared design-tree changes + pull
 ```
 
