@@ -97,7 +97,7 @@ loom/
 Install all skills globally via [skills.sh](https://skills.sh):
 
 ```bash
-npx skills add freeacger/loom -y -g
+npx skills add freeacger/loom -y -g -a codex -a claude-code
 ```
 
 This installs into `~/.claude/skills/` and `~/.agents/skills/` automatically.

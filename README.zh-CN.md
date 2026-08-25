@@ -97,7 +97,7 @@ loom/
 通过 [skills.sh](https://skills.sh) 全局安装所有 skill：
 
 ```bash
-npx skills add freeacger/loom -y -g
+npx skills add freeacger/loom -y -g -a codex -a claude-code
 ```
 
 这会自动安装到 `~/.claude/skills/` 和 `~/.agents/skills/`。

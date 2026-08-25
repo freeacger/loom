@@ -5,4 +5,7 @@ set -euo pipefail
 echo "→ checking skill eval JSON files..."
 mise run check-skill-json
 
+echo "→ checking pull targets..."
+scripts/test-pull.sh
+
 echo "✓ publish-safe checks passed"
