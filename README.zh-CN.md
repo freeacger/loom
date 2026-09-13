@@ -18,7 +18,7 @@
 
 ## Skills
 
-22 个 skill，按阶段分组：
+23 个 skill，按阶段分组：
 
 ### 设计 (Design)
 
@@ -31,6 +31,7 @@
 | `decision-evaluation` | 对有边界的技术或非技术设计决策做方案比较并给出推荐 |
 | `design-readiness-check` | 判断带有显式目标类型的设计是否足够完整，可以进入实现规划 |
 | `design-decision-audit` | 审查设计文档或计划文档中的缺失决策与上线缺口 |
+| `align-contracts` | 在规格化之前，对齐已有目标设计在适用合同面上的语义与结论 |
 
 ### 工程判断 (Engineering Judgment)
 

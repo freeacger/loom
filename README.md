@@ -18,7 +18,7 @@ The repository covers the full engineering lifecycle:
 
 ## Skills
 
-22 skills organized by phase:
+23 skills organized by phase:
 
 ### Design
 
@@ -31,6 +31,7 @@ The repository covers the full engineering lifecycle:
 | `decision-evaluation` | Compare bounded technical or non-technical design options and recommend one with trade-offs |
 | `design-readiness-check` | Decide whether a typed design is complete enough for implementation planning |
 | `design-decision-audit` | Review design or plan documents for missing decisions and rollout gaps |
+| `align-contracts` | Align an existing target design across applicable contract surfaces before specification work |
 
 ### Engineering Judgment
 
