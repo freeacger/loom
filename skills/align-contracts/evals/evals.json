@@ -1,0 +1,89 @@
+{
+  "skill_name": "align-contracts",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review the supplied saved-default design with align-contracts. Produce the target contract result for downstream specification work without implementing it. Write human-facing prose in English.",
+      "expected_output": "A clearly aligned result that reconciles HTTP, Proto, relational uniqueness, immutable operation snapshots, compatibility, and the evidenced migration path. It includes a Proto diff and complete target DDL without inventing unrelated contract surfaces.",
+      "files": [
+        "evals/fixtures/cross-surface-alignment.md"
+      ],
+      "expectations": [
+        "The result clearly states that contracts are aligned and the next action is downstream specification work.",
+        "The output distinguishes a missing target from an explicitly empty target and preserves explicit-target precedence.",
+        "The Proto correction uses field presence while preserving the existing field number.",
+        "The target DDL is complete for both changed tables, uses uniqueness by user and target type, and stores the accepted operation target as a non-null snapshot.",
+        "The migration obligation uses the supplied audit source before enforcing the non-null snapshot.",
+        "The output preserves existing explicit callers and does not invent caches, events, workers, or new business decisions."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Review the supplied replay-recovery design with align-contracts. Produce only the contract conclusions justified by current authority and the exact next action. Write human-facing prose in English.",
+      "expected_output": "A clearly blocked result that captures the already-established idempotency and persistence corrections but does not choose between stopping and recovering an unknown external result. It hands the new decision to grill-with-docs and requires a fresh alignment pass afterward.",
+      "files": [
+        "evals/fixtures/recovery-decision-blocker.md"
+      ],
+      "expectations": [
+        "The result clearly states that alignment is blocked rather than complete.",
+        "The output identifies the unresolved priority between failed current validation and recovery of an unknown prior ledger result without choosing for the user.",
+        "The output preserves one stable request identity across replay and the compound ledger-entry locator.",
+        "The output rejects the stale worker retry fields and scan index without inventing another recovery mechanism.",
+        "The next action is the required grill-with-docs companion, with affected surfaces and return_to align-contracts made clear.",
+        "The output does not present a decision-complete DDL or claim downstream readiness while the authority decision is open."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Check the supplied internal helper refactor with align-contracts and report only its contract impact. Write human-facing prose in English.",
+      "expected_output": "A short result stating that no contract change is needed. It explains that the change is private and behavior-preserving, creates no contract artifact, and does not manufacture HTTP, Proto, DDL, cache, event, or decision work.",
+      "files": [
+        "evals/fixtures/internal-refactor-no-change.md"
+      ],
+      "expectations": [
+        "The result clearly states in one language that no contract change is needed.",
+        "The result stays concise and states why external behavior, persistent facts, coordination state, and runtime contracts are unchanged.",
+        "The output creates no contract artifact, asks no design question, and invents no contract surface."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "请对虚构项目的“席位保留”功能执行 align-contracts。遵循项目中的适配规则，将合同结论写入项目指定载体，不实现任何源代码。",
+      "expected_output": "使用中文明确说明合同已经对齐，并将结果保存到 docs/contract-freeze/seat-hold.md。结果使用项目领域术语和 PostgreSQL 表示，遵循逻辑 Redis Key 规则及原生权威关系，并交接给 to-spec，不提出澄清问题。",
+      "files": [
+        "evals/fixtures/localized-project/AGENTS.md",
+        "evals/fixtures/localized-project/CONTEXT.md",
+        "evals/fixtures/localized-project/docs/agents/align-contracts.md",
+        "evals/fixtures/localized-project/docs/design/seat-hold.md"
+      ],
+      "expectations": [
+        "结果使用中文明确说明合同已经对齐，写入 docs/contract-freeze/seat-hold.md，并将下一步指向 to-spec。",
+        "面向人的标题、说明和表头只使用中文，不附加英文状态标签；技术标识保持不变。",
+        "结果严格使用项目术语“席位保留”，不替换为被禁用的同义词“座位锁”。",
+        "相同 request_id 的后续请求始终返回首次创建的记录，即使后续载荷不同也不改写或另建记录。",
+        "新 request_id 争用仍有效的同一席位时返回 SEAT_UNAVAILABLE，不返回既有记录，也不臆造具体 HTTP 或 gRPC 错误映射。",
+        "SQL 目标包含完整的 PostgreSQL DDL，不引入 MySQL 专用语法。",
+        "Redis 只展示逻辑 Key seat-hold:{hold_id}，不重复公共物理前缀。",
+        "结果保留候选 Proto 的 string 表示，也不虚构 HTTP 响应结构，因为现有权威没有允许这些表示变化。",
+        "结果保留已接受的 PostgreSQL advisory lock 和过期状态转换语义，不假设部分唯一索引会按时间自动释放席位。",
+        "结果遵循项目适配规则中的原生权威关系，并且不提出澄清问题。"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "请对虚构项目的 callback-receipt 功能执行 align-contracts。检查项目适配规则和相互冲突的候选合同，只执行当前权威允许的操作。",
+      "expected_output": "使用中文明确说明合同对齐受阻，因为项目适配规则没有指定相互冲突的 HTTP 与 Proto 语义由谁决定。结果指出缺失项，给出最小修订建议，在修改项目策略前请求许可，并且不创建功能合同文档。",
+      "files": [
+        "evals/fixtures/incomplete-adapter/AGENTS.md",
+        "evals/fixtures/incomplete-adapter/docs/agents/align-contracts.md",
+        "evals/fixtures/incomplete-adapter/docs/design/callback-receipt.md"
+      ],
+      "expectations": [
+        "结果使用中文明确说明合同对齐受阻，并且不创建功能合同文档。",
+        "阻塞原因指向缺失的权威映射，而不是擅自选择 HTTP 或 Proto 语义。",
+        "结果给出 docs/agents/align-contracts.md 的最小修订建议，并在修改前请求许可。",
+        "结果不猜测 SQL 方言、Redis 前缀、结果权威或下游就绪状态，也不把缺少证据的合同面标为不适用。"
+      ]
+    }
+  ]
+}
